@@ -106,14 +106,18 @@ fn main() -> std::io::Result<()> {
 
     current_layer.use_text(args.title, 24.0, margin, height / 2.0, &sans_font);
 
-    current_layer.begin_text_section();
-
     let font_size = 12.0;
     let line_height = Mm(font_size);
     let line_count = encrypted.lines().count();
-    for (i, line) in encrypted.lines().enumerate() {
-        let offset = line_height / 2.0 * ((line_count - i) as f64);
-        current_layer.use_text(line, font_size, margin, offset + margin, &mono_font);
+
+    current_layer.begin_text_section();
+
+    current_layer.set_text_cursor(margin, line_height * (line_count as f64));
+    current_layer.set_line_height(font_size);
+    current_layer.set_font(&mono_font, font_size);
+
+    for line in encrypted.lines() {
+        current_layer.write_text(line.clone(), &mono_font);
         current_layer.add_line_break();
     }
 
