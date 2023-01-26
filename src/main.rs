@@ -3,10 +3,25 @@ use std::io::Write;
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::Secret;
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Plaintext to encrypt
+    #[arg(short = 't', long)]
+    plaintext: String,
+
+    /// Passphrase
+    #[arg(short, long)]
+    passphrase: String,
+}
 
 fn main() {
-    let plaintext = b"Hello world!";
-    let passphrase = "this is not a good passphrase";
+    let args = Args::parse();
+
+    let plaintext = args.plaintext.as_bytes();
+    let passphrase = args.passphrase.as_str();
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
     let encrypted: String = {
@@ -25,7 +40,7 @@ fn main() {
         };
 
         match writer.write_all(plaintext) {
-            Ok(()) => println!("Ok"),
+            Ok(()) => (),
             Err(error) => panic!("Error: {:?}", error),
         }
 
