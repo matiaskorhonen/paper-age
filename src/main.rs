@@ -1,10 +1,12 @@
 use std::fs::File;
+use std::io::BufWriter;
 use std::io::Write;
 
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::Secret;
 use clap::Parser;
+use printpdf::*;
 use qrcode::render::svg;
 use qrcode::QrCode;
 
@@ -20,7 +22,7 @@ struct Args {
     passphrase: String,
 
     // Output file name
-    #[arg(short, long, default_value = "out.svg")]
+    #[arg(short, long, default_value = "out.pdf")]
     output: String,
 }
 
@@ -73,9 +75,18 @@ fn main() -> std::io::Result<()> {
         .light_color(svg::Color("#ffffff"))
         .build();
 
-    // println!("{}", image);
+    let qrcode = match Svg::parse(image.as_str()) {
+        Ok(qr) => qr,
+        Err(error) => panic!("Error: {:?}", error),
+    };
 
-    let mut file = File::create(args.output)?;
-    file.write_all(&image.as_bytes())?;
+    let (doc, page, layer) = PdfDocument::new("Paper Rage", Mm(210.0), Mm(297.0), "Layer 1");
+    let current_layer = doc.get_page(page).get_layer(layer);
+
+    qrcode.add_to_layer(&current_layer, SvgTransform::default());
+
+    doc.save(&mut BufWriter::new(File::create(args.output).unwrap()))
+        .unwrap();
+
     Ok(())
 }

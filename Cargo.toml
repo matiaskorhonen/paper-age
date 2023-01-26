@@ -10,4 +10,5 @@ categories = ["command-line-utilities", "cryptography"]
 [dependencies]
 age = { version = "0.9.0", features = ["armor"] }
 clap = { version = "4.1.4", features = ["derive"] }
+printpdf = { version = "0.5.3", features = ["svg"] }
 qrcode = "0.12.0"
