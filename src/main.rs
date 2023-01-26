@@ -21,6 +21,10 @@ struct Args {
     #[arg(short, long)]
     passphrase: String,
 
+    /// Page title
+    #[arg(long, default_value = "Paper Rage")]
+    title: String,
+
     // Output file name
     #[arg(short, long, default_value = "out.pdf")]
     output: String,
@@ -66,7 +70,7 @@ fn main() -> std::io::Result<()> {
 
     println!("{}", encrypted);
 
-    let code = QrCode::new(encrypted).unwrap();
+    let code = QrCode::new(encrypted.clone()).unwrap();
 
     let image = code
         .render()
@@ -85,7 +89,30 @@ fn main() -> std::io::Result<()> {
     let margin = Mm(15.0);
 
     let (doc, page, layer) = PdfDocument::new("Paper Rage", width, height, "Layer 1");
+
+    let mono_font = doc
+        .add_external_font(File::open("assets/fonts/IBMPlexMono-Regular.ttf").unwrap())
+        .unwrap();
+    let sans_font = doc
+        .add_external_font(File::open("assets/fonts/IBMPlexSans-Medium.ttf").unwrap())
+        .unwrap();
+
     let current_layer = doc.get_page(page).get_layer(layer);
+
+    current_layer.use_text(args.title, 24.0, margin, height / 2.0, &sans_font);
+
+    current_layer.begin_text_section();
+
+    let font_size = 12.0;
+    let line_height = Mm(font_size);
+    let line_count = encrypted.lines().count();
+    for (i, line) in encrypted.lines().enumerate() {
+        let offset = line_height / 2.0 * ((line_count - i) as f64);
+        current_layer.use_text(line, font_size, margin, offset + margin, &mono_font);
+        current_layer.add_line_break();
+    }
+
+    current_layer.end_text_section();
 
     let scale = 4.0;
     let dpi = 300.0;
