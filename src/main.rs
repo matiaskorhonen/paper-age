@@ -1,5 +1,7 @@
 use std::fs::File;
+use std::io::BufReader;
 use std::io::BufWriter;
+use std::io::Cursor;
 use std::io::Write;
 
 use age::armor::ArmoredWriter;
@@ -90,11 +92,14 @@ fn main() -> std::io::Result<()> {
 
     let (doc, page, layer) = PdfDocument::new("Paper Rage", width, height, "Layer 1");
 
+    let mono_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
     let mono_font = doc
-        .add_external_font(File::open("assets/fonts/IBMPlexMono-Regular.ttf").unwrap())
+        .add_external_font(BufReader::new(Cursor::new(mono_data)))
         .unwrap();
+
+    let sans_data = include_bytes!("assets/fonts/IBMPlexSans-Medium.ttf");
     let sans_font = doc
-        .add_external_font(File::open("assets/fonts/IBMPlexSans-Medium.ttf").unwrap())
+        .add_external_font(BufReader::new(Cursor::new(sans_data)))
         .unwrap();
 
     let current_layer = doc.get_page(page).get_layer(layer);
