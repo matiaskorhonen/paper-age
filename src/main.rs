@@ -1,9 +1,12 @@
+use std::fs::File;
 use std::io::Write;
 
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::Secret;
 use clap::Parser;
+use qrcode::render::svg;
+use qrcode::QrCode;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -15,9 +18,13 @@ struct Args {
     /// Passphrase
     #[arg(short, long)]
     passphrase: String,
+
+    // Output file name
+    #[arg(short, long, default_value = "out.svg")]
+    output: String,
 }
 
-fn main() {
+fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
     let plaintext = args.plaintext.as_bytes();
@@ -56,4 +63,19 @@ fn main() {
     };
 
     println!("{}", encrypted);
+
+    let code = QrCode::new(encrypted).unwrap();
+
+    let image = code
+        .render()
+        .min_dimensions(256, 256)
+        .dark_color(svg::Color("#000000"))
+        .light_color(svg::Color("#ffffff"))
+        .build();
+
+    // println!("{}", image);
+
+    let mut file = File::create(args.output)?;
+    file.write_all(&image.as_bytes())?;
+    Ok(())
 }
