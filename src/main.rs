@@ -80,10 +80,32 @@ fn main() -> std::io::Result<()> {
         Err(error) => panic!("Error: {:?}", error),
     };
 
-    let (doc, page, layer) = PdfDocument::new("Paper Rage", Mm(210.0), Mm(297.0), "Layer 1");
+    let width = Mm(210.0);
+    let height = Mm(297.0);
+    let margin = Mm(15.0);
+
+    let (doc, page, layer) = PdfDocument::new("Paper Rage", width, height, "Layer 1");
     let current_layer = doc.get_page(page).get_layer(layer);
 
-    qrcode.add_to_layer(&current_layer, SvgTransform::default());
+    let scale = 4.0;
+    let dpi = 300.0;
+    let code_width = qrcode.width.into_pt(dpi) * scale;
+    let code_height = qrcode.height.into_pt(dpi) * scale;
+
+    let translate_x = (width.into_pt() - code_width) / 2.0;
+    let translate_y = height.into_pt() - code_height - margin.into_pt();
+
+    qrcode.add_to_layer(
+        &current_layer,
+        SvgTransform {
+            translate_x: Some(translate_x),
+            translate_y: Some(translate_y),
+            rotate: None,
+            scale_x: Some(scale),
+            scale_y: Some(scale),
+            dpi: Some(dpi),
+        },
+    );
 
     doc.save(&mut BufWriter::new(File::create(args.output).unwrap()))
         .unwrap();
