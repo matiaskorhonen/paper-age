@@ -10,12 +10,13 @@ use age::secrecy::Secret;
 use clap::Parser;
 use printpdf::*;
 use qrcode::render::svg;
+use qrcode::EcLevel;
 use qrcode::QrCode;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Plaintext to encrypt
+    /// Plaintext to encrypt (max. 640 characters)
     #[arg(short = 't', long)]
     plaintext: String,
 
@@ -72,7 +73,7 @@ fn main() -> std::io::Result<()> {
 
     println!("{}", encrypted);
 
-    let code = QrCode::new(encrypted.clone()).unwrap();
+    let code = QrCode::with_error_correction_level(encrypted.clone(), EcLevel::H).unwrap();
 
     let image = code
         .render()
@@ -85,6 +86,8 @@ fn main() -> std::io::Result<()> {
         Ok(qr) => qr,
         Err(error) => panic!("Error: {:?}", error),
     };
+
+    println!("QR code size: {:?}x{:?}", qrcode.width, qrcode.height);
 
     let width = Mm(210.0);
     let height = Mm(297.0);
@@ -104,15 +107,26 @@ fn main() -> std::io::Result<()> {
 
     let current_layer = doc.get_page(page).get_layer(layer);
 
-    current_layer.use_text(args.title, 24.0, margin, height / 2.0, &sans_font);
+    let divider = Line {
+        points: vec![
+            (Point::new(Mm(0.0), height / 2.0), false),
+            (Point::new(width, height / 2.0), false),
+        ],
+        is_closed: false,
+        has_fill: false,
+        has_stroke: true,
+        is_clipping_path: false,
+    };
 
-    let font_size = 12.0;
-    let line_height = Mm(font_size);
-    let line_count = encrypted.lines().count();
+    current_layer.add_shape(divider);
+
+    current_layer.use_text(args.title, 24.0, margin, height - margin, &sans_font);
+
+    let font_size = 10.0;
 
     current_layer.begin_text_section();
 
-    current_layer.set_text_cursor(margin, line_height * (line_count as f64));
+    current_layer.set_text_cursor(margin, (height / 2.0) - Mm::from(Pt(font_size)) - margin);
     current_layer.set_line_height(font_size);
     current_layer.set_font(&mono_font, font_size);
 
@@ -123,13 +137,13 @@ fn main() -> std::io::Result<()> {
 
     current_layer.end_text_section();
 
-    let scale = 4.0;
+    let scale = 3.5;
     let dpi = 300.0;
     let code_width = qrcode.width.into_pt(dpi) * scale;
     let code_height = qrcode.height.into_pt(dpi) * scale;
 
     let translate_x = (width.into_pt() - code_width) / 2.0;
-    let translate_y = height.into_pt() - code_height - margin.into_pt();
+    let translate_y = height.into_pt() - code_height - (margin.into_pt() * 2.0);
 
     qrcode.add_to_layer(
         &current_layer,
