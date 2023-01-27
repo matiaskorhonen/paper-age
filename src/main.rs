@@ -87,11 +87,18 @@ fn main() -> std::io::Result<()> {
         Err(error) => panic!("Error: {:?}", error),
     };
 
-    println!("QR code size: {:?}x{:?}", qrcode.width, qrcode.height);
-
     let width = Mm(210.0);
     let height = Mm(297.0);
     let margin = Mm(15.0);
+
+    let desired_qr_size = (height / 2.0) - margin * 3.0;
+    let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
+    let qr_scale = desired_qr_size / initial_qr_size;
+
+    println!(
+        "QR code size: {:?}x{:?} (scale: {:?})",
+        qrcode.width, qrcode.height, qr_scale
+    );
 
     let (doc, page, layer) = PdfDocument::new("Paper Rage", width, height, "Layer 1");
 
@@ -122,12 +129,13 @@ fn main() -> std::io::Result<()> {
 
     current_layer.use_text(args.title, 24.0, margin, height - margin, &sans_font);
 
-    let font_size = 10.0;
+    let font_size = 13.0;
+    let line_height = font_size * 1.2;
 
     current_layer.begin_text_section();
 
     current_layer.set_text_cursor(margin, (height / 2.0) - Mm::from(Pt(font_size)) - margin);
-    current_layer.set_line_height(font_size);
+    current_layer.set_line_height(line_height);
     current_layer.set_font(&mono_font, font_size);
 
     for line in encrypted.lines() {
@@ -137,7 +145,7 @@ fn main() -> std::io::Result<()> {
 
     current_layer.end_text_section();
 
-    let scale = 3.5;
+    let scale = qr_scale;
     let dpi = 300.0;
     let code_width = qrcode.width.into_pt(dpi) * scale;
     let code_height = qrcode.height.into_pt(dpi) * scale;
