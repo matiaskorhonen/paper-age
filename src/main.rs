@@ -49,12 +49,6 @@ struct Args {
     fonts_license: bool,
 }
 
-struct Page {
-    width: Mm,
-    height: Mm,
-    margin: Mm,
-}
-
 fn encrypt_plaintext(
     plaintext: String,
     passphrase: String,
@@ -94,6 +88,43 @@ fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> 
     Ok(svg)
 }
 
+#[derive(Clone, Copy)]
+struct PageDimensions {
+    width: Mm,
+    height: Mm,
+    margin: Mm,
+}
+
+struct Pdf {
+    doc: PdfDocumentReference,
+    page: PdfPageIndex,
+    layer: PdfLayerIndex,
+    title_font: IndirectFontRef,
+    code_font: IndirectFontRef,
+}
+
+fn initialize_pdf(
+    dimensions: PageDimensions,
+    title: String,
+) -> Result<Pdf, Box<dyn std::error::Error>> {
+    let (doc, page, layer) =
+        PdfDocument::new(title, dimensions.width, dimensions.height, "Layer 1");
+
+    let code_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
+    let code_font = doc.add_external_font(BufReader::new(Cursor::new(code_data)))?;
+
+    let title_data = include_bytes!("assets/fonts/IBMPlexMono-Medium.ttf");
+    let title_font = doc.add_external_font(BufReader::new(Cursor::new(title_data)))?;
+
+    Ok(Pdf {
+        doc: doc,
+        page: page,
+        layer: layer,
+        title_font: title_font,
+        code_font: code_font,
+    })
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
@@ -109,7 +140,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let qrcode = generate_qrcode_svg(encrypted.clone())?;
 
-    let a4 = Page {
+    let a4 = PageDimensions {
         width: Mm(210.0),
         height: Mm(297.0),
         margin: Mm(15.0),
@@ -119,15 +150,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
     let qr_scale = desired_qr_size / initial_qr_size;
 
-    let (doc, page, layer) = PdfDocument::new(args.title.clone(), a4.width, a4.height, "Layer 1");
-
-    let code_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
-    let code_font = doc.add_external_font(BufReader::new(Cursor::new(code_data)))?;
-
-    let title_data = include_bytes!("assets/fonts/IBMPlexMono-Medium.ttf");
-    let title_font = doc.add_external_font(BufReader::new(Cursor::new(title_data)))?;
-
-    let current_layer = doc.get_page(page).get_layer(layer);
+    let pdf = initialize_pdf(a4, args.title.clone())?;
+    let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
 
     let mut dash_pattern = LineDashPattern::default();
     dash_pattern.dash_1 = Some(5);
@@ -153,7 +177,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         14.0,
         a4.margin,
         a4.height - a4.margin,
-        &title_font,
+        &pdf.title_font,
     );
 
     let font_size = 13.0;
@@ -166,10 +190,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         (a4.height / 2.0) - Mm::from(Pt(font_size)) - a4.margin,
     );
     current_layer.set_line_height(line_height);
-    current_layer.set_font(&code_font, font_size);
+    current_layer.set_font(&pdf.code_font, font_size);
 
     for line in encrypted.lines() {
-        current_layer.write_text(line.clone(), &code_font);
+        current_layer.write_text(line.clone(), &pdf.code_font);
         current_layer.add_line_break();
     }
 
@@ -196,7 +220,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     let file = File::create(args.output)?;
-    doc.save(&mut BufWriter::new(file))?;
+    pdf.doc.save(&mut BufWriter::new(file))?;
 
     Ok(())
 }
