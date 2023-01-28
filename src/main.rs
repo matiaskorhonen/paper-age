@@ -73,6 +73,21 @@ fn encrypt_plaintext(
     return Ok(utf8);
 }
 
+fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> {
+    let code = QrCode::with_error_correction_level(text, EcLevel::H)?;
+
+    let image = code
+        .render()
+        .min_dimensions(256, 256)
+        .dark_color(svg::Color("#000000"))
+        .light_color(svg::Color("#ffffff"))
+        .build();
+
+    let svg = Svg::parse(image.as_str())?;
+
+    Ok(svg)
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
@@ -86,20 +101,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let encrypted = encrypt_plaintext(args.plaintext, args.passphrase)?;
     io::stdout().write_all(encrypted.as_bytes())?;
 
-    let code = QrCode::with_error_correction_level(encrypted.clone(), EcLevel::H).unwrap();
+    let qrcode = generate_qrcode_svg(encrypted.clone())?;
 
-    let image = code
-        .render()
-        .min_dimensions(256, 256)
-        .dark_color(svg::Color("#000000"))
-        .light_color(svg::Color("#ffffff"))
-        .build();
-
-    let qrcode = Svg::parse(image.as_str())?;
-
-    let width = Mm(210.0);
-    let height = Mm(297.0);
-    let margin = Mm(15.0);
+    let a4 = Page {
+        width: Mm(210.0),
+        height: Mm(297.0),
+        margin: Mm(15.0),
+    };
 
     let desired_qr_size = (height / 2.0) - margin * 3.0;
     let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
