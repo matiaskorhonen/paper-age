@@ -36,7 +36,7 @@ struct Args {
     )]
     passphrase: String,
 
-    /// Page title
+    /// Page title (max. 60 characters)
     #[arg(long, default_value = "Paper Rage", requires = "plaintext")]
     title: String,
 
@@ -125,17 +125,23 @@ fn main() -> std::io::Result<()> {
 
     let (doc, page, layer) = PdfDocument::new("Paper Rage", width, height, "Layer 1");
 
-    let mono_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
-    let mono_font = doc
-        .add_external_font(BufReader::new(Cursor::new(mono_data)))
+    let code_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
+    let code_font = doc
+        .add_external_font(BufReader::new(Cursor::new(code_data)))
         .unwrap();
 
-    let sans_data = include_bytes!("assets/fonts/IBMPlexSans-Medium.ttf");
-    let sans_font = doc
-        .add_external_font(BufReader::new(Cursor::new(sans_data)))
+    let title_data = include_bytes!("assets/fonts/IBMPlexMono-Medium.ttf");
+    let title_font = doc
+        .add_external_font(BufReader::new(Cursor::new(title_data)))
         .unwrap();
 
     let current_layer = doc.get_page(page).get_layer(layer);
+
+    let mut dash_pattern = LineDashPattern::default();
+    dash_pattern.dash_1 = Some(5);
+    let outline_color = Color::Rgb(Rgb::new(0.75, 0.75, 0.75, None));
+    current_layer.set_outline_color(outline_color);
+    current_layer.set_line_dash_pattern(dash_pattern);
 
     let divider = Line {
         points: vec![
@@ -150,7 +156,7 @@ fn main() -> std::io::Result<()> {
 
     current_layer.add_shape(divider);
 
-    current_layer.use_text(args.title, 24.0, margin, height - margin, &sans_font);
+    current_layer.use_text(args.title, 14.0, margin, height - margin, &title_font);
 
     let font_size = 13.0;
     let line_height = font_size * 1.2;
@@ -159,10 +165,10 @@ fn main() -> std::io::Result<()> {
 
     current_layer.set_text_cursor(margin, (height / 2.0) - Mm::from(Pt(font_size)) - margin);
     current_layer.set_line_height(line_height);
-    current_layer.set_font(&mono_font, font_size);
+    current_layer.set_font(&code_font, font_size);
 
     for line in encrypted.lines() {
-        current_layer.write_text(line.clone(), &mono_font);
+        current_layer.write_text(line.clone(), &code_font);
         current_layer.add_line_break();
     }
 
