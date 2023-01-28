@@ -125,6 +125,24 @@ fn initialize_pdf(
     })
 }
 
+fn draw_divider(current_layer: &PdfLayerReference, points: Vec<Point>) {
+    let mut dash_pattern = LineDashPattern::default();
+    dash_pattern.dash_1 = Some(5);
+    let outline_color = Color::Rgb(Rgb::new(0.75, 0.75, 0.75, None));
+    current_layer.set_outline_color(outline_color);
+    current_layer.set_line_dash_pattern(dash_pattern);
+
+    let divider = Line {
+        points: points.iter().map(|p| (*p, false)).collect(),
+        is_closed: false,
+        has_fill: false,
+        has_stroke: true,
+        is_clipping_path: false,
+    };
+
+    current_layer.add_shape(divider);
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
@@ -153,24 +171,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pdf = initialize_pdf(a4, args.title.clone())?;
     let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
 
-    let mut dash_pattern = LineDashPattern::default();
-    dash_pattern.dash_1 = Some(5);
-    let outline_color = Color::Rgb(Rgb::new(0.75, 0.75, 0.75, None));
-    current_layer.set_outline_color(outline_color);
-    current_layer.set_line_dash_pattern(dash_pattern);
-
-    let divider = Line {
-        points: vec![
-            (Point::new(Mm(0.0), a4.height / 2.0), false),
-            (Point::new(a4.width, a4.height / 2.0), false),
+    draw_divider(
+        &current_layer,
+        vec![
+            Point::new(Mm(0.0), a4.height / 2.0),
+            Point::new(a4.width, a4.height / 2.0),
         ],
-        is_closed: false,
-        has_fill: false,
-        has_stroke: true,
-        is_clipping_path: false,
-    };
-
-    current_layer.add_shape(divider);
+    );
 
     current_layer.use_text(
         args.title,
