@@ -1,4 +1,5 @@
 use std::fs::File;
+use std::io;
 use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Cursor;
@@ -17,24 +18,46 @@ use qrcode::QrCode;
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Plaintext to encrypt (max. 640 characters)
-    #[arg(short = 't', long)]
+    #[arg(
+        short = 't',
+        long,
+        default_value = "",
+        required_unless_present = "fonts_license"
+    )]
     plaintext: String,
 
     /// Passphrase
-    #[arg(short, long)]
+    #[arg(
+        short,
+        long,
+        default_value = "",
+        requires = "plaintext",
+        required_unless_present = "fonts_license"
+    )]
     passphrase: String,
 
     /// Page title
-    #[arg(long, default_value = "Paper Rage")]
+    #[arg(long, default_value = "Paper Rage", requires = "plaintext")]
     title: String,
 
     // Output file name
-    #[arg(short, long, default_value = "out.pdf")]
+    #[arg(short, long, default_value = "out.pdf", requires = "plaintext")]
     output: String,
+
+    // Print out the license for the embedded fonts
+    #[arg(long, default_value_t = false, exclusive = true)]
+    fonts_license: bool,
 }
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
+
+    if args.fonts_license {
+        let license = include_bytes!("assets/fonts/license.txt");
+        io::stdout().write_all(license)?;
+        io::stdout().write_all(b"\n")?;
+        return Ok(());
+    }
 
     let plaintext = args.plaintext.as_bytes();
     let passphrase = args.passphrase.as_str();
