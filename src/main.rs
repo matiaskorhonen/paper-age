@@ -55,7 +55,6 @@ fn main() -> std::io::Result<()> {
     if args.fonts_license {
         let license = include_bytes!("assets/fonts/license.txt");
         io::stdout().write_all(license)?;
-        io::stdout().write_all(b"\n")?;
         return Ok(());
     }
 
