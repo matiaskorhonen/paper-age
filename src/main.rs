@@ -49,6 +49,12 @@ struct Args {
     fonts_license: bool,
 }
 
+struct Page {
+    width: Mm,
+    height: Mm,
+    margin: Mm,
+}
+
 fn encrypt_plaintext(
     plaintext: String,
     passphrase: String,
@@ -109,16 +115,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         margin: Mm(15.0),
     };
 
-    let desired_qr_size = (height / 2.0) - margin * 3.0;
+    let desired_qr_size = (a4.height / 2.0) - a4.margin * 3.0;
     let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
     let qr_scale = desired_qr_size / initial_qr_size;
 
-    println!(
-        "QR code size: {:?}x{:?} (scale: {:?})",
-        qrcode.width, qrcode.height, qr_scale
-    );
-
-    let (doc, page, layer) = PdfDocument::new("Paper Rage", width, height, "Layer 1");
+    let (doc, page, layer) = PdfDocument::new(args.title.clone(), a4.width, a4.height, "Layer 1");
 
     let code_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
     let code_font = doc.add_external_font(BufReader::new(Cursor::new(code_data)))?;
@@ -136,8 +137,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let divider = Line {
         points: vec![
-            (Point::new(Mm(0.0), height / 2.0), false),
-            (Point::new(width, height / 2.0), false),
+            (Point::new(Mm(0.0), a4.height / 2.0), false),
+            (Point::new(a4.width, a4.height / 2.0), false),
         ],
         is_closed: false,
         has_fill: false,
@@ -147,14 +148,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     current_layer.add_shape(divider);
 
-    current_layer.use_text(args.title, 14.0, margin, height - margin, &title_font);
+    current_layer.use_text(
+        args.title,
+        14.0,
+        a4.margin,
+        a4.height - a4.margin,
+        &title_font,
+    );
 
     let font_size = 13.0;
     let line_height = font_size * 1.2;
 
     current_layer.begin_text_section();
 
-    current_layer.set_text_cursor(margin, (height / 2.0) - Mm::from(Pt(font_size)) - margin);
+    current_layer.set_text_cursor(
+        a4.margin,
+        (a4.height / 2.0) - Mm::from(Pt(font_size)) - a4.margin,
+    );
     current_layer.set_line_height(line_height);
     current_layer.set_font(&code_font, font_size);
 
@@ -170,8 +180,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let code_width = qrcode.width.into_pt(dpi) * scale;
     let code_height = qrcode.height.into_pt(dpi) * scale;
 
-    let translate_x = (width.into_pt() - code_width) / 2.0;
-    let translate_y = height.into_pt() - code_height - (margin.into_pt() * 2.0);
+    let translate_x = (a4.width.into_pt() - code_width) / 2.0;
+    let translate_y = a4.height.into_pt() - code_height - (a4.margin.into_pt() * 2.0);
 
     qrcode.add_to_layer(
         &current_layer,
