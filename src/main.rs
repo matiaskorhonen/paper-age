@@ -143,6 +143,74 @@ fn draw_divider(current_layer: &PdfLayerReference, points: Vec<Point>) {
     current_layer.add_shape(divider);
 }
 
+fn insert_qr_code(current_layer: &PdfLayerReference, qrcode: Svg, dimensions: PageDimensions) {
+    let desired_qr_size = (dimensions.height / 2.0) - dimensions.margin * 3.0;
+    let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
+    let qr_scale = desired_qr_size / initial_qr_size;
+
+    let scale = qr_scale;
+    let dpi = 300.0;
+    let code_width = qrcode.width.into_pt(dpi) * scale;
+    let code_height = qrcode.height.into_pt(dpi) * scale;
+
+    let translate_x = (dimensions.width.into_pt() - code_width) / 2.0;
+    let translate_y =
+        dimensions.height.into_pt() - code_height - (dimensions.margin.into_pt() * 2.0);
+
+    qrcode.add_to_layer(
+        &current_layer,
+        SvgTransform {
+            translate_x: Some(translate_x),
+            translate_y: Some(translate_y),
+            rotate: None,
+            scale_x: Some(scale),
+            scale_y: Some(scale),
+            dpi: Some(dpi),
+        },
+    );
+}
+
+fn insert_title_text(
+    title: String,
+    pdf: &Pdf,
+    current_layer: &PdfLayerReference,
+    dimensions: PageDimensions,
+) {
+    current_layer.use_text(
+        title,
+        14.0,
+        dimensions.margin,
+        dimensions.height - dimensions.margin,
+        &pdf.title_font,
+    );
+}
+
+fn insert_pem_text(
+    pdf: &Pdf,
+    current_layer: &PdfLayerReference,
+    pem: String,
+    dimensions: PageDimensions,
+) {
+    let font_size = 13.0;
+    let line_height = font_size * 1.2;
+
+    current_layer.begin_text_section();
+
+    current_layer.set_text_cursor(
+        dimensions.margin,
+        (dimensions.height / 2.0) - Mm::from(Pt(font_size)) - dimensions.margin,
+    );
+    current_layer.set_line_height(line_height);
+    current_layer.set_font(&pdf.code_font, font_size);
+
+    for line in pem.lines() {
+        current_layer.write_text(line.clone(), &pdf.code_font);
+        current_layer.add_line_break();
+    }
+
+    current_layer.end_text_section();
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
@@ -156,20 +224,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let encrypted = encrypt_plaintext(args.plaintext, args.passphrase)?;
     io::stdout().write_all(encrypted.as_bytes())?;
 
-    let qrcode = generate_qrcode_svg(encrypted.clone())?;
-
     let a4 = PageDimensions {
         width: Mm(210.0),
         height: Mm(297.0),
         margin: Mm(15.0),
     };
 
-    let desired_qr_size = (a4.height / 2.0) - a4.margin * 3.0;
-    let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
-    let qr_scale = desired_qr_size / initial_qr_size;
-
     let pdf = initialize_pdf(a4, args.title.clone())?;
     let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+
+    insert_title_text(args.title, &pdf, &current_layer, a4);
+
+    let qrcode = generate_qrcode_svg(encrypted.clone())?;
+    insert_qr_code(&current_layer, qrcode, a4);
 
     draw_divider(
         &current_layer,
@@ -179,52 +246,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ],
     );
 
-    current_layer.use_text(
-        args.title,
-        14.0,
-        a4.margin,
-        a4.height - a4.margin,
-        &pdf.title_font,
-    );
-
-    let font_size = 13.0;
-    let line_height = font_size * 1.2;
-
-    current_layer.begin_text_section();
-
-    current_layer.set_text_cursor(
-        a4.margin,
-        (a4.height / 2.0) - Mm::from(Pt(font_size)) - a4.margin,
-    );
-    current_layer.set_line_height(line_height);
-    current_layer.set_font(&pdf.code_font, font_size);
-
-    for line in encrypted.lines() {
-        current_layer.write_text(line.clone(), &pdf.code_font);
-        current_layer.add_line_break();
-    }
-
-    current_layer.end_text_section();
-
-    let scale = qr_scale;
-    let dpi = 300.0;
-    let code_width = qrcode.width.into_pt(dpi) * scale;
-    let code_height = qrcode.height.into_pt(dpi) * scale;
-
-    let translate_x = (a4.width.into_pt() - code_width) / 2.0;
-    let translate_y = a4.height.into_pt() - code_height - (a4.margin.into_pt() * 2.0);
-
-    qrcode.add_to_layer(
-        &current_layer,
-        SvgTransform {
-            translate_x: Some(translate_x),
-            translate_y: Some(translate_y),
-            rotate: None,
-            scale_x: Some(scale),
-            scale_y: Some(scale),
-            dpi: Some(dpi),
-        },
-    );
+    insert_pem_text(&pdf, &current_layer, encrypted, a4);
 
     let file = File::create(args.output)?;
     pdf.doc.save(&mut BufWriter::new(file))?;
