@@ -1,22 +1,20 @@
 use std::fs::File;
-use std::io;
-use std::io::BufReader;
-use std::io::BufWriter;
-use std::io::Cursor;
-use std::io::Write;
+use std::io::{self, BufReader, BufWriter, Cursor, Write};
 
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::Secret;
 use clap::Parser;
-use printpdf::*;
+use printpdf::{
+    Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
+    PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
+};
 use qrcode::render::svg;
-use qrcode::EcLevel;
-use qrcode::QrCode;
+use qrcode::{EcLevel, QrCode};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-struct Args {
+struct Cli {
     /// Plaintext to encrypt (max. 640 characters)
     #[arg(
         short = 't',
@@ -236,7 +234,7 @@ fn insert_pem_text(
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = Args::parse();
+    let args = Cli::parse();
 
     if args.fonts_license {
         let license = include_bytes!("assets/fonts/license.txt");
