@@ -16,24 +16,7 @@ use printpdf::{
 use qrcode::render::svg;
 use qrcode::{EcLevel, QrCode};
 
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Cli {
-    /// Page title (max. 60 characters)
-    #[arg(long, default_value = "Paper Rage")]
-    title: String,
-
-    /// Output file name
-    #[arg(short, long, default_value = "out.pdf")]
-    output: String,
-
-    /// Print out the license for the embedded fonts
-    #[arg(long, default_value_t = false, exclusive = true)]
-    fonts_license: bool,
-
-    /// The path to the file to read, use - to read from stdin (max. 712 characters/bytes)
-    input: Option<PathBuf>,
-}
+mod cli;
 
 fn encrypt_plaintext(
     reader: &mut BufReader<Box<dyn Read>>,
@@ -222,7 +205,7 @@ fn insert_pem_text(
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = Cli::parse();
+    let args = cli::Args::parse();
 
     if args.fonts_license {
         let license = include_bytes!("assets/fonts/license.txt");
@@ -279,10 +262,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     pdf.doc.save(&mut BufWriter::new(file))?;
 
     Ok(())
-}
-
-#[test]
-fn verify_cli() {
-    use clap::CommandFactory;
-    Cli::command().debug_assert()
 }
