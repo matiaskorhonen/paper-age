@@ -21,7 +21,7 @@ mod cli;
 fn encrypt_plaintext(
     reader: &mut BufReader<Box<dyn Read>>,
     passphrase: Secret<String>,
-) -> Result<String, Box<dyn std::error::Error>> {
+) -> Result<(usize, String), Box<dyn std::error::Error>> {
     let mut plaintext: Vec<u8> = vec![];
     reader.read_to_end(&mut plaintext)?;
 
@@ -39,7 +39,7 @@ fn encrypt_plaintext(
 
     let utf8 = std::string::String::from_utf8(output.to_owned())?;
 
-    Ok(utf8)
+    Ok((plaintext.len(), utf8))
 }
 
 fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> {
@@ -229,7 +229,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
-    let encrypted = encrypt_plaintext(&mut reader, passphrase)?;
+    let (plaintext_len, encrypted) = encrypt_plaintext(&mut reader, passphrase)?;
+
+    println!("Plaintext length: {plaintext_len:?} bytes");
+    println!("Encrypted length: {:?} bytes", encrypted.len());
+
     io::stdout().write_all(encrypted.as_bytes())?;
 
     let a4 = PageDimensions {
