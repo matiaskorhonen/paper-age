@@ -1,10 +1,14 @@
-use std::fs::File;
-use std::io::{self, BufReader, BufWriter, Cursor, Write};
+use is_terminal::IsTerminal as _;
+use std::{
+    fs::File,
+    io::{self, stdin, BufReader, BufWriter, Cursor, Read, Write},
+    path::PathBuf,
+};
 
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::Secret;
-use clap::Parser;
+use clap::{CommandFactory, Parser};
 use printpdf::{
     Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
     PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
@@ -15,43 +19,38 @@ use qrcode::{EcLevel, QrCode};
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// Plaintext to encrypt (max. 640 characters)
-    #[arg(
-        short = 't',
-        long,
-        default_value = "",
-        required_unless_present = "fonts_license"
-    )]
-    plaintext: String,
-
     /// Passphrase
     #[arg(
         short,
         long,
         default_value = "",
-        requires = "plaintext",
         required_unless_present = "fonts_license"
     )]
     passphrase: String,
 
     /// Page title (max. 60 characters)
-    #[arg(long, default_value = "Paper Rage", requires = "plaintext")]
+    #[arg(long, default_value = "Paper Rage")]
     title: String,
 
-    // Output file name
-    #[arg(short, long, default_value = "out.pdf", requires = "plaintext")]
+    /// Output file name
+    #[arg(short, long, default_value = "out.pdf")]
     output: String,
 
-    // Print out the license for the embedded fonts
+    /// Print out the license for the embedded fonts
     #[arg(long, default_value_t = false, exclusive = true)]
     fonts_license: bool,
+
+    /// The path to the file to read, use - to read from stdin (max. 712 characters/bytes)
+    input: Option<PathBuf>,
 }
 
 fn encrypt_plaintext(
-    plaintext: String,
+    reader: &mut BufReader<Box<dyn Read>>,
     passphrase: String,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    let plaintext = plaintext.as_bytes();
+    let mut plaintext: Vec<u8> = vec![];
+    reader.read_to_end(&mut plaintext)?;
+
     let passphrase = passphrase.as_str();
 
     let encryptor = age::Encryptor::with_user_passphrase(Secret::new(passphrase.to_owned()));
@@ -62,7 +61,7 @@ fn encrypt_plaintext(
 
     let mut writer = encryptor.wrap_output(armored_writer)?;
 
-    writer.write_all(plaintext)?;
+    writer.write_all(&plaintext)?;
 
     let output = writer.finish().and_then(|armor| armor.finish())?;
 
@@ -242,8 +241,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
+    let file = args.input.unwrap();
+
+    let mut reader: BufReader<Box<dyn Read>> = {
+        if file == PathBuf::from("-") {
+            if stdin().is_terminal() {
+                Cli::command().print_help().unwrap();
+                ::std::process::exit(2);
+            }
+
+            // file = PathBuf::from("<stdin>");
+            BufReader::new(Box::new(stdin().lock()))
+        } else {
+            BufReader::new(Box::new(File::open(&file).unwrap()))
+        }
+    };
+
     // Encrypt the plaintext to a ciphertext using the passphrase...
-    let encrypted = encrypt_plaintext(args.plaintext, args.passphrase)?;
+    let encrypted = encrypt_plaintext(&mut reader, args.passphrase)?;
     io::stdout().write_all(encrypted.as_bytes())?;
 
     let a4 = PageDimensions {

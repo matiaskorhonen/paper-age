@@ -975,6 +975,7 @@ version = "0.1.0"
 dependencies = [
  "age",
  "clap",
+ "is-terminal",
  "printpdf",
  "qrcode",
 ]
