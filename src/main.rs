@@ -143,6 +143,30 @@ fn draw_divider(current_layer: &PdfLayerReference, points: Vec<Point>) {
     current_layer.add_shape(divider);
 }
 
+fn draw_grid(current_layer: &PdfLayerReference, dimensions: PageDimensions) {
+    let grid_size = Mm(10.0);
+
+    let mut x = Mm(0.0);
+    let mut y = Mm(0.0);
+    while x < dimensions.width {
+        x = x + grid_size;
+
+        draw_divider(
+            current_layer,
+            vec![Point::new(x, dimensions.height), Point::new(x, Mm(0.0))],
+        );
+
+        while y < dimensions.height {
+            y = y + grid_size;
+
+            draw_divider(
+                current_layer,
+                vec![Point::new(dimensions.width, y), Point::new(Mm(0.0), y)],
+            );
+        }
+    }
+}
+
 fn insert_qr_code(current_layer: &PdfLayerReference, qrcode: Svg, dimensions: PageDimensions) {
     let desired_qr_size = (dimensions.height / 2.0) - dimensions.margin * 3.0;
     let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
@@ -232,6 +256,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let pdf = initialize_pdf(a4, args.title.clone())?;
     let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+
+    draw_grid(&current_layer, a4);
 
     insert_title_text(args.title, &pdf, &current_layer, a4);
 
