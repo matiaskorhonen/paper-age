@@ -226,7 +226,7 @@ fn insert_pem_text(
     current_layer.set_font(&pdf.code_font, font_size);
 
     for line in pem.lines() {
-        current_layer.write_text(line.clone(), &pdf.code_font);
+        current_layer.write_text(line, &pdf.code_font);
         current_layer.add_line_break();
     }
 
