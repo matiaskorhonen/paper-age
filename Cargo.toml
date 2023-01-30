@@ -8,8 +8,9 @@ license = "MIT"
 categories = ["command-line-utilities", "cryptography"]
 
 [dependencies]
-age = { version = "0.9.0", features = ["armor"] }
+age = { version = "0.9.0", features = ["armor", "cli-common"] }
 clap = { version = "4.1.4", features = ["derive"] }
+exitcode = "1.1.2"
 is-terminal = "0.4.2"
 printpdf = { version = "0.5.3", features = ["svg"] }
 qrcode = "0.12.0"

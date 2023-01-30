@@ -6,6 +6,7 @@ use std::{
 
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
+use age::cli_common::read_secret;
 use age::secrecy::Secret;
 use clap::Parser;
 use printpdf::{
@@ -18,15 +19,6 @@ use qrcode::{EcLevel, QrCode};
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// Passphrase
-    #[arg(
-        short,
-        long,
-        default_value = "",
-        required_unless_present = "fonts_license"
-    )]
-    passphrase: String,
-
     /// Page title (max. 60 characters)
     #[arg(long, default_value = "Paper Rage")]
     title: String,
@@ -45,14 +37,12 @@ struct Cli {
 
 fn encrypt_plaintext(
     reader: &mut BufReader<Box<dyn Read>>,
-    passphrase: String,
+    passphrase: Secret<String>,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let mut plaintext: Vec<u8> = vec![];
     reader.read_to_end(&mut plaintext)?;
 
-    let passphrase = passphrase.as_str();
-
-    let encryptor = age::Encryptor::with_user_passphrase(Secret::new(passphrase.to_owned()));
+    let encryptor = age::Encryptor::with_user_passphrase(passphrase);
 
     let mut encrypted = vec![];
 
@@ -240,6 +230,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
+    let passphrase = match read_secret("Type passphrase", "Passphrase", None) {
+        Ok(s) => s,
+        Err(_e) => std::process::exit(exitcode::NOINPUT),
+    };
+
     let file = args.input.unwrap();
 
     let mut reader: BufReader<Box<dyn Read>> = {
@@ -251,7 +246,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
-    let encrypted = encrypt_plaintext(&mut reader, args.passphrase)?;
+    let encrypted = encrypt_plaintext(&mut reader, passphrase)?;
     io::stdout().write_all(encrypted.as_bytes())?;
 
     let a4 = PageDimensions {
