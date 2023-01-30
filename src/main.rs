@@ -1,4 +1,3 @@
-use is_terminal::IsTerminal as _;
 use std::{
     fs::File,
     io::{self, stdin, BufReader, BufWriter, Cursor, Read, Write},
@@ -8,7 +7,7 @@ use std::{
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::Secret;
-use clap::{CommandFactory, Parser};
+use clap::Parser;
 use printpdf::{
     Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
     PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
@@ -245,12 +244,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut reader: BufReader<Box<dyn Read>> = {
         if file == PathBuf::from("-") {
-            if stdin().is_terminal() {
-                Cli::command().print_help().unwrap();
-                ::std::process::exit(2);
-            }
-
-            // file = PathBuf::from("<stdin>");
             BufReader::new(Box::new(stdin().lock()))
         } else {
             BufReader::new(Box::new(File::open(&file).unwrap()))
