@@ -68,7 +68,7 @@ fn encrypt_plaintext(
 
     let utf8 = std::string::String::from_utf8(output.to_owned())?;
 
-    return Ok(utf8);
+    Ok(utf8)
 }
 
 fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> {
@@ -115,11 +115,11 @@ fn initialize_pdf(
     let title_font = doc.add_external_font(BufReader::new(Cursor::new(title_data)))?;
 
     Ok(Pdf {
-        doc: doc,
-        page: page,
-        layer: layer,
-        title_font: title_font,
-        code_font: code_font,
+        doc,
+        page,
+        layer,
+        title_font,
+        code_font,
     })
 }
 
@@ -147,7 +147,7 @@ fn draw_grid(current_layer: &PdfLayerReference, dimensions: PageDimensions) {
     let mut x = Mm(0.0);
     let mut y = Mm(0.0);
     while x < dimensions.width {
-        x = x + grid_size;
+        x += grid_size;
 
         draw_divider(
             current_layer,
@@ -155,7 +155,7 @@ fn draw_grid(current_layer: &PdfLayerReference, dimensions: PageDimensions) {
         );
 
         while y < dimensions.height {
-            y = y + grid_size;
+            y += grid_size;
 
             draw_divider(
                 current_layer,
@@ -180,7 +180,7 @@ fn insert_qr_code(current_layer: &PdfLayerReference, qrcode: Svg, dimensions: Pa
         dimensions.height.into_pt() - code_height - (dimensions.margin.into_pt() * 2.0);
 
     qrcode.add_to_layer(
-        &current_layer,
+        current_layer,
         SvgTransform {
             translate_x: Some(translate_x),
             translate_y: Some(translate_y),
