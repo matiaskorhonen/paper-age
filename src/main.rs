@@ -275,7 +275,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let file = File::create(args.output)?;
     pdf.doc.save(&mut BufWriter::new(file))?;
 
-    Ok(())
+    return Ok(());
 }
 
 #[test]
