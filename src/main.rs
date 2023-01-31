@@ -50,6 +50,7 @@ fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> 
         .min_dimensions(256, 256)
         .dark_color(svg::Color("#000000"))
         .light_color(svg::Color("#ffffff"))
+        .quiet_zone(false)
         .build();
 
     let svg = Svg::parse(image.as_str())?;
@@ -154,7 +155,7 @@ fn draw_grid(current_layer: &PdfLayerReference, dimensions: PageDimensions) {
 }
 
 fn insert_qr_code(current_layer: &PdfLayerReference, qrcode: Svg, dimensions: PageDimensions) {
-    let desired_qr_size = (dimensions.height / 2.0) - dimensions.margin * 3.0;
+    let desired_qr_size = Mm(110.0);
     let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
     let qr_scale = desired_qr_size / initial_qr_size;
 
@@ -186,11 +187,22 @@ fn insert_title_text(
     current_layer: &PdfLayerReference,
     dimensions: PageDimensions,
 ) {
+    let font_size = 14.0;
+
+    // Align the title with the QR code if the title is narrower than the QR code
+    let margin = {
+        if title.len() <= 37 {
+            Mm(50.0)
+        } else {
+            dimensions.margin
+        }
+    };
+
     current_layer.use_text(
         title,
-        14.0,
-        dimensions.margin,
-        dimensions.height - dimensions.margin,
+        font_size,
+        margin,
+        dimensions.height - dimensions.margin - Mm::from(Pt(font_size)),
         &pdf.title_font,
     );
 }
@@ -202,7 +214,7 @@ fn insert_pem_text(
     dimensions: PageDimensions,
 ) {
     let font_size = 13.0;
-    let line_height = font_size * 1.2;
+    let line_height = 15.0;
 
     current_layer.begin_text_section();
 
@@ -219,6 +231,30 @@ fn insert_pem_text(
     }
 
     current_layer.end_text_section();
+}
+
+fn insert_passphrase(pdf: &Pdf, current_layer: &PdfLayerReference, dimensions: PageDimensions) {
+    let baseline = dimensions.height / 2.0 + dimensions.margin;
+    current_layer.use_text("Passphrase: ", 13.0, Mm(50.0), baseline, &pdf.title_font);
+    draw_divider(
+        current_layer,
+        vec![
+            Point::new(Mm(50.0) + Mm(30.0), baseline - Mm(1.0)),
+            Point::new(Mm(110.0) + Mm(50.0), baseline - Mm(1.0)),
+        ],
+        1.0,
+        false,
+    )
+}
+
+fn insert_footer(pdf: &Pdf, current_layer: &PdfLayerReference, dimensions: PageDimensions) {
+    current_layer.use_text(
+        "Scan QR code and decrypt using Age <https://age-encryption.org>",
+        13.0,
+        dimensions.margin,
+        dimensions.margin,
+        &pdf.title_font,
+    );
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -256,18 +292,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let a4 = PageDimensions {
         width: Mm(210.0),
         height: Mm(297.0),
-        margin: Mm(15.0),
+        margin: Mm(10.0),
     };
 
     let pdf = initialize_pdf(a4, args.title.clone())?;
     let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
 
-    draw_grid(&current_layer, a4);
+    if args.grid {
+        draw_grid(&current_layer, a4);
+    }
 
     insert_title_text(args.title, &pdf, &current_layer, a4);
 
     let qrcode = generate_qrcode_svg(encrypted.clone())?;
     insert_qr_code(&current_layer, qrcode, a4);
+
+    insert_passphrase(&pdf, &current_layer, a4);
 
     draw_divider(
         &current_layer,
@@ -280,6 +320,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     insert_pem_text(&pdf, &current_layer, encrypted, a4);
+
+    insert_footer(&pdf, &current_layer, a4);
 
     let file = File::create(args.output)?;
     pdf.doc.save(&mut BufWriter::new(file))?;

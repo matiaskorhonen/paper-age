@@ -13,6 +13,10 @@ pub(crate) struct Args {
     #[arg(short, long, default_value = "out.pdf")]
     pub output: String,
 
+    /// Draw a grid pattern for debugging layout issues
+    #[arg(short, long, default_value_t = false)]
+    pub grid: bool,
+
     /// Print out the license for the embedded fonts
     #[arg(long, default_value_t = false, exclusive = true)]
     pub fonts_license: bool,
