@@ -21,7 +21,7 @@ pub(crate) struct Args {
     #[arg(long, default_value_t = false, exclusive = true)]
     pub fonts_license: bool,
 
-    /// The path to the file to read, use - to read from stdin (max. 712 characters/bytes)
+    /// The path to the file to read, use - to read from stdin (max. 704 characters/bytes)
     pub input: Option<PathBuf>,
 }
 
