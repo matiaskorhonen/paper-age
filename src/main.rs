@@ -312,8 +312,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     draw_divider(
         &current_layer,
         vec![
-            Point::new(Mm(0.0), a4.height / 2.0),
-            Point::new(a4.width, a4.height / 2.0),
+            Point::new(a4.margin, a4.height / 2.0),
+            Point::new(a4.width - a4.margin, a4.height / 2.0),
         ],
         1.0,
         true,
