@@ -94,12 +94,24 @@ fn initialize_pdf(
     })
 }
 
-fn draw_divider(current_layer: &PdfLayerReference, points: Vec<Point>) {
+fn draw_divider(
+    current_layer: &PdfLayerReference,
+    points: Vec<Point>,
+    thickness: f64,
+    dashed: bool,
+) {
     let mut dash_pattern = LineDashPattern::default();
-    dash_pattern.dash_1 = Some(5);
+    if dashed {
+        dash_pattern.dash_1 = Some(5);
+    } else {
+        dash_pattern.dash_1 = None;
+    }
+    current_layer.set_line_dash_pattern(dash_pattern);
+
     let outline_color = Color::Rgb(Rgb::new(0.75, 0.75, 0.75, None));
     current_layer.set_outline_color(outline_color);
-    current_layer.set_line_dash_pattern(dash_pattern);
+
+    current_layer.set_outline_thickness(thickness);
 
     let divider = Line {
         points: points.iter().map(|p| (*p, false)).collect(),
@@ -113,24 +125,29 @@ fn draw_divider(current_layer: &PdfLayerReference, points: Vec<Point>) {
 }
 
 fn draw_grid(current_layer: &PdfLayerReference, dimensions: PageDimensions) {
-    let grid_size = Mm(10.0);
+    let grid_size = Mm(5.0);
+    let thickness = 0.0;
 
     let mut x = Mm(0.0);
-    let mut y = Mm(0.0);
+    let mut y = dimensions.height;
     while x < dimensions.width {
         x += grid_size;
 
         draw_divider(
             current_layer,
             vec![Point::new(x, dimensions.height), Point::new(x, Mm(0.0))],
+            thickness,
+            false,
         );
 
-        while y < dimensions.height {
-            y += grid_size;
+        while y > Mm(0.0) {
+            y -= grid_size;
 
             draw_divider(
                 current_layer,
                 vec![Point::new(dimensions.width, y), Point::new(Mm(0.0), y)],
+                thickness,
+                false,
             );
         }
     }
@@ -258,6 +275,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Point::new(Mm(0.0), a4.height / 2.0),
             Point::new(a4.width, a4.height / 2.0),
         ],
+        1.0,
+        true,
     );
 
     insert_pem_text(&pdf, &current_layer, encrypted, a4);
