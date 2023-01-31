@@ -18,6 +18,8 @@ use qrcode::{EcLevel, QrCode};
 
 mod cli;
 
+const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
+
 fn encrypt_plaintext(
     reader: &mut BufReader<Box<dyn Read>>,
     passphrase: Secret<String>,
@@ -77,8 +79,11 @@ fn initialize_pdf(
     dimensions: PageDimensions,
     title: String,
 ) -> Result<Pdf, Box<dyn std::error::Error>> {
-    let (doc, page, layer) =
+    let (mut doc, page, layer) =
         PdfDocument::new(title, dimensions.width, dimensions.height, "Layer 1");
+
+    let producer = format!("Paper Rage v{}", VERSION.unwrap_or("0.0.0"));
+    doc = doc.with_producer(producer);
 
     let code_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
     let code_font = doc.add_external_font(BufReader::new(Cursor::new(code_data)))?;
