@@ -13,8 +13,7 @@ use printpdf::{
     Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
     PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
 };
-use qrcode::render::svg;
-use qrcode::{EcLevel, QrCode};
+use qrcode::{render::svg, types::QrError, EcLevel, QrCode};
 
 mod cli;
 
@@ -45,7 +44,30 @@ fn encrypt_plaintext(
 }
 
 fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> {
-    let code = QrCode::with_error_correction_level(text, EcLevel::H)?;
+    // QR Code Error Correction Capability (approx.)
+    //     H: 30%
+    //     Q: 25%
+    //     M: 15%
+    //     L: 7%
+    let levels = [EcLevel::H, EcLevel::Q, EcLevel::M, EcLevel::L];
+
+    // Find the best level of EC level possible for the data
+    let mut result: Result<QrCode, QrError> = Result::Err(QrError::DataTooLong);
+    for ec_level in levels.iter() {
+        println!("EC: {ec_level:?}");
+        result = QrCode::with_error_correction_level(text.clone(), *ec_level);
+
+        if result.is_ok() {
+            break;
+        }
+    }
+    let code = result?;
+
+    println!(
+        "QR code EC level: {:?}, Version: {:?}",
+        code.error_correction_level(),
+        code.version()
+    );
 
     let image = code
         .render()
@@ -218,8 +240,19 @@ fn insert_pem_text(
     pem: String,
     dimensions: PageDimensions,
 ) {
-    let font_size = 13.0;
-    let line_height = 15.0;
+    let mut font_size = 13.0;
+    let mut line_height = 15.0;
+
+    if pem.lines().count() > 39 {
+        font_size = 7.0;
+        line_height = 8.0;
+    } else if pem.lines().count() > 27 {
+        font_size = 8.0;
+        line_height = 9.0;
+    } else if pem.lines().count() > 22 {
+        font_size = 10.0;
+        line_height = 12.0;
+    }
 
     current_layer.begin_text_section();
 
@@ -291,8 +324,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Plaintext length: {plaintext_len:?} bytes");
     println!("Encrypted length: {:?} bytes", encrypted.len());
-
-    io::stdout().write_all(encrypted.as_bytes())?;
 
     let a4 = PageDimensions {
         width: Mm(210.0),
