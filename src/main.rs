@@ -54,7 +54,6 @@ fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> 
     // Find the best level of EC level possible for the data
     let mut result: Result<QrCode, QrError> = Result::Err(QrError::DataTooLong);
     for ec_level in levels.iter() {
-        println!("EC: {ec_level:?}");
         result = QrCode::with_error_correction_level(text.clone(), *ec_level);
 
         if result.is_ok() {
