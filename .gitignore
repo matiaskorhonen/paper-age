@@ -1,7 +1,8 @@
 /target
-*.jpeg
-*.jpg
-*.pdf
-*.png
-*.svg
-test.txt
+/*.jpeg
+/*.jpg
+/*.pdf
+/*.png
+/*.svg
+/*.dat
+/test.*
