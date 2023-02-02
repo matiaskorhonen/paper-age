@@ -4,7 +4,7 @@ description = "Easy and secure paper backups of secrets"
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/matiaskorhonen/paper-rage"
-authors = ["Matias Korhonen <me@matiaskorhonen.fi"]
+authors = ["Matias Korhonen <me@matiaskorhonen.fi>"]
 license = "MIT"
 categories = ["command-line-utilities", "cryptography"]
 
