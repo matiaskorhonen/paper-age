@@ -88,12 +88,19 @@ struct PageDimensions {
     margin: Mm,
 }
 
+const A4_PAGE: PageDimensions = PageDimensions {
+    width: Mm(210.0),
+    height: Mm(297.0),
+    margin: Mm(10.0),
+};
+
 struct Pdf {
     doc: PdfDocumentReference,
     page: PdfPageIndex,
     layer: PdfLayerIndex,
     title_font: IndirectFontRef,
     code_font: IndirectFontRef,
+    dimensions: PageDimensions,
 }
 
 fn initialize_pdf(
@@ -118,6 +125,7 @@ fn initialize_pdf(
         layer,
         title_font,
         code_font,
+        dimensions: dimensions,
     })
 }
 
@@ -324,39 +332,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Plaintext length: {plaintext_len:?} bytes");
     println!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let a4 = PageDimensions {
-        width: Mm(210.0),
-        height: Mm(297.0),
-        margin: Mm(10.0),
-    };
-
-    let pdf = initialize_pdf(a4, args.title.clone())?;
+    let pdf = initialize_pdf(A4_PAGE, args.title.clone())?;
     let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
 
     if args.grid {
-        draw_grid(&current_layer, a4);
+        draw_grid(&current_layer, pdf.dimensions);
     }
 
-    insert_title_text(args.title, &pdf, &current_layer, a4);
+    insert_title_text(args.title, &pdf, &current_layer, pdf.dimensions);
 
     let qrcode = generate_qrcode_svg(encrypted.clone())?;
-    insert_qr_code(&current_layer, qrcode, a4);
+    insert_qr_code(&current_layer, qrcode, pdf.dimensions);
 
-    insert_passphrase(&pdf, &current_layer, a4);
+    insert_passphrase(&pdf, &current_layer, pdf.dimensions);
 
     draw_divider(
         &current_layer,
         vec![
-            Point::new(a4.margin, a4.height / 2.0),
-            Point::new(a4.width - a4.margin, a4.height / 2.0),
+            Point::new(pdf.dimensions.margin, pdf.dimensions.height / 2.0),
+            Point::new(
+                pdf.dimensions.width - pdf.dimensions.margin,
+                pdf.dimensions.height / 2.0,
+            ),
         ],
         1.0,
         true,
     );
 
-    insert_pem_text(&pdf, &current_layer, encrypted, a4);
+    insert_pem_text(&pdf, &current_layer, encrypted, pdf.dimensions);
 
-    insert_footer(&pdf, &current_layer, a4);
+    insert_footer(&pdf, &current_layer, pdf.dimensions);
 
     let file = File::create(args.output)?;
     pdf.doc.save(&mut BufWriter::new(file))?;
