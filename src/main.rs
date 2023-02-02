@@ -11,7 +11,7 @@ use age::secrecy::Secret;
 use clap::Parser;
 use printpdf::{
     Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
-    PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
+    PdfLayerIndex, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
 };
 use qrcode::{render::svg, types::QrError, EcLevel, QrCode};
 
@@ -94,6 +94,12 @@ const A4_PAGE: PageDimensions = PageDimensions {
     margin: Mm(10.0),
 };
 
+impl Default for PageDimensions {
+    fn default() -> Self {
+        A4_PAGE
+    }
+}
+
 struct Pdf {
     doc: PdfDocumentReference,
     page: PdfPageIndex,
@@ -103,10 +109,9 @@ struct Pdf {
     dimensions: PageDimensions,
 }
 
-fn initialize_pdf(
-    dimensions: PageDimensions,
-    title: String,
-) -> Result<Pdf, Box<dyn std::error::Error>> {
+fn initialize_pdf(title: String) -> Result<Pdf, Box<dyn std::error::Error>> {
+    let dimensions = PageDimensions::default();
+
     let (mut doc, page, layer) =
         PdfDocument::new(title, dimensions.width, dimensions.height, "Layer 1");
 
@@ -125,16 +130,13 @@ fn initialize_pdf(
         layer,
         title_font,
         code_font,
-        dimensions: dimensions,
+        dimensions,
     })
 }
 
-fn draw_divider(
-    current_layer: &PdfLayerReference,
-    points: Vec<Point>,
-    thickness: f64,
-    dashed: bool,
-) {
+fn draw_divider(pdf: &Pdf, points: Vec<Point>, thickness: f64, dashed: bool) {
+    let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+
     let mut dash_pattern = LineDashPattern::default();
     if dashed {
         dash_pattern.dash_1 = Some(5);
@@ -159,18 +161,18 @@ fn draw_divider(
     current_layer.add_shape(divider);
 }
 
-fn draw_grid(current_layer: &PdfLayerReference, dimensions: PageDimensions) {
+fn draw_grid(pdf: &Pdf) {
     let grid_size = Mm(5.0);
     let thickness = 0.0;
 
     let mut x = Mm(0.0);
-    let mut y = dimensions.height;
-    while x < dimensions.width {
+    let mut y = pdf.dimensions.height;
+    while x < pdf.dimensions.width {
         x += grid_size;
 
         draw_divider(
-            current_layer,
-            vec![Point::new(x, dimensions.height), Point::new(x, Mm(0.0))],
+            &pdf,
+            vec![Point::new(x, pdf.dimensions.height), Point::new(x, Mm(0.0))],
             thickness,
             false,
         );
@@ -179,8 +181,8 @@ fn draw_grid(current_layer: &PdfLayerReference, dimensions: PageDimensions) {
             y -= grid_size;
 
             draw_divider(
-                current_layer,
-                vec![Point::new(dimensions.width, y), Point::new(Mm(0.0), y)],
+                &pdf,
+                vec![Point::new(pdf.dimensions.width, y), Point::new(Mm(0.0), y)],
                 thickness,
                 false,
             );
@@ -188,7 +190,9 @@ fn draw_grid(current_layer: &PdfLayerReference, dimensions: PageDimensions) {
     }
 }
 
-fn insert_qr_code(current_layer: &PdfLayerReference, qrcode: Svg, dimensions: PageDimensions) {
+fn insert_qr_code(pdf: &Pdf, qrcode: Svg) {
+    let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+
     let desired_qr_size = Mm(110.0);
     let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
     let qr_scale = desired_qr_size / initial_qr_size;
@@ -198,12 +202,12 @@ fn insert_qr_code(current_layer: &PdfLayerReference, qrcode: Svg, dimensions: Pa
     let code_width = qrcode.width.into_pt(dpi) * scale;
     let code_height = qrcode.height.into_pt(dpi) * scale;
 
-    let translate_x = (dimensions.width.into_pt() - code_width) / 2.0;
+    let translate_x = (pdf.dimensions.width.into_pt() - code_width) / 2.0;
     let translate_y =
-        dimensions.height.into_pt() - code_height - (dimensions.margin.into_pt() * 2.0);
+        pdf.dimensions.height.into_pt() - code_height - (pdf.dimensions.margin.into_pt() * 2.0);
 
     qrcode.add_to_layer(
-        current_layer,
+        &current_layer,
         SvgTransform {
             translate_x: Some(translate_x),
             translate_y: Some(translate_y),
@@ -215,12 +219,9 @@ fn insert_qr_code(current_layer: &PdfLayerReference, qrcode: Svg, dimensions: Pa
     );
 }
 
-fn insert_title_text(
-    title: String,
-    pdf: &Pdf,
-    current_layer: &PdfLayerReference,
-    dimensions: PageDimensions,
-) {
+fn insert_title_text(pdf: &Pdf, title: String) {
+    let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+
     let font_size = 14.0;
 
     // Align the title with the QR code if the title is narrower than the QR code
@@ -228,7 +229,7 @@ fn insert_title_text(
         if title.len() <= 37 {
             Mm(50.0)
         } else {
-            dimensions.margin
+            pdf.dimensions.margin
         }
     };
 
@@ -236,17 +237,14 @@ fn insert_title_text(
         title,
         font_size,
         margin,
-        dimensions.height - dimensions.margin - Mm::from(Pt(font_size)),
+        pdf.dimensions.height - pdf.dimensions.margin - Mm::from(Pt(font_size)),
         &pdf.title_font,
     );
 }
 
-fn insert_pem_text(
-    pdf: &Pdf,
-    current_layer: &PdfLayerReference,
-    pem: String,
-    dimensions: PageDimensions,
-) {
+fn insert_pem_text(pdf: &Pdf, pem: String) {
+    let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+
     let mut font_size = 13.0;
     let mut line_height = 15.0;
 
@@ -264,8 +262,8 @@ fn insert_pem_text(
     current_layer.begin_text_section();
 
     current_layer.set_text_cursor(
-        dimensions.margin,
-        (dimensions.height / 2.0) - Mm::from(Pt(font_size)) - dimensions.margin,
+        pdf.dimensions.margin,
+        (pdf.dimensions.height / 2.0) - Mm::from(Pt(font_size)) - pdf.dimensions.margin,
     );
     current_layer.set_line_height(line_height);
     current_layer.set_font(&pdf.code_font, font_size);
@@ -278,11 +276,15 @@ fn insert_pem_text(
     current_layer.end_text_section();
 }
 
-fn insert_passphrase(pdf: &Pdf, current_layer: &PdfLayerReference, dimensions: PageDimensions) {
-    let baseline = dimensions.height / 2.0 + dimensions.margin;
+fn insert_passphrase(pdf: &Pdf) {
+    let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+
+    let baseline = pdf.dimensions.height / 2.0 + pdf.dimensions.margin;
+
     current_layer.use_text("Passphrase: ", 13.0, Mm(50.0), baseline, &pdf.title_font);
+
     draw_divider(
-        current_layer,
+        &pdf,
         vec![
             Point::new(Mm(50.0) + Mm(30.0), baseline - Mm(1.0)),
             Point::new(Mm(110.0) + Mm(50.0), baseline - Mm(1.0)),
@@ -292,12 +294,14 @@ fn insert_passphrase(pdf: &Pdf, current_layer: &PdfLayerReference, dimensions: P
     )
 }
 
-fn insert_footer(pdf: &Pdf, current_layer: &PdfLayerReference, dimensions: PageDimensions) {
+fn insert_footer(pdf: &Pdf) {
+    let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+
     current_layer.use_text(
         "Scan QR code and decrypt using Age <https://age-encryption.org>",
         13.0,
-        dimensions.margin,
-        dimensions.margin,
+        pdf.dimensions.margin,
+        pdf.dimensions.margin,
         &pdf.title_font,
     );
 }
@@ -332,22 +336,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Plaintext length: {plaintext_len:?} bytes");
     println!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = initialize_pdf(A4_PAGE, args.title.clone())?;
-    let current_layer = pdf.doc.get_page(pdf.page).get_layer(pdf.layer);
+    let pdf = initialize_pdf(args.title.clone())?;
 
     if args.grid {
-        draw_grid(&current_layer, pdf.dimensions);
+        draw_grid(&pdf);
     }
 
-    insert_title_text(args.title, &pdf, &current_layer, pdf.dimensions);
+    insert_title_text(&pdf, args.title);
 
     let qrcode = generate_qrcode_svg(encrypted.clone())?;
-    insert_qr_code(&current_layer, qrcode, pdf.dimensions);
+    insert_qr_code(&pdf, qrcode);
 
-    insert_passphrase(&pdf, &current_layer, pdf.dimensions);
+    insert_passphrase(&pdf);
 
     draw_divider(
-        &current_layer,
+        &pdf,
         vec![
             Point::new(pdf.dimensions.margin, pdf.dimensions.height / 2.0),
             Point::new(
@@ -359,9 +362,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         true,
     );
 
-    insert_pem_text(&pdf, &current_layer, encrypted, pdf.dimensions);
+    insert_pem_text(&pdf, encrypted);
 
-    insert_footer(&pdf, &current_layer, pdf.dimensions);
+    insert_footer(&pdf);
 
     let file = File::create(args.output)?;
     pdf.doc.save(&mut BufWriter::new(file))?;
