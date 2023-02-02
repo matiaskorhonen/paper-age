@@ -11,7 +11,7 @@ use age::secrecy::Secret;
 use clap::Parser;
 use printpdf::{
     Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
-    PdfLayerIndex, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
+    PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
 };
 use qrcode::{render::svg, types::QrError, EcLevel, QrCode};
 
@@ -135,8 +135,12 @@ impl Document {
         })
     }
 
+    fn get_current_layer(&self) -> PdfLayerReference {
+        self.doc.get_page(self.page).get_layer(self.layer)
+    }
+
     fn insert_title_text(&self, title: String) {
-        let current_layer = self.doc.get_page(self.page).get_layer(self.layer);
+        let current_layer = self.get_current_layer();
 
         let font_size = 14.0;
 
@@ -159,7 +163,7 @@ impl Document {
     }
 
     fn insert_pem_text(&self, pem: String) {
-        let current_layer = self.doc.get_page(self.page).get_layer(self.layer);
+        let current_layer = self.get_current_layer();
 
         let mut font_size = 13.0;
         let mut line_height = 15.0;
@@ -194,7 +198,7 @@ impl Document {
     }
 
     fn insert_qr_code(&self, qrcode: Svg) {
-        let current_layer = self.doc.get_page(self.page).get_layer(self.layer);
+        let current_layer = self.get_current_layer();
 
         let desired_qr_size = Mm(110.0);
         let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
@@ -253,8 +257,8 @@ impl Document {
         }
     }
 
-        let current_layer = self.doc.get_page(self.page).get_layer(self.layer);
     fn draw_line(&self, points: Vec<Point>, thickness: f64, dash_pattern: LineDashPattern) {
+        let current_layer = self.get_current_layer();
 
         current_layer.set_line_dash_pattern(dash_pattern);
 
@@ -275,7 +279,7 @@ impl Document {
     }
 
     fn insert_passphrase(&self) {
-        let current_layer = self.doc.get_page(self.page).get_layer(self.layer);
+        let current_layer = self.get_current_layer();
 
         let baseline = self.dimensions.height / 2.0 + self.dimensions.margin;
 
@@ -292,7 +296,7 @@ impl Document {
     }
 
     fn insert_footer(&self) {
-        let current_layer = self.doc.get_page(self.page).get_layer(self.layer);
+        let current_layer = self.get_current_layer();
 
         current_layer.use_text(
             "Scan QR code and decrypt using Age <https://age-encryption.org>",
