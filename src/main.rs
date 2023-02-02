@@ -232,36 +232,30 @@ impl Document {
         while x < self.dimensions.width {
             x += grid_size;
 
-            self.draw_divider(
+            self.draw_line(
                 vec![
                     Point::new(x, self.dimensions.height),
                     Point::new(x, Mm(0.0)),
                 ],
                 thickness,
-                false,
+                LineDashPattern::default(),
             );
 
             while y > Mm(0.0) {
                 y -= grid_size;
 
-                self.draw_divider(
+                self.draw_line(
                     vec![Point::new(self.dimensions.width, y), Point::new(Mm(0.0), y)],
                     thickness,
-                    false,
+                    LineDashPattern::default(),
                 );
             }
         }
     }
 
-    fn draw_divider(&self, points: Vec<Point>, thickness: f64, dashed: bool) {
         let current_layer = self.doc.get_page(self.page).get_layer(self.layer);
+    fn draw_line(&self, points: Vec<Point>, thickness: f64, dash_pattern: LineDashPattern) {
 
-        let mut dash_pattern = LineDashPattern::default();
-        if dashed {
-            dash_pattern.dash_1 = Some(5);
-        } else {
-            dash_pattern.dash_1 = None;
-        }
         current_layer.set_line_dash_pattern(dash_pattern);
 
         let outline_color = Color::Rgb(Rgb::new(0.75, 0.75, 0.75, None));
@@ -287,13 +281,13 @@ impl Document {
 
         current_layer.use_text("Passphrase: ", 13.0, Mm(50.0), baseline, &self.title_font);
 
-        self.draw_divider(
+        self.draw_line(
             vec![
                 Point::new(Mm(50.0) + Mm(30.0), baseline - Mm(1.0)),
                 Point::new(Mm(110.0) + Mm(50.0), baseline - Mm(1.0)),
             ],
             1.0,
-            false,
+            LineDashPattern::default(),
         )
     }
 
@@ -353,7 +347,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     pdf.insert_passphrase();
 
-    pdf.draw_divider(
+    pdf.draw_line(
         vec![
             Point::new(pdf.dimensions.margin, pdf.dimensions.height / 2.0),
             Point::new(
@@ -362,7 +356,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ),
         ],
         1.0,
-        true,
+        LineDashPattern {
+            dash_1: Some(5),
+            ..LineDashPattern::default()
+        },
     );
 
     pdf.insert_pem_text(encrypted);
