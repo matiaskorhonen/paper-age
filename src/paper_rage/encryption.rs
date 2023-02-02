@@ -1,11 +1,11 @@
-use std::io::{BufReader, Read, Write};
+use std::io::Write;
 
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::Secret;
 
 pub fn encrypt_plaintext(
-    reader: &mut BufReader<Box<dyn Read>>,
+    reader: &mut dyn std::io::BufRead,
     passphrase: Secret<String>,
 ) -> Result<(usize, String), Box<dyn std::error::Error>> {
     let mut plaintext: Vec<u8> = vec![];
@@ -26,4 +26,22 @@ pub fn encrypt_plaintext(
     let utf8 = std::string::String::from_utf8(output.to_owned())?;
 
     Ok((plaintext.len(), utf8))
+}
+
+#[test]
+fn test_armored_output() {
+    let mut input = b"some secrets" as &[u8];
+    let passphrase = Secret::new(String::from("snakeoil"));
+    let result = encrypt_plaintext(&mut input, passphrase);
+
+    assert!(!result.is_err());
+
+    let (plaintext_size, armored) = result.unwrap();
+    assert_eq!(plaintext_size, 12);
+
+    let first_line: String = armored.lines().take(1).collect();
+    assert_eq!(first_line, "-----BEGIN AGE ENCRYPTED FILE-----");
+
+    let last_line: &str = armored.lines().last().unwrap();
+    assert_eq!(last_line, "-----END AGE ENCRYPTED FILE-----")
 }
