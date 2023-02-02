@@ -12,8 +12,7 @@ use clap::Parser;
 use printpdf::{LineDashPattern, Point, Svg};
 use qrcode::{render::svg, types::QrError, EcLevel, QrCode};
 
-mod cli;
-mod paperrage;
+mod paper_rage;
 
 fn encrypt_plaintext(
     reader: &mut BufReader<Box<dyn Read>>,
@@ -78,7 +77,7 @@ fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> 
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = cli::Args::parse();
+    let args = paper_rage::cli::Args::parse();
 
     if args.fonts_license {
         let license = include_bytes!("assets/fonts/license.txt");
@@ -107,7 +106,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Plaintext length: {plaintext_len:?} bytes");
     println!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = paperrage::Document::new(args.title.clone())?;
+    let pdf = paper_rage::Document::new(args.title.clone())?;
 
     if args.grid {
         pdf.draw_grid();

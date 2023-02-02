@@ -5,6 +5,8 @@ use printpdf::{
     PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
 };
 
+pub mod cli;
+
 pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 
 #[derive(Clone, Copy)]
@@ -37,7 +39,7 @@ pub struct Document {
 
 impl Document {
     pub fn new(title: String) -> Result<Document, Box<dyn std::error::Error>> {
-        let dimensions = PageDimensions::default();
+        let dimensions: PageDimensions = Default::default();
 
         let (mut doc, page, layer) =
             PdfDocument::new(title, dimensions.width, dimensions.height, "Layer 1");

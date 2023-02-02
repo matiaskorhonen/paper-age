@@ -1,6 +1,6 @@
 use clap::CommandFactory;
 
-#[path = "src/cli.rs"]
+#[path = "src/paper_rage/cli.rs"]
 mod cli;
 
 fn main() -> std::io::Result<()> {
