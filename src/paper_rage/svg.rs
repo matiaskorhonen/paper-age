@@ -37,7 +37,7 @@ pub fn qrcode(text: String) -> Result<String, QrError> {
 }
 
 #[test]
-fn generates_svg_qrcodes() {
+fn test_svg_qrcode() {
     let svg = qrcode(String::from("Some value")).unwrap();
     assert_eq!(
         svg,
@@ -46,7 +46,7 @@ fn generates_svg_qrcodes() {
 }
 
 #[test]
-fn return_error_if_too_large() {
+fn test_input_too_large() {
     let result = qrcode(String::from(include_str!(
         "../../tests/data/some_value.svg"
     )));
