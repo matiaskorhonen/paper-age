@@ -6,50 +6,11 @@ use std::{
 
 use age::cli_common::read_secret;
 use clap::Parser;
-use printpdf::{LineDashPattern, Point, Svg};
-use qrcode::{render::svg, types::QrError, EcLevel, QrCode};
+use printpdf::{LineDashPattern, Point};
 
 use crate::paper_rage::encryption::encrypt_plaintext;
 
 mod paper_rage;
-
-fn generate_qrcode_svg(text: String) -> Result<Svg, Box<dyn std::error::Error>> {
-    // QR Code Error Correction Capability (approx.)
-    //     H: 30%
-    //     Q: 25%
-    //     M: 15%
-    //     L: 7%
-    let levels = [EcLevel::H, EcLevel::Q, EcLevel::M, EcLevel::L];
-
-    // Find the best level of EC level possible for the data
-    let mut result: Result<QrCode, QrError> = Result::Err(QrError::DataTooLong);
-    for ec_level in levels.iter() {
-        result = QrCode::with_error_correction_level(text.clone(), *ec_level);
-
-        if result.is_ok() {
-            break;
-        }
-    }
-    let code = result?;
-
-    println!(
-        "QR code EC level: {:?}, Version: {:?}",
-        code.error_correction_level(),
-        code.version()
-    );
-
-    let image = code
-        .render()
-        .min_dimensions(256, 256)
-        .dark_color(svg::Color("#000000"))
-        .light_color(svg::Color("#ffffff"))
-        .quiet_zone(false)
-        .build();
-
-    let svg = Svg::parse(image.as_str())?;
-
-    Ok(svg)
-}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = paper_rage::cli::Args::parse();
@@ -89,8 +50,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     pdf.insert_title_text(args.title);
 
-    let qrcode = generate_qrcode_svg(encrypted.clone())?;
-    pdf.insert_qr_code(qrcode);
+    pdf.insert_qr_code(encrypted.clone())?;
 
     pdf.insert_passphrase();
 

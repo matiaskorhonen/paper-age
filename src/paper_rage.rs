@@ -7,6 +7,7 @@ use printpdf::{
 
 pub mod cli;
 pub mod encryption;
+pub mod svg;
 
 pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 
@@ -126,7 +127,10 @@ impl Document {
         current_layer.end_text_section();
     }
 
-    pub fn insert_qr_code(&self, qrcode: Svg) {
+    pub fn insert_qr_code(&self, text: String) -> Result<(), Box<dyn std::error::Error>> {
+        let image = svg::qrcode(text)?;
+        let qrcode = Svg::parse(image.as_str())?;
+
         let current_layer = self.get_current_layer();
 
         let desired_qr_size = Mm(110.0);
@@ -154,6 +158,8 @@ impl Document {
                 dpi: Some(dpi),
             },
         );
+
+        Ok(())
     }
 
     pub fn draw_grid(&self) {
