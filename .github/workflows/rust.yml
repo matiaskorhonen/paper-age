@@ -15,7 +15,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install markdown-test-report
+      run: cargo install markdown-test-report
     - name: Build
       run: cargo build --verbose
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose -- -Z unstable-options --report-time --format json | tee test-output.json
+    - name: Job Summary
+      if: ${{ always() }}
+      run: "[ -f test-output.json ] && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
