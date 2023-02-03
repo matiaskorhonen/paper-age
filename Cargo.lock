@@ -1035,7 +1035,7 @@ dependencies = [
 
 [[package]]
 name = "paper-rage"
-version = "0.1.0"
+version = "0.1.0-prerelease2"
 dependencies = [
  "age",
  "clap",

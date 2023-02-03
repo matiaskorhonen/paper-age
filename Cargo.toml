@@ -1,7 +1,7 @@
 [package]
 name = "paper-rage"
 description = "Easy and secure paper backups of secrets"
-version = "0.1.0"
+version = "0.1.0-prerelease2"
 edition = "2021"
 repository = "https://github.com/matiaskorhonen/paper-rage"
 authors = ["Matias Korhonen <me@matiaskorhonen.fi>"]
@@ -25,4 +25,3 @@ clap_mangen = { version = "0.2.7" }
 inherits = "release"
 debug = true
 split-debuginfo = "packed"
-
