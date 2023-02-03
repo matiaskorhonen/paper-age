@@ -15,7 +15,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install markdown-test-report
+      run: |
+        mkdir -p "${HOME}/.local/bin"
+        echo "${HOME}/.local/bin" >> $GITHUB_PATH
+        wget --quiet -O "${HOME}/.local/bin/markdown-test-report" https://github.com/ctron/markdown-test-report/releases/download/v0.3.6/markdown-test-report-linux-amd64
+        chmod +x "${HOME}/.local/bin/markdown-test-report"
     - name: Build
       run: cargo build --verbose
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose -- -Z unstable-options --report-time --format json | tee test-output.json
+    - name: Job Summary
+      if: ${{ always() }}
+      run: "[ -f test-output.json ] && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
+      continue-on-error: true
