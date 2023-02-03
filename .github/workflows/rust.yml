@@ -20,6 +20,7 @@ jobs:
         mkdir -p "${HOME}/.local/bin"
         echo "${HOME}/.local/bin" >> $GITHUB_PATH
         wget --quiet -O "${HOME}/.local/bin/markdown-test-report" https://github.com/ctron/markdown-test-report/releases/download/v0.3.6/markdown-test-report-linux-amd64
+        chmod +x "${HOME}/.local/bin/markdown-test-report"
     - name: Build
       run: cargo build --verbose
     - name: Run tests
