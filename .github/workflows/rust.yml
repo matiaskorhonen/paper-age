@@ -24,3 +24,4 @@ jobs:
     - name: Job Summary
       if: ${{ always() }}
       run: "[ -f test-output.json ] && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
+      continue-on-error: true
