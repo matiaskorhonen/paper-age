@@ -45,8 +45,6 @@ fn test_svg_qrcode() {
 
 #[test]
 fn test_input_too_large() {
-    let result = qrcode(String::from(include_str!(
-        "../../tests/data/some_value.svg"
-    )));
+    let result = qrcode(String::from(include_str!("../../tests/data/too_large.txt")));
     assert!(result.is_err());
 }

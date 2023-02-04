@@ -11,11 +11,17 @@ pub mod svg;
 
 pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct PageDimensions {
     pub width: Mm,
     pub height: Mm,
     pub margin: Mm,
+}
+
+impl PartialEq for PageDimensions {
+    fn eq(&self, other: &PageDimensions) -> bool {
+        self.width == other.width && self.height == other.height && self.margin == other.margin
+    }
 }
 
 pub const A4_PAGE: PageDimensions = PageDimensions {
@@ -257,4 +263,38 @@ impl Document {
             &self.title_font,
         );
     }
+}
+
+#[test]
+fn test_paper_dimensions_default() {
+    let default = PageDimensions::default();
+    assert_eq!(default.width, Mm(210.0));
+    assert_eq!(default.height, Mm(297.0));
+}
+
+#[test]
+fn test_new_document() {
+    let title = String::from("Hello World!");
+    let result = Document::new(title);
+    assert!(result.is_ok());
+
+    let doc = result.unwrap();
+    assert_eq!(doc.dimensions, A4_PAGE);
+}
+
+#[test]
+fn test_qrcode() {
+    let result = Document::new(String::from("QR code"));
+    let document = result.unwrap();
+    let result = document.insert_qr_code(String::from("payload"));
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_qrcode_too_large() {
+    let document = Document::new(String::from("QR code")).unwrap();
+    let result = document.insert_qr_code(String::from(include_str!("../tests/data/too_large.txt")));
+
+    assert!(result.is_err());
+    assert!(result.unwrap_err().is::<qrcode::types::QrError>());
 }
