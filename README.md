@@ -39,6 +39,28 @@ paper-age [OPTIONS] [INPUT]
 * `-q, --quiet...` — Less output per occurrence
 * `-h, --help` — Print help
 * `-V, --version` — Print version
+
+## Development
+
+Run the latest from git locally, assuming you have already [installed Rust](https://www.rust-lang.org/learn/get-started):
+
+1. Pull this repo
+2. Run the tests: `cargo test`
+3. Get help: `cargo run -- -h`
+4. Encrypt from stdin: `echo "Hello World" | cargo run -- --title="secrets from stdin" --out="stdin.pdf"`
+
+### Releases
+
+Releases are compiled and released on GitHub when new versions are tagged in git.
+
+Use [cargo release](https://github.com/crate-ci/cargo-release) to tag and publish a new version, For example:
+
+```sh
+cargo release 1.2.3
+```
+
+⚠️ Append `--execute` to the command to actually execute the release.
+
 ## License & Credits
 
 PaperAge is released under the MIT License. See the [LICENSE.txt](LICENSE.txt) file for details.
