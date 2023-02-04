@@ -5,20 +5,36 @@ use std::{
 };
 
 use age::cli_common::read_secret;
-use clap::Parser;
+use clap::error::ErrorKind;
+use clap::{CommandFactory, Parser};
 use printpdf::{LineDashPattern, Point};
+use qrcode::types::QrError;
 
 use crate::paper_age::encryption::encrypt_plaintext;
 
 mod paper_age;
 
+const TITLE_MAX_LEN: usize = 64;
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = paper_age::cli::Args::parse();
+    let mut cmd = paper_age::cli::Args::command();
 
     if args.fonts_license {
         let license = include_bytes!("assets/fonts/IBMPlexMono-LICENSE.txt");
         io::stdout().write_all(license)?;
         return Ok(());
+    }
+
+    if args.title.len() > TITLE_MAX_LEN {
+        cmd.error(
+            ErrorKind::InvalidValue,
+            format!(
+                "The title cannot be longer than {} characters",
+                TITLE_MAX_LEN
+            ),
+        )
+        .exit();
     }
 
     let passphrase = match read_secret("Type passphrase", "Passphrase", None) {
@@ -50,7 +66,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     pdf.insert_title_text(args.title);
 
-    pdf.insert_qr_code(encrypted.clone())?;
+    match pdf.insert_qr_code(encrypted.clone()) {
+        Ok(()) => (),
+        Err(error) => {
+            if error.is::<QrError>() {
+                cmd.error(
+                    ErrorKind::ValueValidation,
+                    "Too much data after encryption, please try a smaller file",
+                )
+                .exit()
+            } else {
+                println!("The QR code generaton failed for an unknown reason");
+                std::process::exit(exitcode::DATAERR);
+            }
+        }
+    }
 
     pdf.insert_passphrase();
 
