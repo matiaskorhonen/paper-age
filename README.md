@@ -53,7 +53,7 @@ Run the latest from git locally, assuming you have already [installed Rust](http
 
 Releases are compiled and released on GitHub when new versions are tagged in git.
 
-Use [cargo release](https://github.com/crate-ci/cargo-release) to tag and publish a new version, For example:
+Use [cargo release](https://github.com/crate-ci/cargo-release) to tag and publish a new version, for example:
 
 ```sh
 cargo release 1.2.3
