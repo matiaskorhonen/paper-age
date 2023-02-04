@@ -8,6 +8,9 @@ authors = ["Matias Korhonen <me@matiaskorhonen.fi>"]
 license = "MIT"
 categories = ["command-line-utilities", "cryptography"]
 
+[package.metadata.release]
+tag-message = "Release {{crate_name}} version {{version}}"
+
 [dependencies]
 age = { version = "0.9.0", features = ["armor", "cli-common"] }
 clap = { version = "4.1.4", features = ["derive"] }
