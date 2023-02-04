@@ -11,6 +11,9 @@ categories = ["command-line-utilities", "cryptography"]
 [package.metadata.release]
 tag-message = "Release {{crate_name}} version {{version}}"
 sign-tag = true
+pre-release-replacements = [
+  {file="CHANGELOG.md", search="Unreleased", replace="{{version}}", min=1},
+]
 
 [dependencies]
 age = { version = "0.9.0", features = ["armor", "cli-common"] }
