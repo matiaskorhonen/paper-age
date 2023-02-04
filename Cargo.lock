@@ -1041,7 +1041,6 @@ dependencies = [
  "clap",
  "clap_mangen",
  "exitcode",
- "is-terminal",
  "printpdf",
  "qrcode",
 ]
