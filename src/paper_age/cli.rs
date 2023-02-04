@@ -6,7 +6,7 @@ use clap_verbosity_flag::Verbosity;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub(crate) struct Args {
-    /// Page title (max. 60 characters)
+    /// Page title (max. 64 characters)
     #[arg(long, default_value = "Paper Rage")]
     pub title: String,
 
@@ -26,7 +26,7 @@ pub(crate) struct Args {
     #[clap(flatten)]
     pub verbose: Verbosity,
 
-    /// The path to the file to read, use - to read from stdin (max. 704 characters/bytes)
+    /// The path to the file to read, use - to read from stdin (max. ~1.5KB)
     pub input: Option<PathBuf>,
 }
 

@@ -27,19 +27,18 @@ paper-age [OPTIONS] [INPUT]
 
 ### **Options:**
 
-* `--title <TITLE>` — Page title (max. 60 characters)
+* `--title <TITLE>` — Page title (max. 64 characters)
 
   Default value: `Paper Rage`
 * `-o`, `--output <OUTPUT>` — Output file name
 
   Default value: `out.pdf`
 * `-g`, `--grid` — Draw a grid pattern for debugging layout issues
-
-  Default value: `false`
 * `--fonts-license` — Print out the license for the embedded fonts
-
-  Default value: `false`
-
+* `-v, --verbose...` — More output per occurrence
+* `-q, --quiet...` — Less output per occurrence
+* `-h, --help` — Print help
+* `-V, --version` — Print version
 ## License & Credits
 
 PaperAge is released under the MIT License. See the [LICENSE.txt](LICENSE.txt) file for details.
