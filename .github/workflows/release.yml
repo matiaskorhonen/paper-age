@@ -34,8 +34,6 @@ jobs:
             os: macos-latest
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
-          - target: x86_64-apple-darwin
-            os: macos-latest
           # Universal macOS binary is supported as universal-apple-darwin.
           - target: universal-apple-darwin
             os: macos-latest
@@ -49,6 +47,8 @@ jobs:
           bin: paper-age
           # (optional) Target triple, default is host triple.
           target: ${{ matrix.target }}
+          # (optional) Comma-separated list of additional files to be included to archive.
+          include: README.md,LICENSE.txt,src/assets/fonts/IBMPlexMono-LICENSE.txt
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
 
