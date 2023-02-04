@@ -41,6 +41,8 @@ pub struct Document {
 
 impl Document {
     pub fn new(title: String) -> Result<Document, Box<dyn std::error::Error>> {
+        debug!("Initializing PDF");
+
         let dimensions: PageDimensions = Default::default();
 
         let (mut doc, page, layer) =
@@ -70,6 +72,8 @@ impl Document {
     }
 
     pub fn insert_title_text(&self, title: String) {
+        debug!("Inserting title: {}", title.as_str());
+
         let current_layer = self.get_current_layer();
 
         let font_size = 14.0;
@@ -93,6 +97,8 @@ impl Document {
     }
 
     pub fn insert_pem_text(&self, pem: String) {
+        debug!("Inserting PEM encoded ciphertext");
+
         let current_layer = self.get_current_layer();
 
         let mut font_size = 13.0;
@@ -128,6 +134,8 @@ impl Document {
     }
 
     pub fn insert_qr_code(&self, text: String) -> Result<(), Box<dyn std::error::Error>> {
+        debug!("Inserting QR code");
+
         let image = svg::qrcode(text)?;
         let qrcode = Svg::parse(image.as_str())?;
 
@@ -163,6 +171,8 @@ impl Document {
     }
 
     pub fn draw_grid(&self) {
+        debug!("Drawing grid");
+
         let grid_size = Mm(5.0);
         let thickness = 0.0;
 
@@ -193,6 +203,8 @@ impl Document {
     }
 
     pub fn draw_line(&self, points: Vec<Point>, thickness: f64, dash_pattern: LineDashPattern) {
+        trace!("Drawing line");
+
         let current_layer = self.get_current_layer();
 
         current_layer.set_line_dash_pattern(dash_pattern);
@@ -214,6 +226,8 @@ impl Document {
     }
 
     pub fn insert_passphrase(&self) {
+        debug!("Inserting passphrase placeholder");
+
         let current_layer = self.get_current_layer();
 
         let baseline = self.dimensions.height / 2.0 + self.dimensions.margin;
@@ -231,6 +245,8 @@ impl Document {
     }
 
     pub fn insert_footer(&self) {
+        debug!("Inserting footer");
+
         let current_layer = self.get_current_layer();
 
         current_layer.use_text(

@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use clap::Parser;
+use clap_verbosity_flag::Verbosity;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -20,6 +21,10 @@ pub(crate) struct Args {
     /// Print out the license for the embedded fonts
     #[arg(long, default_value_t = false, exclusive = true)]
     pub fonts_license: bool,
+
+    /// Verbose output for debugging
+    #[clap(flatten)]
+    pub verbose: Verbosity,
 
     /// The path to the file to read, use - to read from stdin (max. 704 characters/bytes)
     pub input: Option<PathBuf>,

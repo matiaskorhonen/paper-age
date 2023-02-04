@@ -8,6 +8,8 @@ pub fn encrypt_plaintext(
     reader: &mut dyn std::io::BufRead,
     passphrase: Secret<String>,
 ) -> Result<(usize, String), Box<dyn std::error::Error>> {
+    debug!("Encrypting plaintext");
+
     let mut plaintext: Vec<u8> = vec![];
     reader.read_to_end(&mut plaintext)?;
 

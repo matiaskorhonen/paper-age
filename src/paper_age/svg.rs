@@ -11,6 +11,7 @@ pub fn qrcode(text: String) -> Result<String, QrError> {
     // Find the best level of EC level possible for the data
     let mut result: Result<QrCode, QrError> = Result::Err(QrError::DataTooLong);
     for ec_level in levels.iter() {
+        debug!("Trying EC level {:?}", *ec_level);
         result = QrCode::with_error_correction_level(text.clone(), *ec_level);
 
         if result.is_ok() {
@@ -19,11 +20,8 @@ pub fn qrcode(text: String) -> Result<String, QrError> {
     }
     let code = result?;
 
-    println!(
-        "QR code EC level: {:?}, Version: {:?}",
-        code.error_correction_level(),
-        code.version()
-    );
+    info!("QR code EC level: {:?}", code.error_correction_level());
+    info!("QR code version: {:?}", code.version());
 
     let image = code
         .render()
