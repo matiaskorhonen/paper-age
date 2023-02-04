@@ -39,8 +39,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::process::exit(exitcode::DATAERR);
     }
 
-    let path = args.input.unwrap();
+    let output = args.output;
+    if output.exists() {
+        if args.force {
+            warn!("Overwriting existing output file: {}", output.display());
+        } else {
+            error!("Output file already exists: {}", output.display());
+            std::process::exit(exitcode::CANTCREAT);
+        }
+    }
 
+    let path = args.input.unwrap();
     let mut reader: BufReader<Box<dyn Read>> = {
         if path == PathBuf::from("-") {
             BufReader::new(Box::new(stdin().lock()))
@@ -105,7 +114,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     pdf.insert_footer();
 
-    let file = File::create(args.output)?;
+    let file = File::create(output)?;
     pdf.doc.save(&mut BufWriter::new(file))?;
 
     Ok(())

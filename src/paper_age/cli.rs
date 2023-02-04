@@ -7,12 +7,16 @@ use clap_verbosity_flag::Verbosity;
 #[command(author, version, about, long_about = None)]
 pub(crate) struct Args {
     /// Page title (max. 64 characters)
-    #[arg(long, default_value = "Paper Rage")]
+    #[arg(short, long, default_value = "Paper Rage")]
     pub title: String,
 
     /// Output file name
     #[arg(short, long, default_value = "out.pdf")]
-    pub output: String,
+    pub output: PathBuf,
+
+    /// Overwrite the output file if it already exists
+    #[arg(short, long, default_value_t = false)]
+    pub force: bool,
 
     /// Draw a grid pattern for debugging layout issues
     #[arg(short, long, default_value_t = false)]

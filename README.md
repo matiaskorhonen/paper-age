@@ -27,18 +27,19 @@ paper-age [OPTIONS] [INPUT]
 
 ### **Options:**
 
-* `--title <TITLE>` — Page title (max. 64 characters)
+* `-t`, `--title <TITLE>` — Page title (max. 64 characters)
 
   Default value: `Paper Rage`
 * `-o`, `--output <OUTPUT>` — Output file name
 
   Default value: `out.pdf`
+* `-f`, `--force` — Overwrite the output file if it already exists
 * `-g`, `--grid` — Draw a grid pattern for debugging layout issues
 * `--fonts-license` — Print out the license for the embedded fonts
-* `-v, --verbose...` — More output per occurrence
-* `-q, --quiet...` — Less output per occurrence
-* `-h, --help` — Print help
-* `-V, --version` — Print version
+* `-v`, `--verbose...` — More output per occurrence
+* `-q`, `--quiet...` — Less output per occurrence
+* `-h`, `--help` — Print help
+* `-V`, `--version` — Print version
 
 ## Development
 
@@ -48,6 +49,7 @@ Run the latest from git locally, assuming you have already [installed Rust](http
 2. Run the tests: `cargo test`
 3. Get help: `cargo run -- -h`
 4. Encrypt from stdin: `echo "Hello World" | cargo run -- --title="secrets from stdin" --out="stdin.pdf"`
+5. Run with maximum verbosity:  `echo "Hello World" | cargo run -- -vvvv`
 
 ### Releases
 
