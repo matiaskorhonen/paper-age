@@ -11,9 +11,12 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.create-gh-release.outputs.computed-prefix }}${{ steps.create-gh-release.outputs.version }}
     steps:
       - uses: actions/checkout@v3
-      - uses: taiki-e/create-gh-release-action@v1
+      - id: create-gh-release
+        uses: taiki-e/create-gh-release-action@v1
         with:
           draft: true
           changelog: CHANGELOG.md
@@ -21,6 +24,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   upload-assets:
+    needs: [create-release]
     strategy:
       matrix:
         include:
