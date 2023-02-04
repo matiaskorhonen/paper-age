@@ -1073,7 +1073,7 @@ dependencies = [
 
 [[package]]
 name = "paper-age"
-version = "0.1.0-prerelease3"
+version = "0.1.0-prerelease4"
 dependencies = [
  "age",
  "clap",
