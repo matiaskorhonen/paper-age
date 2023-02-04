@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = paper_age::cli::Args::parse();
 
     if args.fonts_license {
-        let license = include_bytes!("assets/fonts/license.txt");
+        let license = include_bytes!("assets/fonts/IBMPlexMono-LICENSE.txt");
         io::stdout().write_all(license)?;
         return Ok(());
     }
