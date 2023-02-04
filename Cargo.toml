@@ -10,6 +10,7 @@ categories = ["command-line-utilities", "cryptography"]
 
 [package.metadata.release]
 tag-message = "Release {{crate_name}} version {{version}}"
+sign-tag = true
 
 [dependencies]
 age = { version = "0.9.0", features = ["armor", "cli-common"] }
