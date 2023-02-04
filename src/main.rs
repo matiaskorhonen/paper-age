@@ -1,10 +1,11 @@
 use std::{
+    env,
     fs::File,
     io::{self, stdin, BufReader, BufWriter, Read, Write},
     path::PathBuf,
 };
 
-use age::cli_common::read_secret;
+use age::{cli_common::read_secret, secrecy::SecretString};
 use clap::Parser;
 use printpdf::{LineDashPattern, Point};
 use qrcode::types::QrError;
@@ -61,9 +62,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let passphrase = match read_secret("Type passphrase", "Passphrase", None) {
-        Ok(s) => s,
-        Err(_e) => std::process::exit(exitcode::NOINPUT),
+    let passphrase = match env::var("PAPERAGE_PASSPHRASE") {
+        Ok(pass) => SecretString::from(pass),
+        Err(_error) => match read_secret("Type passphrase", "Passphrase", None) {
+            Ok(s) => s,
+            Err(_e) => std::process::exit(exitcode::NOINPUT),
+        },
     };
 
     // Encrypt the plaintext to a ciphertext using the passphrase...

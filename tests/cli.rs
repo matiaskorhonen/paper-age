@@ -3,6 +3,25 @@ use assert_fs::prelude::*;
 use predicates::prelude::*;
 
 #[test]
+fn test_happy_path() -> Result<(), Box<dyn std::error::Error>> {
+    let temp = assert_fs::TempDir::new().unwrap();
+    let input = temp.child("sample.txt");
+    input.write_str("Hello")?;
+    let output = temp.child("output.pdf");
+    let mut cmd = Command::cargo_bin("paper-age")?;
+
+    cmd.arg("--output")
+        .arg(output.path())
+        .arg(input.path())
+        .env("PAPERAGE_PASSPHRASE", "secret");
+    cmd.assert().success();
+
+    output.assert(predicate::path::is_file());
+
+    Ok(())
+}
+
+#[test]
 fn test_file_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
     let temp = assert_fs::TempDir::new().unwrap();
     let output = temp.child("output.pdf");
