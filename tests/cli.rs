@@ -40,6 +40,27 @@ fn test_file_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_too_much_data() -> Result<(), Box<dyn std::error::Error>> {
+    let temp = assert_fs::TempDir::new().unwrap();
+    let input = temp.child("sample.txt");
+    input.write_str("x".repeat(2048).as_str())?;
+    let output = temp.child("output.pdf");
+    let mut cmd = Command::cargo_bin("paper-age")?;
+
+    cmd.arg("--output")
+        .arg(output.path())
+        .arg(input.path())
+        .env("PAPERAGE_PASSPHRASE", "secret");
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains("Too much data after encryption"));
+
+    output.assert(predicate::path::missing());
+
+    Ok(())
+}
+
+#[test]
 fn test_fonts_license() -> Result<(), Box<dyn std::error::Error>> {
     let mut cmd = Command::cargo_bin("paper-age")?;
 
