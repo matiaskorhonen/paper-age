@@ -8,12 +8,12 @@ use age::cli_common::read_secret;
 use clap::Parser;
 use printpdf::{LineDashPattern, Point};
 
-use crate::paper_rage::encryption::encrypt_plaintext;
+use crate::paper_age::encryption::encrypt_plaintext;
 
-mod paper_rage;
+mod paper_age;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = paper_rage::cli::Args::parse();
+    let args = paper_age::cli::Args::parse();
 
     if args.fonts_license {
         let license = include_bytes!("assets/fonts/license.txt");
@@ -42,7 +42,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Plaintext length: {plaintext_len:?} bytes");
     println!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = paper_rage::Document::new(args.title.clone())?;
+    let pdf = paper_age::Document::new(args.title.clone())?;
 
     if args.grid {
         pdf.draw_grid();

@@ -1,4 +1,4 @@
-# Paper Rage
+# PaperAge
 
 Easy and secure paper backups of (smallish) secrets using the Age format ([age-encryption.org/v1](https://age-encryption.org/v1)).
 

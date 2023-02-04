@@ -1,9 +1,9 @@
 [package]
-name = "paper-rage"
+name = "paper-age"
 description = "Easy and secure paper backups of secrets"
 version = "0.1.0-prerelease2"
 edition = "2021"
-repository = "https://github.com/matiaskorhonen/paper-rage"
+repository = "https://github.com/matiaskorhonen/paper-age"
 authors = ["Matias Korhonen <me@matiaskorhonen.fi>"]
 license = "MIT"
 categories = ["command-line-utilities", "cryptography"]

@@ -1,6 +1,6 @@
 use clap::CommandFactory;
 
-#[path = "src/paper_rage/cli.rs"]
+#[path = "src/paper_age/cli.rs"]
 mod cli;
 
 fn main() -> std::io::Result<()> {
@@ -12,7 +12,7 @@ fn main() -> std::io::Result<()> {
     let mut buffer: Vec<u8> = Default::default();
     man.render(&mut buffer)?;
 
-    std::fs::write(out_dir.join("paper-rage.1"), buffer)?;
+    std::fs::write(out_dir.join("paper-age.1"), buffer)?;
 
     Ok(())
 }
