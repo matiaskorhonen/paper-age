@@ -11,6 +11,7 @@ fn test_happy_path() -> Result<(), Box<dyn std::error::Error>> {
     let mut cmd = Command::cargo_bin("paper-age")?;
 
     cmd.arg("--output")
+        .arg("--grid")
         .arg(output.path())
         .arg(input.path())
         .env("PAPERAGE_PASSPHRASE", "secret");
