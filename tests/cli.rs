@@ -31,3 +31,16 @@ fn test_fonts_license() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+#[test]
+fn test_title_too_long() -> Result<(), Box<dyn std::error::Error>> {
+    let input = assert_fs::NamedTempFile::new("sample.txt")?;
+    let mut cmd = Command::cargo_bin("paper-age")?;
+
+    cmd.arg("--title").arg("x".repeat(80)).arg(input.path());
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains("The title cannot be longer than"));
+
+    Ok(())
+}
