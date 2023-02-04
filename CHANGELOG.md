@@ -10,7 +10,6 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- This changelog
 - Better logging, including command line flags for verbosity
 
 ## [0.1.0-prerelease3]
