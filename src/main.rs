@@ -130,7 +130,7 @@ fn get_passphrase() -> Result<Secret<String>, io::Error> {
 
     match read_secret("Type passphrase", "Passphrase", None) {
         Ok(secret) => Ok(secret),
-        Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{}", e))),
+        Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{e}"))),
     }
 }
 

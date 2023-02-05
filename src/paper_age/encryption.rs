@@ -40,7 +40,7 @@ mod tests {
         let passphrase = Secret::new(String::from("snakeoil"));
         let result = encrypt_plaintext(&mut input, passphrase);
 
-        assert!(!result.is_err());
+        assert!(result.is_ok());
 
         let (plaintext_size, armored) = result.unwrap();
         assert_eq!(plaintext_size, 12);
