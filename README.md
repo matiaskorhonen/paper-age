@@ -7,6 +7,7 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 * Takes plaintext input either from a file or stdin
 * Encrypts that input with a passphrase
 * Outputs a PDF with a QR code of the encrypted ciphertext
+* The error correction level of the QR code is optimised (less data → more error correction)
 * The passphrase **isn't** rendered on the PDF so you can print it on an untrusted printer (for example at work or at the library)
 
 ## Limitations
