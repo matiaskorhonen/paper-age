@@ -2,6 +2,7 @@
 #![doc(
     html_logo_url = "https://user-images.githubusercontent.com/43314/216838549-bc5cafc8-0211-44e2-9bcc-651c74bfc853.svg"
 )]
+#![doc(html_favicon_url = "https://shots.matiaskorhonen.fi/paper-age-favicon.ico")]
 
 use std::{
     env,
