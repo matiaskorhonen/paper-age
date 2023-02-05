@@ -27,7 +27,12 @@ jobs:
         wget --quiet -O "${HOME}/.local/bin/markdown-test-report" https://github.com/ctron/markdown-test-report/releases/download/v0.3.6/markdown-test-report-linux-amd64
         chmod +x "${HOME}/.local/bin/markdown-test-report"
     - name: Install grcov
-      run: cargo install grcov
+      run: |
+        mkdir -p /tmp/grcov
+        wget --quiet -O /tmp/grcov/grcov-x86_64-unknown-linux-gnu.tar.bz2 https://github.com/mozilla/grcov/releases/download/v0.8.13/grcov-x86_64-unknown-linux-gnu.tar.bz2
+        tar -xvf /tmp/grcov/grcov-x86_64-unknown-linux-gnu.tar.bz2
+        mv grcov "${HOME}/.local/bin"
+        chmod +x "${HOME}/.local/bin/grcov"
     - name: Build
       run: cargo build --verbose
     - name: Run tests
