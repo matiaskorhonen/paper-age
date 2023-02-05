@@ -124,8 +124,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn get_passphrase() -> Result<Secret<String>, io::Error> {
     let env_passphrase = env::var("PAPERAGE_PASSPHRASE");
 
-    if env_passphrase.is_ok() {
-        return Ok(SecretString::from(env_passphrase.unwrap()));
+    if let Ok(value) = env_passphrase {
+        return Ok(SecretString::from(value));
     }
 
     match read_secret("Type passphrase", "Passphrase", None) {
