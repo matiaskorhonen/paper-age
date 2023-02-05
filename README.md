@@ -28,15 +28,15 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 paper-age [OPTIONS] [INPUT]
 ```
 
-### **Arguments:**
+### **Arguments**
 
 * `<INPUT>` — The path to the file to read, use `-` to read from stdin (max. ~1.5KB)
 
-### **Options:**
+### **Options**
 
 * `-t`, `--title <TITLE>` — Page title (max. 64 characters)
 
-  Default value: `Paper Rage`
+  Default value: `PaperAge`
 * `-o`, `--output <OUTPUT>` — Output file name
 
   Default value: `out.pdf`
