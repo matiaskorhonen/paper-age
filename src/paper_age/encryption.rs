@@ -1,3 +1,4 @@
+//! Age based encryption
 use std::io::Write;
 
 use age::armor::ArmoredWriter;

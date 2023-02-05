@@ -1,3 +1,4 @@
+//! Generate SVG formnat QR codes
 use qrcode::{render::svg, types::QrError, EcLevel, QrCode};
 
 /// Generate a QR code svg for the given string. The error correction level of

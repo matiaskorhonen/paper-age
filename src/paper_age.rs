@@ -1,3 +1,4 @@
+//! PaperAge
 use std::io::{BufReader, Cursor};
 
 use printpdf::{

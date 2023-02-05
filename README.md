@@ -18,7 +18,7 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 
 ## Limitations
 
-* The maximum input size is about 1.5KiB as QR codes cannot encode arbitrarily large payloads (1.5KiB results in a payload of about 3KiB when encrypted)
+* The maximum input size is about 1.5 KiB as QR codes cannot encode arbitrarily large payloads (1.5 KiB plaintext results in a payload of about 3 KiB when encrypted)
 * Only passphrase-based encryption is supported at the moment
 * Only the A4 paper size is supported at the moment
 

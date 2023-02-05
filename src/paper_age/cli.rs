@@ -1,3 +1,4 @@
+//! Command line arguments
 use std::path::PathBuf;
 
 use clap::Parser;
