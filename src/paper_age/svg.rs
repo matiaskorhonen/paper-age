@@ -34,17 +34,22 @@ pub fn qrcode(text: String) -> Result<String, QrError> {
     Ok(image)
 }
 
-#[test]
-fn test_svg_qrcode() {
-    let svg = qrcode(String::from("Some value")).unwrap();
-    assert_eq!(
-        svg,
-        String::from(include_str!("../../tests/data/some_value.svg")).trim()
-    );
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-#[test]
-fn test_input_too_large() {
-    let result = qrcode(String::from(include_str!("../../tests/data/too_large.txt")));
-    assert!(result.is_err());
+    #[test]
+    fn test_svg_qrcode() {
+        let svg = qrcode(String::from("Some value")).unwrap();
+        assert_eq!(
+            svg,
+            String::from(include_str!("../../tests/data/some_value.svg")).trim()
+        );
+    }
+
+    #[test]
+    fn test_input_too_large() {
+        let result = qrcode(String::from(include_str!("../../tests/data/too_large.txt")));
+        assert!(result.is_err());
+    }
 }
