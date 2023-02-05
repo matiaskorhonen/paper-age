@@ -9,8 +9,10 @@ pub mod cli;
 pub mod encryption;
 pub mod svg;
 
+/// PaperAge version
 pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 
+/// PDF dimensions
 #[derive(Clone, Copy, Debug)]
 pub struct PageDimensions {
     pub width: Mm,
@@ -24,28 +26,44 @@ impl PartialEq for PageDimensions {
     }
 }
 
+/// A4 dimensions with a 10mm margin
 pub const A4_PAGE: PageDimensions = PageDimensions {
     width: Mm(210.0),
     height: Mm(297.0),
     margin: Mm(10.0),
 };
 
+/// Default to an A4 page
 impl Default for PageDimensions {
     fn default() -> Self {
         A4_PAGE
     }
 }
 
+/// Container for all the data required to insert elements into the PDF
 pub struct Document {
+    /// A reference to the printpdf PDF document
     pub doc: PdfDocumentReference,
+
+    /// Index of the first page in the PDF document
     pub page: PdfPageIndex,
+
+    /// Index of the initial layer in the PDF document
     pub layer: PdfLayerIndex,
+
+    /// Reference to the medium weight font
     pub title_font: IndirectFontRef,
+
+    /// Reference to the regular weight font
     pub code_font: IndirectFontRef,
+
+    /// PDF Page dimensions
     pub dimensions: PageDimensions,
 }
 
 impl Document {
+    /// Initialize the PDF with default dimensions and the required fonts. Also
+    /// sets the title and the producer in the PDF metadata.
     pub fn new(title: String) -> Result<Document, Box<dyn std::error::Error>> {
         debug!("Initializing PDF");
 
@@ -73,10 +91,12 @@ impl Document {
         })
     }
 
+    /// Get the default layer from the PDF
     fn get_current_layer(&self) -> PdfLayerReference {
         self.doc.get_page(self.page).get_layer(self.layer)
     }
 
+    /// Insert the given title at the top of the PDF
     pub fn insert_title_text(&self, title: String) {
         debug!("Inserting title: {}", title.as_str());
 
@@ -102,6 +122,7 @@ impl Document {
         );
     }
 
+    /// Insert the given PEM ciphertext in the bottom half of the page
     pub fn insert_pem_text(&self, pem: String) {
         debug!("Inserting PEM encoded ciphertext");
 
@@ -139,6 +160,7 @@ impl Document {
         current_layer.end_text_section();
     }
 
+    /// Insert the QR code of the PEM encoded ciphertext in the top half of the page
     pub fn insert_qr_code(&self, text: String) -> Result<(), Box<dyn std::error::Error>> {
         debug!("Inserting QR code");
 
@@ -176,6 +198,7 @@ impl Document {
         Ok(())
     }
 
+    /// Draw a grid debugging layout issues
     pub fn draw_grid(&self) {
         debug!("Drawing grid");
 
@@ -208,6 +231,7 @@ impl Document {
         }
     }
 
+    /// Draw a line on the page
     pub fn draw_line(&self, points: Vec<Point>, thickness: f64, dash_pattern: LineDashPattern) {
         trace!("Drawing line");
 
@@ -231,6 +255,7 @@ impl Document {
         current_layer.add_shape(divider);
     }
 
+    /// Insert the passphrase label and placeholder in the PDF
     pub fn insert_passphrase(&self) {
         debug!("Inserting passphrase placeholder");
 
@@ -250,6 +275,7 @@ impl Document {
         )
     }
 
+    /// Add the footer at the bottom of the page
     pub fn insert_footer(&self) {
         debug!("Inserting footer");
 

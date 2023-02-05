@@ -1,5 +1,7 @@
 use qrcode::{render::svg, types::QrError, EcLevel, QrCode};
 
+/// Generate a QR code svg for the given string. The error correction level of
+/// the QR code is optimised (less data → more error correction)
 pub fn qrcode(text: String) -> Result<String, QrError> {
     // QR Code Error Correction Capability (approx.)
     //     H: 30%

@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 
+/// Command line arguments
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub(crate) struct Args {

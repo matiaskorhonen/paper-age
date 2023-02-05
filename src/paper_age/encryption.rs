@@ -4,6 +4,7 @@ use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::Secret;
 
+/// Encrypt the data from the reader and PEM encode the ciphertext
 pub fn encrypt_plaintext(
     reader: &mut dyn std::io::BufRead,
     passphrase: Secret<String>,

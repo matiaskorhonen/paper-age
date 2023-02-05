@@ -20,6 +20,7 @@ use crate::paper_age::encryption::encrypt_plaintext;
 
 mod paper_age;
 
+/// Maximum length of the document title
 const TITLE_MAX_LEN: usize = 64;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -121,6 +122,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+/// Get the passphrase from an interactive prompt or from the PAPERAGE_PASSPHRASE
+/// environment variable
 fn get_passphrase() -> Result<Secret<String>, io::Error> {
     let env_passphrase = env::var("PAPERAGE_PASSPHRASE");
 
