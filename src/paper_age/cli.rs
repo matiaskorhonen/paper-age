@@ -7,7 +7,7 @@ use clap_verbosity_flag::Verbosity;
 #[command(author, version, about, long_about = None)]
 pub(crate) struct Args {
     /// Page title (max. 64 characters)
-    #[arg(short, long, default_value = "Paper Rage")]
+    #[arg(short, long, default_value = "PaperAge")]
     pub title: String,
 
     /// Output file name
@@ -54,11 +54,22 @@ mod tests {
             "Hello",
             "--output",
             "test.pdf",
+            "input.txt",
         ]);
         assert!(args.force);
         assert!(args.grid);
         assert_eq!(args.title, "Hello");
         assert_eq!(args.output.to_str().unwrap(), "test.pdf");
+        assert_eq!(args.input.unwrap().to_str().unwrap(), "input.txt");
+    }
+
+    #[test]
+    fn test_defaults() {
+        let args = Args::parse_from(["paper-age"]);
+        assert_eq!(args.title, "PaperAge");
+        assert_eq!(args.output.to_str().unwrap(), "out.pdf");
+        assert_eq!(args.input, None);
+        assert!(!args.force);
     }
 
     #[test]
