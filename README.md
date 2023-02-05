@@ -72,10 +72,10 @@ cargo release 1.2.3
 
 ## License & Credits
 
-PaperAge is released under the MIT License. See the [LICENSE.txt](LICENSE.txt) file for details.
+PaperAge is released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
 
-Includes the [IBM Plex Mono](https://www.ibm.com/plex/) font, see [IBMPlexMono-LICENSE.txt](src/assets/fonts/IBMPlexMono-LICENSE.txt) for details.
+Includes the SIL Open Font Licensed [IBM Plex Mono](https://www.ibm.com/plex/) font. See [IBMPlexMono-LICENSE.txt](src/assets/fonts/IBMPlexMono-LICENSE.txt).
 
-The encryption uses the Rust implementation of Age from [github.com/str4d/rage](https://github.com/str4d/rage).
+Uses the Rust implementation of Age from [github.com/str4d/rage](https://github.com/str4d/rage) and the [printpdf](https://github.com/fschutt/printpdf) library.
 
 Thanks to [Ariel Salminen](https://arie.ls) for the PaperAge icon.
