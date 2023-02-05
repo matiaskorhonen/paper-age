@@ -33,6 +33,8 @@ jobs:
         tar -xvf /tmp/grcov/grcov-x86_64-unknown-linux-gnu.tar.bz2
         mv grcov "${HOME}/.local/bin"
         chmod +x "${HOME}/.local/bin/grcov"
+    - name: Add llvm-tools
+      run: rustup component add llvm-tools
     - name: Build
       run: cargo build --verbose
     - name: Run tests
