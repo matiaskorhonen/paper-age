@@ -7,3 +7,4 @@
 /*.dat
 /test.*
 test-output.json
+*.profraw
