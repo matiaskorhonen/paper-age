@@ -5,7 +5,10 @@ use std::{
     path::PathBuf,
 };
 
-use age::{cli_common::read_secret, secrecy::SecretString};
+use age::{
+    cli_common::read_secret,
+    secrecy::{Secret, SecretString},
+};
 use clap::Parser;
 use printpdf::{LineDashPattern, Point};
 use qrcode::types::QrError;
@@ -62,13 +65,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let passphrase = match env::var("PAPERAGE_PASSPHRASE") {
-        Ok(pass) => SecretString::from(pass),
-        Err(_error) => match read_secret("Type passphrase", "Passphrase", None) {
-            Ok(s) => s,
-            Err(_e) => std::process::exit(exitcode::NOINPUT),
-        },
-    };
+    let passphrase = get_passphrase()?;
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
     let (plaintext_len, encrypted) = encrypt_plaintext(&mut reader, passphrase)?;
@@ -122,4 +119,38 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     pdf.doc.save(&mut BufWriter::new(file))?;
 
     Ok(())
+}
+
+fn get_passphrase() -> Result<Secret<String>, io::Error> {
+    let env_passphrase = env::var("PAPERAGE_PASSPHRASE");
+
+    if let Ok(value) = env_passphrase {
+        return Ok(SecretString::from(value));
+    }
+
+    match read_secret("Type passphrase", "Passphrase", None) {
+        Ok(secret) => Ok(secret),
+        Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{e}"))),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use age::secrecy::ExposeSecret;
+
+    #[test]
+    fn test_get_passphrase_from_env() -> Result<(), Box<dyn std::error::Error>> {
+        env::set_var("PAPERAGE_PASSPHRASE", "secret");
+
+        let result = get_passphrase();
+        assert!(result.is_ok());
+
+        let passphrase = result?;
+        passphrase.expose_secret();
+
+        assert_eq!(passphrase.expose_secret(), "secret");
+
+        Ok(())
+    }
 }

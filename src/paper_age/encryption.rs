@@ -30,20 +30,25 @@ pub fn encrypt_plaintext(
     Ok((plaintext.len(), utf8))
 }
 
-#[test]
-fn test_armored_output() {
-    let mut input = b"some secrets" as &[u8];
-    let passphrase = Secret::new(String::from("snakeoil"));
-    let result = encrypt_plaintext(&mut input, passphrase);
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    assert!(!result.is_err());
+    #[test]
+    fn test_armored_output() {
+        let mut input = b"some secrets" as &[u8];
+        let passphrase = Secret::new(String::from("snakeoil"));
+        let result = encrypt_plaintext(&mut input, passphrase);
 
-    let (plaintext_size, armored) = result.unwrap();
-    assert_eq!(plaintext_size, 12);
+        assert!(result.is_ok());
 
-    let first_line: String = armored.lines().take(1).collect();
-    assert_eq!(first_line, "-----BEGIN AGE ENCRYPTED FILE-----");
+        let (plaintext_size, armored) = result.unwrap();
+        assert_eq!(plaintext_size, 12);
 
-    let last_line: &str = armored.lines().last().unwrap();
-    assert_eq!(last_line, "-----END AGE ENCRYPTED FILE-----")
+        let first_line: String = armored.lines().take(1).collect();
+        assert_eq!(first_line, "-----BEGIN AGE ENCRYPTED FILE-----");
+
+        let last_line: &str = armored.lines().last().unwrap();
+        assert_eq!(last_line, "-----END AGE ENCRYPTED FILE-----")
+    }
 }

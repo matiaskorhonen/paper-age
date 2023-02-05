@@ -7,7 +7,7 @@ use clap_verbosity_flag::Verbosity;
 #[command(author, version, about, long_about = None)]
 pub(crate) struct Args {
     /// Page title (max. 64 characters)
-    #[arg(short, long, default_value = "Paper Rage")]
+    #[arg(short, long, default_value = "PaperAge")]
     pub title: String,
 
     /// Output file name
@@ -34,8 +34,56 @@ pub(crate) struct Args {
     pub input: Option<PathBuf>,
 }
 
-#[test]
-fn verify_args() {
-    use clap::CommandFactory;
-    Args::command().debug_assert()
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn verify_args() {
+        use clap::CommandFactory;
+        super::Args::command().debug_assert()
+    }
+
+    #[test]
+    fn test_args() {
+        let args = Args::parse_from([
+            "paper-age",
+            "-f",
+            "-g",
+            "--title",
+            "Hello",
+            "--output",
+            "test.pdf",
+            "input.txt",
+        ]);
+        assert!(args.force);
+        assert!(args.grid);
+        assert_eq!(args.title, "Hello");
+        assert_eq!(args.output.to_str().unwrap(), "test.pdf");
+        assert_eq!(args.input.unwrap().to_str().unwrap(), "input.txt");
+    }
+
+    #[test]
+    fn test_defaults() {
+        let args = Args::parse_from(["paper-age"]);
+        assert_eq!(args.title, "PaperAge");
+        assert_eq!(args.output.to_str().unwrap(), "out.pdf");
+        assert_eq!(args.input, None);
+        assert!(!args.force);
+    }
+
+    #[test]
+    fn test_fonts_license() {
+        let args = Args::parse_from(["paper-age", "--fonts-license"]);
+        assert!(args.fonts_license);
+    }
+
+    #[test]
+    fn test_fonts_license_conflict() -> Result<(), Box<dyn std::error::Error>> {
+        let result = Args::try_parse_from(["paper-age", "--fonts-license", "--grid"]);
+
+        assert!(result.is_err());
+
+        Ok(())
+    }
 }
