@@ -1,3 +1,9 @@
+<picture style="width: 76px; height: 96px" width="76" height="96">
+  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/43314/216831744-e17e8282-669d-4716-b728-1ba31edda3f0.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/43314/216831743-2afcda16-c2e4-406d-9183-ebfcd2d50537.svg">
+  <img style="width: 76px; height: 96px" width="76" height="96" alt="" src="https://user-images.githubusercontent.com/43314/216831743-2afcda16-c2e4-406d-9183-ebfcd2d50537.svg">
+</picture>
+
 # PaperAge
 
 Easy and secure paper backups of (smallish) secrets using the Age format ([age-encryption.org/v1](https://age-encryption.org/v1)).
