@@ -36,7 +36,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Removed unused depedency (`is-terminal`)
+- Removed unused dependency (`is-terminal`)
 
 ## [0.1.0-prerelease2]
 
