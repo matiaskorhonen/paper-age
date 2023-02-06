@@ -22,15 +22,15 @@ use qrcode::types::QrError;
 #[macro_use]
 extern crate log;
 
-use crate::paper_age::encryption::encrypt_plaintext;
-
-mod paper_age;
+mod builder;
+mod cli;
+mod encryption;
 
 /// Maximum length of the document title
 const TITLE_MAX_LEN: usize = 64;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = paper_age::cli::Args::parse();
+    let args = cli::Args::parse();
 
     env_logger::Builder::new()
         .filter_level(args.verbose.log_level_filter())
@@ -75,12 +75,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let passphrase = get_passphrase()?;
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
-    let (plaintext_len, encrypted) = encrypt_plaintext(&mut reader, passphrase)?;
+    let (plaintext_len, encrypted) = encryption::encrypt_plaintext(&mut reader, passphrase)?;
 
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = paper_age::Document::new(args.title.clone())?;
+    let pdf = builder::Document::new(args.title.clone())?;
 
     if args.grid {
         pdf.draw_grid();
