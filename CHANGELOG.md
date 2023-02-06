@@ -4,7 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
--
+### Added
+
+- The passphrase can also be read from the `PAPERAGE_PASSPHRASE` environment variable
+- Better documentation
+
+### Changed
+
+- Better test coverage
+- Development: output test summaries and code coverage information in GitHub actions
+
+### Fixed
+
+- Prevent accidental overwrites of the output file
 
 ## [0.1.0-prerelease4]
 
