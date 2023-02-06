@@ -6,8 +6,6 @@ use printpdf::{
     PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
 };
 
-pub mod cli;
-pub mod encryption;
 pub mod svg;
 
 /// PaperAge version
