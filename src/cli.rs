@@ -32,7 +32,7 @@ pub(crate) struct Args {
     #[clap(flatten)]
     pub verbose: Verbosity,
 
-    /// The path to the file to read. Defaults to standard input. Max. ~1.5KB.
+    /// The path to the file to read. Defaults to standard input. Max. ~1.9KB.
     pub input: Option<PathBuf>,
 }
 

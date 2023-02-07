@@ -74,14 +74,14 @@ paper-age [OPTIONS] [INPUT]
 
 ### **Arguments**
 
-* `<INPUT>` — The path to the file to read, use `-` to read from stdin (max. ~1.5KB)
+* `<INPUT>` — The path to the file to read. Defaults to standard input. Max. ~1.9KB.
 
 ### **Options**
 
 * `-t`, `--title <TITLE>` — Page title (max. 64 characters)
 
   Default value: `PaperAge`
-* `-o`, `--output <OUTPUT>` — Output file name
+* `-o`, `--output <OUTPUT>` — Output file name. Use - for STDOUT.
 
   Default value: `out.pdf`
 * `-f`, `--force` — Overwrite the output file if it already exists
