@@ -38,7 +38,7 @@ This is what the output PDF looks like. The QR code is easily readable with an i
 <img alt="A4 sheet with a title of ‘PaperAge’, a QR code, and a PEM encoded section" width="420" height="594" src="https://user-images.githubusercontent.com/43314/217248893-c7aed7d6-5a45-48af-b79a-8cdbd31d79cd.svg">
 </a>
 
-If you want to try decode it yourself, the passphrase is `snakeoil`.
+If you want to try decoding it yourself, the passphrase is `snakeoil`.
 
 ## Installation
 
