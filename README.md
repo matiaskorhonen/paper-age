@@ -32,6 +32,40 @@ This is what the output PDF looks like. The QR code is easily readable with an i
 
 If you want to try decode it youself, the passphrase is `snakeoil`.
 
+## Installation
+
+### Binary
+
+Download the latest release from the [Releases](https://github.com/matiaskorhonen/paper-age/releases) page, extract the files, and install the `paper-age` binary somewhere in `PATH` (for example `/usr/local/bin`).
+
+```sh
+# Download the latest release (pick your OS)
+# macOS (Intel or Apple Silicon):
+curl -o paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/latest/paper-age-universal-apple-darwin.tar.gz
+# Linux (x86-64):
+curl -o paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/latest/paper-age-x86_64-unknown-linux-gnu.tar.gz
+# Linux (ARM):
+curl -o paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/latest/paper-age-aarch64-unknown-linux-gnu.tar.gz
+
+# Extract the files
+tar -xf paper-age.tar.gz
+
+# Install the binary in /usr/local/bin
+sudo install paper-age /usr/local/bin/
+# Or: sudo mv paper-age /usr/local/bin/
+
+# macOS only: clear the quarantine flag
+sudo xattr -r -d com.apple.quarantine /usr/local/bin/paper-age
+```
+
+### Cargo
+
+If you already have Rust installed, PaperAge can be installed with Cargo:
+
+```sh
+cargo install paper-age
+```
+
 ## Usage
 
 ```
