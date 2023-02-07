@@ -60,7 +60,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    let path = args.input.unwrap();
+    let path = match args.input {
+        Some(p) => p,
+        None => PathBuf::from("-"),
+    };
     let mut reader: BufReader<Box<dyn Read>> = {
         if path == PathBuf::from("-") {
             BufReader::new(Box::new(stdin().lock()))
