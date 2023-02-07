@@ -65,6 +65,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if path == PathBuf::from("-") {
             BufReader::new(Box::new(stdin().lock()))
         } else if path.is_file() {
+            let size = path.metadata()?.len();
+            if size >= 2048 {
+                warn!("File too large ({size:?} bytes). The maximum file size is about 1.9 KiB.");
+            }
             BufReader::new(Box::new(File::open(&path).unwrap()))
         } else {
             error!("File not found: {}", path.display());
