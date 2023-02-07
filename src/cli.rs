@@ -12,7 +12,7 @@ pub(crate) struct Args {
     #[arg(short, long, default_value = "PaperAge")]
     pub title: String,
 
-    /// Output file name
+    /// Output file name. Use - for STDOUT.
     #[arg(short, long, default_value = "out.pdf")]
     pub output: PathBuf,
 

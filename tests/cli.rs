@@ -23,6 +23,26 @@ fn test_happy_path() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_stdout() -> Result<(), Box<dyn std::error::Error>> {
+    let temp = assert_fs::TempDir::new().unwrap();
+    let input = temp.child("sample.txt");
+    input.write_str("STDOUT")?;
+
+    let mut cmd = Command::cargo_bin("paper-age")?;
+
+    let output_size = 400 * 1024; // 400 KiB
+    let len_predicate_fn = predicate::function(|x: &[u8]| x.len() > output_size);
+
+    cmd.arg("--output")
+        .arg("-")
+        .arg(input.path())
+        .env("PAPERAGE_PASSPHRASE", "secret");
+    cmd.assert().stdout(len_predicate_fn).success();
+
+    Ok(())
+}
+
+#[test]
 fn test_file_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
     let temp = assert_fs::TempDir::new().unwrap();
     let output = temp.child("output.pdf");

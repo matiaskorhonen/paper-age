@@ -126,8 +126,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     pdf.insert_footer();
 
-    let file = File::create(output)?;
-    pdf.doc.save(&mut BufWriter::new(file))?;
+    if output == PathBuf::from("-") {
+        debug!("Writing to STDOUT");
+        let bytes = pdf.doc.save_to_bytes()?;
+        io::stdout().write_all(&*bytes)?;
+    } else {
+        debug!("Writing to file: {}", output.to_string_lossy());
+        let file = File::create(output)?;
+        pdf.doc.save(&mut BufWriter::new(file))?;
+    }
 
     Ok(())
 }
