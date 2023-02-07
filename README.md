@@ -42,6 +42,15 @@ If you want to try decode it youself, the passphrase is `snakeoil`.
 
 ## Installation
 
+### Homebrew
+
+Add the PaperAge Tap to install the latest version with Homebrew:
+
+```sh
+brew tap matiaskorhonen/paper-age
+brew install paper-age
+```
+
 ### Binary
 
 Download the latest release from the [Releases](https://github.com/matiaskorhonen/paper-age/releases) page, extract the files, and install the `paper-age` binary somewhere in `PATH` (for example `/usr/local/bin`).
