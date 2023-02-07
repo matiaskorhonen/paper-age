@@ -9,6 +9,7 @@ license = "MIT"
 categories = ["command-line-utilities", "cryptography"]
 
 [package.metadata.release]
+pre-release-commit-message = "Release"
 tag-message = "Release {{crate_name}} version {{version}}"
 sign-tag = true
 pre-release-replacements = [
