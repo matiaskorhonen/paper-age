@@ -12,7 +12,7 @@ pub(crate) struct Args {
     #[arg(short, long, default_value = "PaperAge")]
     pub title: String,
 
-    /// Output file name
+    /// Output file name. Use - for STDOUT.
     #[arg(short, long, default_value = "out.pdf")]
     pub output: PathBuf,
 
@@ -32,7 +32,7 @@ pub(crate) struct Args {
     #[clap(flatten)]
     pub verbose: Verbosity,
 
-    /// The path to the file to read, use - to read from stdin (max. ~1.5KB)
+    /// The path to the file to read. Defaults to standard input. Max. ~1.9KB.
     pub input: Option<PathBuf>,
 }
 
