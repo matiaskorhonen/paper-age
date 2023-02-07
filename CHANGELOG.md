@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [1.0.1] - 2023-02-07
+
 ### Added
 
 - PaperAge can now be installed via a [Homebrew Tap](https://github.com/matiaskorhonen/paper-age#homebrew)
@@ -49,7 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent accidental overwrites of the output file
 
 <!-- next-url -->
-[Unreleased]: https://github.com/crate-ci/cargo-release/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/crate-ci/cargo-release/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/crate-ci/cargo-release/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/crate-ci/cargo-release/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/matiaskorhonen/paper-age/compare/v0.1.0-prerelease4...v0.1.0
 [0.1.0-prerelease4]: https://github.com/matiaskorhonen/paper-age/releases/tag/b0534db779720e912750d0107b3b03b6551abcdd...v0.1.0-prerelease4

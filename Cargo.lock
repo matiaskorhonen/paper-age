@@ -1208,7 +1208,7 @@ dependencies = [
 
 [[package]]
 name = "paper-age"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "age",
  "assert_cmd",
