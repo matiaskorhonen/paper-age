@@ -22,7 +22,7 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 * Only passphrase-based encryption is supported at the moment
 * Only the A4 paper size is supported at the moment
 
-## Thread models and use cases
+## Threat models and use cases
 
 * The main use case is keeping secrets, such as TFA recovery codes, in a safe place
 * Adding the passphrase by hand allows the use of public printers, for example in libraries, offices, copy shops, and so forth
