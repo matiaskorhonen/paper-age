@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Enables writing the PDF to standard out
+
+### Changed
+
+- Default to reading from standard input
+
 ## [0.1.0] - 2023-02-07
 
 ### Added
