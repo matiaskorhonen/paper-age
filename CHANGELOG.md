@@ -1,51 +1,33 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+ll notable changes to this project will be documented in this file.
 
-## [Unreleased]
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+<!-- next-header -->
+## [Unreleased] - ReleaseDate
 
 ### Added
 
+- First version
 - The passphrase can also be read from the `PAPERAGE_PASSPHRASE` environment variable
 - Better documentation
-
-### Changed
-
-- Better test coverage
-- Development: output test summaries and code coverage information in GitHub actions
-
-### Fixed
-
-- Prevent accidental overwrites of the output file
-
-## [0.1.0-prerelease4]
-
-### Added
-
 - Better logging, including command line flags for verbosity
-
-## [0.1.0-prerelease3]
-
-### Added
-
 - Development: added a job summary to the Github Action test job
 
 ### Changed
 
 - Renamed the project from ‘Paper Rage’ to ‘PaperAge’
-
-### Fixed
-
-- Removed unused dependency (`is-terminal`)
-
-## [0.1.0-prerelease2]
+- Better test coverage
+- Development: output test summaries and code coverage information in GitHub actions
 
 ### Fixed
 
 - Fixed prerelease versioning
+- Removed unused dependency (`is-terminal`)
+- Prevent accidental overwrites of the output file
 
-## [0.1.0-prerelease1]
-
-### Added
-
-- First prerelease version with most features working
+<!-- next-url -->
+[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/matiaskorhonen/paper-age/releases/tag/b0534db779720e912750d0107b3b03b6551abcdd...v0.1.0
