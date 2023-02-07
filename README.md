@@ -22,6 +22,14 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 * Only passphrase-based encryption is supported at the moment
 * Only the A4 paper size is supported at the moment
 
+## Thread models and use cases
+
+* The main use case is keeping secrets, such as TFA recovery codes, in a safe place
+* Adding the passphrase by hand allows the use of public printers, for example in libraries, offices, copy shops, and so forth
+* For extra protection, memorize the passphrase or store it separately from the printout
+* Needing to scan and decrypt protects against unsophisticated adversaries even if the passphrase is right there (the average burglar isn't going to care about your Mastodon account)
+* If you need protection from nation states or other advanced threats, look elsewhere
+
 ## Example
 
 This is what the output PDF looks like. The QR code is easily readable with an iPhone (or other modern smartphone).
