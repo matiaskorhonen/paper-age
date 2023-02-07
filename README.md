@@ -22,6 +22,16 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 * Only passphrase-based encryption is supported at the moment
 * Only the A4 paper size is supported at the moment
 
+## Example
+
+This is what the output PDF looks like. The QR code is easily readable with an iPhone (or other modern smartphone).
+
+<a title="Download example PDF" href="https://github.com/matiaskorhonen/paper-age/files/10675081/snakeoil.pdf">
+<img alt="A4 sheet with a title of ‘PaperAge’, a QR code, and a PEM encoded section" width="420" height="594" src="https://user-images.githubusercontent.com/43314/217248893-c7aed7d6-5a45-48af-b79a-8cdbd31d79cd.svg">
+</a>
+
+If you want to try decode it youself, the passphrase is `snakeoil`.
+
 ## Usage
 
 ```
