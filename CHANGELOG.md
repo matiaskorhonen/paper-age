@@ -29,5 +29,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent accidental overwrites of the output file
 
 <!-- next-url -->
-[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/matiaskorhonen/paper-age/releases/tag/b0534db779720e912750d0107b3b03b6551abcdd...v0.1.0
+[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v0.1.0-prerelease4...HEAD
+[0.1.0-prerelease4]: https://github.com/matiaskorhonen/paper-age/releases/tag/b0534db779720e912750d0107b3b03b6551abcdd...v0.1.0
