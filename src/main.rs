@@ -132,7 +132,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if output == PathBuf::from("-") {
         debug!("Writing to STDOUT");
         let bytes = pdf.doc.save_to_bytes()?;
-        io::stdout().write_all(&*bytes)?;
+        io::stdout().write_all(&bytes)?;
     } else {
         debug!("Writing to file: {}", output.to_string_lossy());
         let file = File::create(output)?;
