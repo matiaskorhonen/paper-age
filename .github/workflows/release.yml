@@ -69,6 +69,7 @@ jobs:
 
   update-homebrew:
     needs: [create-release, upload-assets, publish-release]
+    if: ${{ !(contains(needs.create-release.outputs.tag, 'alpha') || contains(needs.create-release.outputs.tag, 'beta') || contains(needs.create-release.outputs.tag, 'prerelease')) }}
     runs-on: ubuntu-latest
     steps:
       - name: Update Homebrew Formula
