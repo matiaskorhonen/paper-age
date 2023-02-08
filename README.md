@@ -8,7 +8,7 @@
 
 Easy and secure paper backups of (smallish) secrets using the Age format ([age-encryption.org/v1](https://age-encryption.org/v1)).
 
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/matiaskorhonen/paper-age)](https://github.com/matiaskorhonen/paper-age/releases/latest) [![Crates.io](https://img.shields.io/crates/v/paper-age)](https://crates.io/crates/paper-age)
+[![Rust build](https://github.com/matiaskorhonen/paper-age/actions/workflows/rust.yml/badge.svg)](https://github.com/matiaskorhonen/paper-age/actions/workflows/rust.yml) [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/matiaskorhonen/paper-age)](https://github.com/matiaskorhonen/paper-age/releases/latest) [![Crates.io](https://img.shields.io/crates/v/paper-age)](https://crates.io/crates/paper-age)
 
 ## Features
 
