@@ -66,3 +66,16 @@ jobs:
       - name: mark release as non-draft
         run: |
           gh release edit ${{ needs.create-release.outputs.tag }} --draft=false
+
+  update-homebrew:
+    needs: [create-release, upload-assets, publish-release]
+    if: ${{ !(contains(needs.create-release.outputs.tag, 'alpha') || contains(needs.create-release.outputs.tag, 'beta') || contains(needs.create-release.outputs.tag, 'prerelease')) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Homebrew Formula
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: matiaskorhonen/homebrew-paper-age
+          event-type: "Update Homebrew Formula"
+          client-payload: '{ "version": "${{ needs.create-release.outputs.tag }}" }'
