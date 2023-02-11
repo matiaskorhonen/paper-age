@@ -6,6 +6,8 @@ use printpdf::{
     PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
 };
 
+use crate::cli::PageSize;
+
 pub mod svg;
 
 /// PaperAge version
@@ -25,10 +27,46 @@ impl PartialEq for PageDimensions {
     }
 }
 
+impl PageDimensions {
+    pub fn center(&self) -> Point {
+        Point::new(self.width / 2.0, self.height / 2.0)
+    }
+
+    pub fn center_left(&self) -> Point {
+        Point::new(Mm(0.0) + self.margin, self.height / 2.0)
+    }
+
+    pub fn center_right(&self) -> Point {
+        Point::new(self.width - self.margin, self.height / 2.0)
+    }
+
+    pub fn top_left(&self) -> Point {
+        Point::new(Mm(0.0), self.height - self.margin)
+    }
+
+    pub fn top_right(&self) -> Point {
+        Point::new(self.width - self.margin, self.height - self.margin)
+    }
+
+    pub fn bottom_left(&self) -> Point {
+        Point::new(self.margin, self.margin)
+    }
+
+    pub fn bottom_right(&self) -> Point {
+        Point::new(self.width, self.margin)
+    }
+}
+
 /// A4 dimensions with a 10mm margin
 pub const A4_PAGE: PageDimensions = PageDimensions {
     width: Mm(210.0),
     height: Mm(297.0),
+    margin: Mm(10.0),
+};
+
+pub const LETTER_PAGE: PageDimensions = PageDimensions {
+    width: Mm(215.9),
+    height: Mm(279.4),
     margin: Mm(10.0),
 };
 
@@ -63,10 +101,16 @@ pub struct Document {
 impl Document {
     /// Initialize the PDF with default dimensions and the required fonts. Also
     /// sets the title and the producer in the PDF metadata.
-    pub fn new(title: String) -> Result<Document, Box<dyn std::error::Error>> {
+    pub fn new(title: String, page_size: PageSize) -> Result<Document, Box<dyn std::error::Error>> {
         debug!("Initializing PDF");
 
-        let dimensions: PageDimensions = Default::default();
+        let dimensions = {
+            if page_size == PageSize::Letter {
+                LETTER_PAGE
+            } else {
+                A4_PAGE
+            }
+        };
 
         let (mut doc, page, layer) =
             PdfDocument::new(title, dimensions.width, dimensions.height, "Layer 1");
@@ -300,7 +344,7 @@ fn test_paper_dimensions_default() {
 #[test]
 fn test_new_document() {
     let title = String::from("Hello World!");
-    let result = Document::new(title);
+    let result = Document::new(title, PageSize::A4);
     assert!(result.is_ok());
 
     let doc = result.unwrap();
@@ -309,7 +353,7 @@ fn test_new_document() {
 
 #[test]
 fn test_qrcode() {
-    let result = Document::new(String::from("QR code"));
+    let result = Document::new(String::from("QR code"), PageSize::A4);
     let document = result.unwrap();
     let result = document.insert_qr_code(String::from("payload"));
     assert!(result.is_ok());
@@ -317,7 +361,7 @@ fn test_qrcode() {
 
 #[test]
 fn test_qrcode_too_large() {
-    let document = Document::new(String::from("QR code")).unwrap();
+    let document = Document::new(String::from("QR code"), PageSize::A4).unwrap();
     let result = document.insert_qr_code(String::from(include_str!("../tests/data/too_large.txt")));
 
     assert!(result.is_err());

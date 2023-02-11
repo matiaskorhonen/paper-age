@@ -87,7 +87,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = builder::Document::new(args.title.clone())?;
+    let pdf = builder::Document::new(args.title.clone(), args.page_size)?;
 
     if args.grid {
         pdf.draw_grid();
@@ -111,13 +111,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     pdf.insert_passphrase();
 
     pdf.draw_line(
-        vec![
-            Point::new(pdf.dimensions.margin, pdf.dimensions.height / 2.0),
-            Point::new(
-                pdf.dimensions.width - pdf.dimensions.margin,
-                pdf.dimensions.height / 2.0,
-            ),
-        ],
+        vec![pdf.dimensions.center_left(), pdf.dimensions.center_right()],
         1.0,
         LineDashPattern {
             dash_1: Some(5),

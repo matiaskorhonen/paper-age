@@ -1,8 +1,20 @@
 //! Command line arguments
-use std::path::PathBuf;
+use std::{fmt, path::PathBuf};
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use clap_verbosity_flag::Verbosity;
+
+#[derive(ValueEnum, Clone, Debug, PartialEq, Eq)]
+pub enum PageSize {
+    A4,
+    Letter,
+}
+
+impl fmt::Display for PageSize {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", format!("{:?}", self).to_lowercase())
+    }
+}
 
 /// Command line arguments
 #[derive(Parser, Debug)]
@@ -15,6 +27,10 @@ pub(crate) struct Args {
     /// Output file name. Use - for STDOUT.
     #[arg(short, long, default_value = "out.pdf")]
     pub output: PathBuf,
+
+    /// Paper size
+    #[arg(short = 's', long, default_value_t = PageSize::A4)]
+    pub page_size: PageSize,
 
     /// Overwrite the output file if it already exists
     #[arg(short, long, default_value_t = false)]
