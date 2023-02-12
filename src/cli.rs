@@ -4,10 +4,12 @@ use std::path::PathBuf;
 use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 
+use crate::page::PageSize;
+
 /// Command line arguments
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-pub(crate) struct Args {
+pub struct Args {
     /// Page title (max. 64 characters)
     #[arg(short, long, default_value = "PaperAge")]
     pub title: String,
@@ -15,6 +17,10 @@ pub(crate) struct Args {
     /// Output file name. Use - for STDOUT.
     #[arg(short, long, default_value = "out.pdf")]
     pub output: PathBuf,
+
+    /// Paper size
+    #[arg(short = 's', long, default_value_t = PageSize::A4)]
+    pub page_size: PageSize,
 
     /// Overwrite the output file if it already exists
     #[arg(short, long, default_value_t = false)]
