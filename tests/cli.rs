@@ -23,6 +23,27 @@ fn test_happy_path() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_letter_support() -> Result<(), Box<dyn std::error::Error>> {
+    let temp = assert_fs::TempDir::new().unwrap();
+    let input = temp.child("sample.txt");
+    input.write_str("Hello")?;
+    let output = temp.child("letter.pdf");
+    let mut cmd = Command::cargo_bin("paper-age")?;
+
+    cmd.arg("--output")
+        .arg(output.path())
+        .arg("--page-size")
+        .arg("letter")
+        .arg(input.path())
+        .env("PAPERAGE_PASSPHRASE", "secret");
+    cmd.assert().success();
+
+    output.assert(predicate::path::is_file());
+
+    Ok(())
+}
+
+#[test]
 fn test_stdout() -> Result<(), Box<dyn std::error::Error>> {
     let temp = assert_fs::TempDir::new().unwrap();
     let input = temp.child("sample.txt");

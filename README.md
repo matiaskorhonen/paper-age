@@ -15,6 +15,7 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 * Takes plaintext input either from a file or stdin
 * Encrypts that input with a passphrase
 * Outputs a PDF with a QR code of the encrypted ciphertext
+* Support for both A4 and letter paper sizes
 * The error correction level of the QR code is optimised (less data → more error correction)
 * The passphrase **isn't** rendered on the PDF so that it can be printed on an untrusted printer (for example at work or at the library)
 
@@ -22,7 +23,6 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 
 * The maximum input size is about 1.9 KiB as QR codes cannot encode arbitrarily large payloads
 * Only passphrase-based encryption is supported at the moment
-* Only the A4 paper size is supported at the moment
 
 ## Threat models and use cases
 
@@ -34,11 +34,9 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 
 ## Example
 
-This is what the output PDF looks like. The QR code is easily readable with an iPhone (or other modern smartphone).
+This is what the output PDF looks like (or alternatively see the [letter equivalent](https://github.com/matiaskorhonen/paper-age/files/10716387/snakeoil-letter.pdf)). The QR code is easily readable with an iPhone (or other modern smartphone).
 
-<a title="Download example PDF" href="https://github.com/matiaskorhonen/paper-age/files/10675081/snakeoil.pdf">
-<img alt="A4 sheet with a title of ‘PaperAge’, a QR code, and a PEM encoded section" width="420" height="594" src="https://user-images.githubusercontent.com/43314/217248893-c7aed7d6-5a45-48af-b79a-8cdbd31d79cd.svg">
-</a>
+<a title="Download example PDF (A4)" href="https://github.com/matiaskorhonen/paper-age/files/10675081/snakeoil.pdf"><img alt="A4 sheet with a title of ‘PaperAge’, a QR code, and a PEM encoded section" width="420" height="594" src="https://user-images.githubusercontent.com/43314/217248893-c7aed7d6-5a45-48af-b79a-8cdbd31d79cd.svg"></a>
 
 If you want to try decoding it yourself, the passphrase is `snakeoil`.
 
@@ -103,6 +101,7 @@ paper-age [OPTIONS] [INPUT]
 * `-o`, `--output <OUTPUT>` — Output file name. Use - for STDOUT.
 
   Default value: `out.pdf`
+* `-s`, `--page-size <PAGE_SIZE>` — Paper size [default: `a4`] [possible values: `a4`, `letter`]
 * `-f`, `--force` — Overwrite the output file if it already exists
 * `-g`, `--grid` — Draw a grid pattern for debugging layout issues
 * `--fonts-license` — Print out the license for the embedded fonts
