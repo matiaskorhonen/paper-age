@@ -21,6 +21,7 @@ use qrcode::types::QrError;
 
 pub mod builder;
 pub mod cli;
+pub mod encryption;
 pub mod page;
 
 #[macro_use]
@@ -82,8 +83,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let passphrase = get_passphrase()?;
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
-    let (plaintext_len, encrypted) =
-        builder::encryption::encrypt_plaintext(&mut reader, passphrase)?;
+    let (plaintext_len, encrypted) = encryption::encrypt_plaintext(&mut reader, passphrase)?;
 
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());

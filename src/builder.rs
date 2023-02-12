@@ -8,7 +8,6 @@ use printpdf::{
 
 use crate::page::*;
 
-pub mod encryption;
 pub mod svg;
 
 /// PaperAge version
