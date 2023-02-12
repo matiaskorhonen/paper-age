@@ -80,7 +80,7 @@ impl Document {
         // Align the title with the QR code if the title is narrower than the QR code
         let margin = {
             if title.len() <= 37 {
-                Mm(50.0)
+                self.page_size.qrcode_left_edge()
             } else {
                 self.page_size.dimensions().margin
             }
@@ -146,7 +146,7 @@ impl Document {
 
         let current_layer = self.get_current_layer();
 
-        let desired_qr_size = Mm(110.0);
+        let desired_qr_size = self.page_size.qrcode_size();
         let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
         let qr_scale = desired_qr_size / initial_qr_size;
 
@@ -244,12 +244,24 @@ impl Document {
         let baseline =
             self.page_size.dimensions().height / 2.0 + self.page_size.dimensions().margin;
 
-        current_layer.use_text("Passphrase: ", 13.0, Mm(50.0), baseline, &self.title_font);
+        current_layer.use_text(
+            "Passphrase: ",
+            13.0,
+            self.page_size.qrcode_left_edge(),
+            baseline,
+            &self.title_font,
+        );
 
         self.draw_line(
             vec![
-                Point::new(Mm(50.0) + Mm(30.0), baseline - Mm(1.0)),
-                Point::new(Mm(110.0) + Mm(50.0), baseline - Mm(1.0)),
+                Point::new(
+                    self.page_size.qrcode_left_edge() + Mm(30.0),
+                    baseline - Mm(1.0),
+                ),
+                Point::new(
+                    self.page_size.qrcode_left_edge() + self.page_size.qrcode_size(),
+                    baseline - Mm(1.0),
+                ),
             ],
             1.0,
             LineDashPattern::default(),

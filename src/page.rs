@@ -79,6 +79,17 @@ impl PageSize {
             PageSize::Letter => LETTER_PAGE,
         }
     }
+
+    pub fn qrcode_size(&self) -> Mm {
+        match self {
+            PageSize::A4 => Mm(110.0),
+            PageSize::Letter => Mm(100.0),
+        }
+    }
+
+    pub fn qrcode_left_edge(&self) -> Mm {
+        (self.dimensions().width - self.qrcode_size()) / 2.0
+    }
 }
 
 impl fmt::Display for PageSize {
