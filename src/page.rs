@@ -83,7 +83,7 @@ impl PageSize {
     pub fn qrcode_size(&self) -> Mm {
         match self {
             PageSize::A4 => Mm(110.0),
-            PageSize::Letter => Mm(100.0),
+            PageSize::Letter => Mm(102.0),
         }
     }
 
