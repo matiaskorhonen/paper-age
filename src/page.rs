@@ -17,30 +17,37 @@ impl PartialEq for PageDimensions {
 }
 
 impl PageDimensions {
+    /// Center point of the page
     pub fn center(&self) -> Point {
         Point::new(self.width / 2.0, self.height / 2.0)
     }
 
+    /// Vertical center left of the page (with margin)
     pub fn center_left(&self) -> Point {
-        Point::new(Mm(0.0) + self.margin, self.height / 2.0)
+        Point::new(self.margin, self.height / 2.0)
     }
 
+    /// Vertical center right of the page (with margin)
     pub fn center_right(&self) -> Point {
         Point::new(self.width - self.margin, self.height / 2.0)
     }
 
+    /// Top left of the page (with margin)
     pub fn top_left(&self) -> Point {
         Point::new(self.margin, self.height - self.margin)
     }
 
+    /// Top right of the page (with margin)
     pub fn top_right(&self) -> Point {
         Point::new(self.width - self.margin, self.height - self.margin)
     }
 
+    /// Bottom left of the page (with margin)
     pub fn bottom_left(&self) -> Point {
         Point::new(self.margin, self.margin)
     }
 
+    /// Bottom right of the page (with margin)
     pub fn bottom_right(&self) -> Point {
         Point::new(self.width - self.margin, self.margin)
     }
@@ -53,6 +60,7 @@ pub const A4_PAGE: PageDimensions = PageDimensions {
     margin: Mm(10.0),
 };
 
+/// Letter dimensions with a 10mm margin
 pub const LETTER_PAGE: PageDimensions = PageDimensions {
     width: Mm(215.9),
     height: Mm(279.4),
@@ -73,6 +81,7 @@ pub enum PageSize {
 }
 
 impl PageSize {
+    /// Page dimensions
     pub fn dimensions(&self) -> PageDimensions {
         match self {
             PageSize::A4 => A4_PAGE,
@@ -80,6 +89,7 @@ impl PageSize {
         }
     }
 
+    /// QR code size for the page size
     pub fn qrcode_size(&self) -> Mm {
         match self {
             PageSize::A4 => Mm(110.0),
@@ -87,6 +97,7 @@ impl PageSize {
         }
     }
 
+    /// The left edge of the QR code on the page
     pub fn qrcode_left_edge(&self) -> Mm {
         (self.dimensions().width - self.qrcode_size()) / 2.0
     }
