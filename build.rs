@@ -4,7 +4,7 @@ use clap::CommandFactory;
 mod cli;
 
 #[path = "src/page.rs"]
-mod page;
+pub mod page;
 
 fn main() -> std::io::Result<()> {
     let out_dir =
@@ -15,7 +15,8 @@ fn main() -> std::io::Result<()> {
     let mut buffer: Vec<u8> = Default::default();
     man.render(&mut buffer)?;
 
-    std::fs::write(out_dir.join("paper-age.1"), buffer)?;
+    // Write to the same level as the binary, even though build scripts shouldn't
+    std::fs::write(out_dir.join("../../../paper-age.1"), buffer)?;
 
     Ok(())
 }
