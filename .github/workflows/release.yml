@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.create-gh-release.outputs.computed-prefix }}${{ steps.create-gh-release.outputs.version }}
+      version: ${{ steps.create-gh-release.outputs.version }}
     steps:
       - uses: actions/checkout@v3
       - id: create-gh-release
@@ -88,4 +89,4 @@ jobs:
           token: ${{ secrets.PAT }}
           repository: matiaskorhonen/homebrew-paper-age
           event-type: "Update Homebrew Formula"
-          client-payload: '{ "version": "${{ needs.create-release.outputs.tag }}" }'
+          client-payload: '{ "version": "${{ needs.create-release.outputs.version }}" }'
