@@ -1,3 +1,4 @@
+//! Page size and dimensions
 use std::fmt;
 
 use printpdf::{Mm, Point};
