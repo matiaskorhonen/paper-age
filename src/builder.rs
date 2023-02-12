@@ -305,6 +305,16 @@ fn test_new_document() {
 }
 
 #[test]
+fn test_new_letter_document() {
+    let title = String::from("Hello Letter!");
+    let result = Document::new(title, PageSize::Letter);
+    assert!(result.is_ok());
+
+    let doc = result.unwrap();
+    assert_eq!(doc.page_size.dimensions(), crate::page::LETTER_PAGE);
+}
+
+#[test]
 fn test_qrcode() {
     let result = Document::new(String::from("QR code"), PageSize::A4);
     let document = result.unwrap();
