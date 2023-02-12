@@ -107,7 +107,10 @@ impl Document {
         let mut line_height = 15.0;
 
         // Rudimentary text scaling to get the Ascii Armor text to fit
-        if pem.lines().count() > 39 {
+        if pem.lines().count() > 42 {
+            font_size = 6.5;
+            line_height = 7.0;
+        } else if pem.lines().count() > 39 {
             font_size = 7.0;
             line_height = 8.0;
         } else if pem.lines().count() > 27 {
