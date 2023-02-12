@@ -40,3 +40,4 @@ predicates = "2.1.5"
 clap = { version = "4.1.4", features = ["derive"] }
 clap-verbosity-flag = "2.0.0"
 clap_mangen = { version = "0.2.7" }
+printpdf = { version = "0.5.3", features = ["svg"] }
