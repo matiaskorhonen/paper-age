@@ -16,15 +16,15 @@ use age::{
     secrecy::{Secret, SecretString},
 };
 use clap::Parser;
-use printpdf::{LineDashPattern, Point};
+use printpdf::LineDashPattern;
 use qrcode::types::QrError;
+
+pub mod builder;
+pub mod cli;
+pub mod page;
 
 #[macro_use]
 extern crate log;
-
-mod builder;
-mod cli;
-mod encryption;
 
 /// Maximum length of the document title
 const TITLE_MAX_LEN: usize = 64;
@@ -82,7 +82,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let passphrase = get_passphrase()?;
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
-    let (plaintext_len, encrypted) = encryption::encrypt_plaintext(&mut reader, passphrase)?;
+    let (plaintext_len, encrypted) =
+        builder::encryption::encrypt_plaintext(&mut reader, passphrase)?;
 
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
@@ -111,7 +112,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     pdf.insert_passphrase();
 
     pdf.draw_line(
-        vec![pdf.dimensions.center_left(), pdf.dimensions.center_right()],
+        vec![
+            pdf.page_size.dimensions().center_left(),
+            pdf.page_size.dimensions().center_right(),
+        ],
         1.0,
         LineDashPattern {
             dash_1: Some(5),

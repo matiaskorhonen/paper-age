@@ -1,25 +1,15 @@
 //! Command line arguments
-use std::{fmt, path::PathBuf};
+use std::path::PathBuf;
 
-use clap::{Parser, ValueEnum};
+use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 
-#[derive(ValueEnum, Clone, Debug, PartialEq, Eq)]
-pub enum PageSize {
-    A4,
-    Letter,
-}
-
-impl fmt::Display for PageSize {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", format!("{:?}", self).to_lowercase())
-    }
-}
+use crate::page::PageSize;
 
 /// Command line arguments
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-pub(crate) struct Args {
+pub struct Args {
     /// Page title (max. 64 characters)
     #[arg(short, long, default_value = "PaperAge")]
     pub title: String,

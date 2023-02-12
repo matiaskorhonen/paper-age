@@ -6,76 +6,13 @@ use printpdf::{
     PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
 };
 
-use crate::cli::PageSize;
+use crate::page::*;
 
+pub mod encryption;
 pub mod svg;
 
 /// PaperAge version
 pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
-
-/// PDF dimensions
-#[derive(Clone, Copy, Debug)]
-pub struct PageDimensions {
-    pub width: Mm,
-    pub height: Mm,
-    pub margin: Mm,
-}
-
-impl PartialEq for PageDimensions {
-    fn eq(&self, other: &PageDimensions) -> bool {
-        self.width == other.width && self.height == other.height && self.margin == other.margin
-    }
-}
-
-impl PageDimensions {
-    pub fn center(&self) -> Point {
-        Point::new(self.width / 2.0, self.height / 2.0)
-    }
-
-    pub fn center_left(&self) -> Point {
-        Point::new(Mm(0.0) + self.margin, self.height / 2.0)
-    }
-
-    pub fn center_right(&self) -> Point {
-        Point::new(self.width - self.margin, self.height / 2.0)
-    }
-
-    pub fn top_left(&self) -> Point {
-        Point::new(Mm(0.0), self.height - self.margin)
-    }
-
-    pub fn top_right(&self) -> Point {
-        Point::new(self.width - self.margin, self.height - self.margin)
-    }
-
-    pub fn bottom_left(&self) -> Point {
-        Point::new(self.margin, self.margin)
-    }
-
-    pub fn bottom_right(&self) -> Point {
-        Point::new(self.width, self.margin)
-    }
-}
-
-/// A4 dimensions with a 10mm margin
-pub const A4_PAGE: PageDimensions = PageDimensions {
-    width: Mm(210.0),
-    height: Mm(297.0),
-    margin: Mm(10.0),
-};
-
-pub const LETTER_PAGE: PageDimensions = PageDimensions {
-    width: Mm(215.9),
-    height: Mm(279.4),
-    margin: Mm(10.0),
-};
-
-/// Default to an A4 page
-impl Default for PageDimensions {
-    fn default() -> Self {
-        A4_PAGE
-    }
-}
 
 /// Container for all the data required to insert elements into the PDF
 pub struct Document {
@@ -94,8 +31,8 @@ pub struct Document {
     /// Reference to the regular weight font
     pub code_font: IndirectFontRef,
 
-    /// PDF Page dimensions
-    pub dimensions: PageDimensions,
+    /// Page size
+    pub page_size: PageSize,
 }
 
 impl Document {
@@ -104,13 +41,7 @@ impl Document {
     pub fn new(title: String, page_size: PageSize) -> Result<Document, Box<dyn std::error::Error>> {
         debug!("Initializing PDF");
 
-        let dimensions = {
-            if page_size == PageSize::Letter {
-                LETTER_PAGE
-            } else {
-                A4_PAGE
-            }
-        };
+        let dimensions = page_size.dimensions();
 
         let (mut doc, page, layer) =
             PdfDocument::new(title, dimensions.width, dimensions.height, "Layer 1");
@@ -130,7 +61,7 @@ impl Document {
             layer,
             title_font,
             code_font,
-            dimensions,
+            page_size,
         })
     }
 
@@ -152,7 +83,7 @@ impl Document {
             if title.len() <= 37 {
                 Mm(50.0)
             } else {
-                self.dimensions.margin
+                self.page_size.dimensions().margin
             }
         };
 
@@ -160,7 +91,9 @@ impl Document {
             title,
             font_size,
             margin,
-            self.dimensions.height - self.dimensions.margin - Mm::from(Pt(font_size)),
+            self.page_size.dimensions().height
+                - self.page_size.dimensions().margin
+                - Mm::from(Pt(font_size)),
             &self.title_font,
         );
     }
@@ -189,8 +122,10 @@ impl Document {
         current_layer.begin_text_section();
 
         current_layer.set_text_cursor(
-            self.dimensions.margin,
-            (self.dimensions.height / 2.0) - Mm::from(Pt(font_size)) - self.dimensions.margin,
+            self.page_size.dimensions().margin,
+            (self.page_size.dimensions().height / 2.0)
+                - Mm::from(Pt(font_size))
+                - self.page_size.dimensions().margin,
         );
         current_layer.set_line_height(line_height);
         current_layer.set_font(&self.code_font, font_size);
@@ -221,10 +156,10 @@ impl Document {
         let code_width = qrcode.width.into_pt(dpi) * scale;
         let code_height = qrcode.height.into_pt(dpi) * scale;
 
-        let translate_x = (self.dimensions.width.into_pt() - code_width) / 2.0;
-        let translate_y = self.dimensions.height.into_pt()
+        let translate_x = (self.page_size.dimensions().width.into_pt() - code_width) / 2.0;
+        let translate_y = self.page_size.dimensions().height.into_pt()
             - code_height
-            - (self.dimensions.margin.into_pt() * 2.0);
+            - (self.page_size.dimensions().margin.into_pt() * 2.0);
 
         qrcode.add_to_layer(
             &current_layer,
@@ -249,13 +184,13 @@ impl Document {
         let thickness = 0.0;
 
         let mut x = Mm(0.0);
-        let mut y = self.dimensions.height;
-        while x < self.dimensions.width {
+        let mut y = self.page_size.dimensions().height;
+        while x < self.page_size.dimensions().width {
             x += grid_size;
 
             self.draw_line(
                 vec![
-                    Point::new(x, self.dimensions.height),
+                    Point::new(x, self.page_size.dimensions().height),
                     Point::new(x, Mm(0.0)),
                 ],
                 thickness,
@@ -266,7 +201,10 @@ impl Document {
                 y -= grid_size;
 
                 self.draw_line(
-                    vec![Point::new(self.dimensions.width, y), Point::new(Mm(0.0), y)],
+                    vec![
+                        Point::new(self.page_size.dimensions().width, y),
+                        Point::new(Mm(0.0), y),
+                    ],
                     thickness,
                     LineDashPattern::default(),
                 );
@@ -304,7 +242,8 @@ impl Document {
 
         let current_layer = self.get_current_layer();
 
-        let baseline = self.dimensions.height / 2.0 + self.dimensions.margin;
+        let baseline =
+            self.page_size.dimensions().height / 2.0 + self.page_size.dimensions().margin;
 
         current_layer.use_text("Passphrase: ", 13.0, Mm(50.0), baseline, &self.title_font);
 
@@ -327,8 +266,8 @@ impl Document {
         current_layer.use_text(
             "Scan QR code and decrypt using Age <https://age-encryption.org>",
             13.0,
-            self.dimensions.margin,
-            self.dimensions.margin,
+            self.page_size.dimensions().margin,
+            self.page_size.dimensions().margin,
             &self.title_font,
         );
     }
@@ -348,7 +287,7 @@ fn test_new_document() {
     assert!(result.is_ok());
 
     let doc = result.unwrap();
-    assert_eq!(doc.dimensions, A4_PAGE);
+    assert_eq!(doc.page_size.dimensions(), crate::page::A4_PAGE);
 }
 
 #[test]
