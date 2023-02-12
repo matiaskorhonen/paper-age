@@ -30,7 +30,7 @@ impl PageDimensions {
     }
 
     pub fn top_left(&self) -> Point {
-        Point::new(Mm(0.0), self.height - self.margin)
+        Point::new(self.margin, self.height - self.margin)
     }
 
     pub fn top_right(&self) -> Point {
@@ -42,7 +42,7 @@ impl PageDimensions {
     }
 
     pub fn bottom_right(&self) -> Point {
-        Point::new(self.width, self.margin)
+        Point::new(self.width - self.margin, self.margin)
     }
 }
 
@@ -95,5 +95,63 @@ impl PageSize {
 impl fmt::Display for PageSize {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", format!("{:?}", self).to_lowercase())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEST_DIMENSIONS: PageDimensions = PageDimensions {
+        width: Mm(100.0),
+        height: Mm(200.0),
+        margin: Mm(10.0),
+    };
+
+    #[test]
+    fn page_dimensions_center() {
+        assert_eq!(TEST_DIMENSIONS.center(), Point::new(Mm(50.0), Mm(100.0)));
+    }
+
+    #[test]
+    fn page_dimensions_center_left() {
+        assert_eq!(
+            TEST_DIMENSIONS.center_left(),
+            Point::new(Mm(10.0), Mm(100.0))
+        );
+    }
+
+    #[test]
+    fn page_dimensions_center_right() {
+        assert_eq!(
+            TEST_DIMENSIONS.center_right(),
+            Point::new(Mm(90.0), Mm(100.0))
+        );
+    }
+
+    #[test]
+    fn page_dimensions_top_left() {
+        assert_eq!(TEST_DIMENSIONS.top_left(), Point::new(Mm(10.0), Mm(190.0)));
+    }
+
+    #[test]
+    fn page_dimensions_top_right() {
+        assert_eq!(TEST_DIMENSIONS.top_right(), Point::new(Mm(90.0), Mm(190.0)));
+    }
+
+    #[test]
+    fn page_dimensions_bottom_left() {
+        assert_eq!(
+            TEST_DIMENSIONS.bottom_left(),
+            Point::new(Mm(10.0), Mm(10.0))
+        );
+    }
+
+    #[test]
+    fn page_dimensions_bottom_right() {
+        assert_eq!(
+            TEST_DIMENSIONS.bottom_right(),
+            Point::new(Mm(90.0), Mm(10.0))
+        );
     }
 }
