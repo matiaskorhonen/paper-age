@@ -34,11 +34,9 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 
 ## Example
 
-This is what the output PDF looks like. The QR code is easily readable with an iPhone (or other modern smartphone).
+This is what the output PDF looks like (or alternatively see the [letter equivalent](https://github.com/matiaskorhonen/paper-age/files/10716387/snakeoil-letter.pdf)). The QR code is easily readable with an iPhone (or other modern smartphone).
 
-| A4 | Letter |
-|---|---|
-| <a title="Download example PDF (A4)" href="https://github.com/matiaskorhonen/paper-age/files/10675081/snakeoil.pdf"><img alt="A4 sheet with a title of ‘PaperAge’, a QR code, and a PEM encoded section" width="420" height="594" src="https://user-images.githubusercontent.com/43314/217248893-c7aed7d6-5a45-48af-b79a-8cdbd31d79cd.svg"></a> | <a title="Download example PDF (letter)" href="https://github.com/matiaskorhonen/paper-age/files/10716387/snakeoil-letter.pdf"><img alt="Letter sheet with a title of ‘PaperAge’, a QR code, and a PEM encoded section" width="459" height="594" src="https://user-images.githubusercontent.com/43314/218320131-d002d49a-ab38-4d98-9d80-c36e90fb270a.svg"></a> |
+<a title="Download example PDF (A4)" href="https://github.com/matiaskorhonen/paper-age/files/10675081/snakeoil.pdf"><img alt="A4 sheet with a title of ‘PaperAge’, a QR code, and a PEM encoded section" width="420" height="594" src="https://user-images.githubusercontent.com/43314/217248893-c7aed7d6-5a45-48af-b79a-8cdbd31d79cd.svg"></a>
 
 If you want to try decoding it yourself, the passphrase is `snakeoil`.
 
