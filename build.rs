@@ -16,13 +16,24 @@ fn main() -> std::io::Result<()> {
     let mut buffer: Vec<u8> = Default::default();
     man.render(&mut buffer)?;
 
-    // Write to the same level as the binary, even though build scripts shouldn't
-    std::fs::write(out_dir.join("../../../paper-age.1"), buffer)?;
+    // Create a man directory the same level as the binary, even though build scripts shouldn't
+    let man_dir = out_dir.join("../../../man");
+    let man_path = std::fs::canonicalize(man_dir.join("paper-age.1"))?;
+    std::fs::create_dir_all(man_dir.clone())?;
+    std::fs::write(man_path.clone(), buffer)?;
+    println!("cargo:warning=generated man page: {man_path:?}");
 
+    // Create a completion directory the same level as the binary
+    let completion_dir = std::fs::canonicalize(out_dir.join("../../../completion"))?;
+    std::fs::create_dir_all(completion_dir.clone())?;
     for shell in [Shell::Bash, Shell::Fish, Shell::Zsh] {
-        let path = generate_to(shell, &mut cmd, "paper-age", out_dir.join("../../../"))?;
-        println!("cargo:info=completion file is generated: {:?}", path);
+        let path = generate_to(shell, &mut cmd, "paper-age", completion_dir.clone())?;
+        println!("cargo:warning=generated {shell:?} completion file: {path:?}",);
     }
+
+    // Re-run if the cli or page files change
+    println!("cargo:rerun-if-changed=src/cli.rs");
+    println!("cargo:rerun-if-changed=src/page.rs");
 
     Ok(())
 }

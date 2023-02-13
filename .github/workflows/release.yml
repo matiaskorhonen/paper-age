@@ -63,7 +63,7 @@ jobs:
           # (optional) Target triple, default is host triple.
           target: ${{ matrix.target }}
           # (optional) Comma-separated list of additional files to be included to archive.
-          include: README.md,LICENSE.txt,src/assets/fonts/IBMPlexMono-LICENSE.txt,target/release/paper-age.1,target/release/paper-age.bash,target/release/paper-age.fish,target/release/_paper-age
+          include: README.md,LICENSE.txt,src/assets/fonts/IBMPlexMono-LICENSE.txt,target/release/man,target/release/completion
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
 
