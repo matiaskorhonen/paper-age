@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Support for the letter paper size
+- Shell completion scripts for Bash, Fish, and Zsh
+
+### Fixed
+
+- The man page is now included in the release archives
+
 ## [1.0.1] - 2023-02-07
 
 ### Added
