@@ -24,20 +24,18 @@ fn main() -> std::io::Result<()> {
     std::fs::create_dir_all(&absolute_man_dir)?;
     let man_path = absolute_man_dir.join("paper-age.1");
     std::fs::write(man_path.clone(), buffer)?;
-    println!("cargo:warning=generated man page: {man_path:?}");
 
     // Create a completion directory the same level as the binary
     let completion_dir = out_dir.join("../../../completion");
     let absolute_completion_dir = completion_dir.absolutize()?;
     std::fs::create_dir_all(absolute_completion_dir.clone())?;
     for shell in [Shell::Bash, Shell::Fish, Shell::Zsh] {
-        let path = generate_to(
+        generate_to(
             shell,
             &mut cmd,
             "paper-age",
             absolute_completion_dir.as_ref(),
         )?;
-        println!("cargo:warning=generated {shell:?} completion file: {path:?}",);
     }
 
     // Re-run if the cli or page files change
