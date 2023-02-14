@@ -38,5 +38,8 @@ predicates = "2.1.5"
 
 [build-dependencies]
 clap = { version = "4.1.4", features = ["derive"] }
+clap_complete = "4.1.1"
 clap-verbosity-flag = "2.0.0"
 clap_mangen = { version = "0.2.7" }
+path-absolutize = "3.0.14"
+printpdf = { version = "0.5.3", features = ["svg"] }
