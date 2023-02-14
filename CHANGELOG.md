@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [1.1.0] - 2023-02-14
+
 ### Added
 
 - Support for the letter paper size
@@ -60,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent accidental overwrites of the output file
 
 <!-- next-url -->
-[Unreleased]: https://github.com/crate-ci/cargo-release/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/crate-ci/cargo-release/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/crate-ci/cargo-release/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/crate-ci/cargo-release/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/crate-ci/cargo-release/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/matiaskorhonen/paper-age/compare/v0.1.0-prerelease4...v0.1.0
