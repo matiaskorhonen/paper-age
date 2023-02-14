@@ -1,5 +1,6 @@
 use clap::CommandFactory;
 use clap_complete::{generate_to, shells::Shell};
+use path_absolutize::*;
 
 #[path = "src/cli.rs"]
 mod cli;
@@ -16,18 +17,26 @@ fn main() -> std::io::Result<()> {
     let mut buffer: Vec<u8> = Default::default();
     man.render(&mut buffer)?;
 
-    // Create a man directory the same level as the binary, even though build scripts shouldn't
-    let man_dir = out_dir.join("../../../man");
-    let man_path = std::fs::canonicalize(man_dir.join("paper-age.1"))?;
-    std::fs::create_dir_all(man_dir.clone())?;
+    // Create a man directory at the same level as the binary, even though build
+    // scripts shouldn't
+    let man_dir = &out_dir.join("../../../man");
+    let absolute_man_dir = man_dir.absolutize()?;
+    std::fs::create_dir_all(&absolute_man_dir)?;
+    let man_path = absolute_man_dir.join("paper-age.1");
     std::fs::write(man_path.clone(), buffer)?;
     println!("cargo:warning=generated man page: {man_path:?}");
 
     // Create a completion directory the same level as the binary
-    let completion_dir = std::fs::canonicalize(out_dir.join("../../../completion"))?;
-    std::fs::create_dir_all(completion_dir.clone())?;
+    let completion_dir = out_dir.join("../../../completion");
+    let absolute_completion_dir = completion_dir.absolutize()?;
+    std::fs::create_dir_all(absolute_completion_dir.clone())?;
     for shell in [Shell::Bash, Shell::Fish, Shell::Zsh] {
-        let path = generate_to(shell, &mut cmd, "paper-age", completion_dir.clone())?;
+        let path = generate_to(
+            shell,
+            &mut cmd,
+            "paper-age",
+            &absolute_completion_dir.as_ref(),
+        )?;
         println!("cargo:warning=generated {shell:?} completion file: {path:?}",);
     }
 
