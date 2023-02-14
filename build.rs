@@ -35,7 +35,7 @@ fn main() -> std::io::Result<()> {
             shell,
             &mut cmd,
             "paper-age",
-            &absolute_completion_dir.as_ref(),
+            absolute_completion_dir.as_ref(),
         )?;
         println!("cargo:warning=generated {shell:?} completion file: {path:?}",);
     }
