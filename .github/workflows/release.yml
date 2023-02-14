@@ -16,11 +16,15 @@ jobs:
       version: ${{ steps.create-gh-release.outputs.version }}
     steps:
       - uses: actions/checkout@v3
+      - name: Changelog variable
+        if: ${{ !(contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'prerelease') || contains(github.ref, 'rc')) }}
+        run: |
+          echo "changelog=CHANGELOG.md" >> $GITHUB_ENV
       - id: create-gh-release
         uses: taiki-e/create-gh-release-action@v1
         with:
           draft: true
-          changelog: CHANGELOG.md
+          changelog: ${{ env.changelog }}
           # (required) GitHub token for creating GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -53,6 +57,18 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: release-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Include documentation files variable (macOS)
+        if: ${{ matrix.target == 'universal-apple-darwin' }}
+        run: |
+          echo "include_docs=target/aarch64-apple-darwin/release/man,target/aarch64-apple-darwin/release/completion" >> $GITHUB_ENV
+      - name: Include documentation files variable (windows)
+        if: ${{ matrix.target == 'x86_64-pc-windows-msvc' }}
+        run: |
+          echo "include_docs=target/${{ matrix.target }}/release/man,target/${{ matrix.target }}/release/completion" >> $env:GITHUB_ENV
+      - name: Include documentation files variable (linux)
+        if: ${{ contains(matrix.target, 'linux') }}
+        run: |
+          echo "include_docs=target/${{ matrix.target }}/release/man,target/${{ matrix.target }}/release/completion" >> $GITHUB_ENV
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required) Comma-separated list of binary names (non-extension portion of filename) to build and upload.
@@ -63,7 +79,7 @@ jobs:
           # (optional) Target triple, default is host triple.
           target: ${{ matrix.target }}
           # (optional) Comma-separated list of additional files to be included to archive.
-          include: README.md,LICENSE.txt,src/assets/fonts/IBMPlexMono-LICENSE.txt,target/release/man,target/release/completion
+          include: README.md,LICENSE.txt,src/assets/fonts/IBMPlexMono-LICENSE.txt,${{ env.include_docs }}
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -80,7 +96,7 @@ jobs:
 
   update-homebrew:
     needs: [create-release, upload-assets, publish-release]
-    if: ${{ !(contains(needs.create-release.outputs.tag, 'alpha') || contains(needs.create-release.outputs.tag, 'beta') || contains(needs.create-release.outputs.tag, 'prerelease')) }}
+    if: ${{ !(contains(needs.create-release.outputs.tag, 'alpha') || contains(needs.create-release.outputs.tag, 'beta') || contains(needs.create-release.outputs.tag, 'prerelease') || contains(needs.create-release.outputs.tag, 'rc')) }}
     runs-on: ubuntu-latest
     steps:
       - name: Update Homebrew Formula
