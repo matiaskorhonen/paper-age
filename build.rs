@@ -23,7 +23,7 @@ fn main() -> std::io::Result<()> {
     let absolute_man_dir = man_dir.absolutize()?;
     std::fs::create_dir_all(&absolute_man_dir)?;
     let man_path = absolute_man_dir.join("paper-age.1");
-    std::fs::write(man_path.clone(), buffer)?;
+    std::fs::write(man_path, buffer)?;
 
     // Create a completion directory the same level as the binary
     let completion_dir = out_dir.join("../../../completion");
