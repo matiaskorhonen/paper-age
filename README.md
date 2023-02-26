@@ -21,7 +21,7 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 
 ## Limitations
 
-* The maximum input size is about 1.9 KiB as QR codes cannot encode arbitrarily large payloads
+* The maximum input size is about 1.9 KiB (127 KiB if using compression) as QR codes cannot encode arbitrarily large payloads
 * Only passphrase-based encryption is supported at the moment
 
 ## Threat models and use cases
@@ -131,6 +131,15 @@ cargo release 1.2.3
 ```
 
 ⚠️ Append `--execute` to the command to actually execute the release.
+
+### Compression
+
+You can optionally build the binary with `--features=compression` and pass the `--compress` flag during runtime to encrypt input data of up to 127 KiB.
+
+Example:
+```bash
+cargo run --features=compression -- in.txt --compress
+```
 
 ## License & Credits
 

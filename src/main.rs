@@ -166,6 +166,7 @@ fn get_passphrase() -> Result<Secret<String>, io::Error> {
     }
 }
 
+#[cfg(feature = "compression")]
 fn compress(mut reader: BufReader<Box<dyn Read>>) -> Vec<u8> {
     use std::io::prelude::*;
     use flate2::Compression;
@@ -177,10 +178,21 @@ fn compress(mut reader: BufReader<Box<dyn Read>>) -> Vec<u8> {
 	compressed_bytes.unwrap()
 }
 
+#[cfg(feature = "compression")]
 fn to_base64(compressed_bytes: Vec<u8>) -> String{
     use base64::{Engine as _, engine::general_purpose};
     let output = general_purpose::STANDARD.encode(compressed_bytes);
     output
+}
+
+#[cfg(not(feature = "compression"))]
+fn compress(_: BufReader<Box<dyn Read>>) -> Vec<u8> {
+    panic!("Compression-related function called but binary not built with --feature=compression");
+}
+
+#[cfg(not(feature = "compression"))]
+fn to_base64(_: Vec<u8>) -> String{
+    panic!("Compression-related function called but binary not built with --feature=compression");
 }
 
 #[cfg(test)]

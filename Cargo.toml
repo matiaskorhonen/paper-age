@@ -30,8 +30,8 @@ printpdf = { version = "0.5.3", features = ["svg"] }
 qrcode = "0.12.0"
 log = "0.4.17"
 env_logger = "0.10.0"
-flate2 = "1.0"
-base64 = "0.21.0"
+flate2 = { version="1.0", optional = true }
+base64 = { version="0.21.0", optional = true }
 
 [dev-dependencies]
 assert_cmd = "2.0.8"
@@ -45,3 +45,6 @@ clap-verbosity-flag = "2.0.0"
 clap_mangen = { version = "0.2.8" }
 path-absolutize = "3.0.14"
 printpdf = { version = "0.5.3", features = ["svg"] }
+
+[features]
+compression = ["dep:flate2", "dep:base64"]
