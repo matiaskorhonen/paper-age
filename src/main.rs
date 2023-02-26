@@ -81,8 +81,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     let compressed_bytes = compress(reader);
-    let mut buf : Vec<u8> = Vec::new();
-    to_base64(compressed_bytes, &mut buf);
+    let base64_encoded = to_base64(compressed_bytes);
+    let buf : Vec<u8> = base64_encoded.as_bytes().to_vec();
     let mut compressed_reader = BufReader::new(Box::new(&buf[..]));
     let passphrase = get_passphrase()?;
 
@@ -162,19 +162,19 @@ fn get_passphrase() -> Result<Secret<String>, io::Error> {
 fn compress(mut reader: BufReader<Box<dyn Read>>) -> Vec<u8> {
     use std::io::prelude::*;
     use flate2::Compression;
-    use flate2::write::ZlibEncoder;
-	let mut e = ZlibEncoder::new(Vec::new(), Compression::default());
+    use flate2::write::GzEncoder;
+	let mut e = GzEncoder::new(Vec::new(), Compression::default());
 
     let _ = e.write_all(reader.fill_buf().unwrap());
     let compressed_bytes = e.finish();
 	compressed_bytes.unwrap()
 }
 
-fn to_base64(compressed_bytes: Vec<u8>, buf: &mut Vec<u8>) {
+fn to_base64(compressed_bytes: Vec<u8>) -> String{
     use base64::{Engine as _, engine::general_purpose};
-    buf.resize(compressed_bytes.len() * 4 / 3 + 4, 0);
-    let bytes_written = general_purpose::STANDARD.encode_slice(compressed_bytes, buf).unwrap();
-    buf.truncate(bytes_written);
+    let output = general_purpose::STANDARD.encode(compressed_bytes);
+    println!("Output: {output}");
+    output
 }
 
 #[cfg(test)]
