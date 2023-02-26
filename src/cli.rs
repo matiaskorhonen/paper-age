@@ -42,6 +42,10 @@ pub struct Args {
     #[arg(short, long, default_value_t = false)]
     pub no_footer: bool,
 
+    /// Compress input with GZip and base64 encode it to output
+    #[arg(short, long, default_value_t = false)]
+    pub compress: bool,
+
     /// The path to the file to read. Defaults to standard input. Max. ~1.9KB.
     pub input: Option<PathBuf>,
 }

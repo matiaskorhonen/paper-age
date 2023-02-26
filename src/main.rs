@@ -65,7 +65,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(p) => p,
         None => PathBuf::from("-"),
     };
-    let reader: BufReader<Box<dyn Read>> = {
+    let mut reader: BufReader<Box<dyn Read>> = {
         if path == PathBuf::from("-") {
             BufReader::with_capacity(153600, Box::new(stdin().lock()))
         } else if path.is_file() {
@@ -80,14 +80,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let compressed_bytes = compress(reader);
-    let base64_encoded = to_base64(compressed_bytes);
-    let buf : Vec<u8> = base64_encoded.as_bytes().to_vec();
-    let mut compressed_reader = BufReader::new(Box::new(&buf[..]));
     let passphrase = get_passphrase()?;
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
-    let (plaintext_len, encrypted) = encryption::encrypt_plaintext(&mut compressed_reader, passphrase)?;
+    let (plaintext_len, encrypted) = match args.compress{
+        false => encryption::encrypt_plaintext(&mut reader, passphrase)?,
+        true => {
+            let compressed_bytes = compress(reader);
+            let base64_encoded = to_base64(compressed_bytes);
+            let buf : Vec<u8> = base64_encoded.as_bytes().to_vec();
+            let mut compressed_reader = BufReader::new(Box::new(&buf[..]));
+            encryption::encrypt_plaintext(&mut compressed_reader, passphrase)?
+        }
+    };
 
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
@@ -175,7 +180,6 @@ fn compress(mut reader: BufReader<Box<dyn Read>>) -> Vec<u8> {
 fn to_base64(compressed_bytes: Vec<u8>) -> String{
     use base64::{Engine as _, engine::general_purpose};
     let output = general_purpose::STANDARD.encode(compressed_bytes);
-    println!("Output: {output}");
     output
 }
 
