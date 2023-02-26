@@ -32,7 +32,7 @@ checksum = "1056efa39f3f960845e69985c292022187b47bc3f83ddfc96edfc586007735a1"
 dependencies = [
  "age-core",
  "atty",
- "base64",
+ "base64 0.13.1",
  "bech32",
  "chacha20poly1305",
  "console",
@@ -62,7 +62,7 @@ version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3d2e815ac879dc23c1139e720d21c6cd4d1276345c772587285d965a69b8f32"
 dependencies = [
- "base64",
+ "base64 0.13.1",
  "chacha20poly1305",
  "cookie-factory",
  "hkdf",
@@ -150,6 +150,12 @@ name = "base64"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
+
+[[package]]
+name = "base64"
+version = "0.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4a4ddaa51a5bc52a6948f74c06d20aaaddb71924eab79b8c97a8c556e942d6a"
 
 [[package]]
 name = "bech32"
@@ -1222,12 +1228,14 @@ dependencies = [
  "age",
  "assert_cmd",
  "assert_fs",
+ "base64 0.21.0",
  "clap",
  "clap-verbosity-flag",
  "clap_complete",
  "clap_mangen",
  "env_logger",
  "exitcode",
+ "flate2",
  "log",
  "path-absolutize",
  "predicates",
@@ -2186,7 +2194,7 @@ version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f472f6f5d41d3eaef059bc893dcd2382eefcdda3e04ebe0b2860c56b538e491e"
 dependencies = [
- "base64",
+ "base64 0.13.1",
  "data-url",
  "flate2",
  "float-cmp",

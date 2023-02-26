@@ -65,7 +65,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(p) => p,
         None => PathBuf::from("-"),
     };
-    let mut reader: BufReader<Box<dyn Read>> = {
+    let reader: BufReader<Box<dyn Read>> = {
         if path == PathBuf::from("-") {
             BufReader::new(Box::new(stdin().lock()))
         } else if path.is_file() {
@@ -80,10 +80,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
+    let compressed_bytes = compress(reader);
+    let mut buf : Vec<u8> = Vec::new();
+    to_base64(compressed_bytes, &mut buf);
+    let mut compressed_reader = BufReader::new(Box::new(&buf[..]));
     let passphrase = get_passphrase()?;
 
     // Encrypt the plaintext to a ciphertext using the passphrase...
-    let (plaintext_len, encrypted) = encryption::encrypt_plaintext(&mut reader, passphrase)?;
+    let (plaintext_len, encrypted) = encryption::encrypt_plaintext(&mut compressed_reader, passphrase)?;
 
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
@@ -153,6 +157,24 @@ fn get_passphrase() -> Result<Secret<String>, io::Error> {
         Ok(secret) => Ok(secret),
         Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{e}"))),
     }
+}
+
+fn compress(mut reader: BufReader<Box<dyn Read>>) -> Vec<u8> {
+    use std::io::prelude::*;
+    use flate2::Compression;
+    use flate2::write::ZlibEncoder;
+	let mut e = ZlibEncoder::new(Vec::new(), Compression::default());
+
+    let _ = e.write_all(reader.fill_buf().unwrap());
+    let compressed_bytes = e.finish();
+	compressed_bytes.unwrap()
+}
+
+fn to_base64(compressed_bytes: Vec<u8>, buf: &mut Vec<u8>) {
+    use base64::{Engine as _, engine::general_purpose};
+    buf.resize(compressed_bytes.len() * 4 / 3 + 4, 0);
+    let bytes_written = general_purpose::STANDARD.encode_slice(compressed_bytes, buf).unwrap();
+    buf.truncate(bytes_written);
 }
 
 #[cfg(test)]
