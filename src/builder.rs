@@ -103,28 +103,14 @@ impl Document {
 
         let current_layer = self.get_current_layer();
 
-        let mut font_size = 13.0;
-        let mut line_height = 15.0;
-
-        // Rudimentary text scaling to get the Ascii Armor text to fit
-        if pem.lines().count() > 42 {
-            font_size = 6.5;
-            line_height = 7.0;
-        } else if pem.lines().count() > 39 {
-            font_size = 7.0;
-            line_height = 8.0;
-        } else if pem.lines().count() > 27 {
-            font_size = 8.0;
-            line_height = 9.0;
-        } else if pem.lines().count() > 22 {
-            font_size = 10.0;
-            line_height = 12.0;
-        }
+        let font_size = 8.0;
+        let line_height = 8.0;
 
         current_layer.begin_text_section();
 
         current_layer.set_text_cursor(
-            self.page_size.dimensions().margin,
+            self.page_size.dimensions().margin
+                + Mm::from(Pt(font_size)) * 14.5,
             (self.page_size.dimensions().height / 2.0)
                 - Mm::from(Pt(font_size))
                 - self.page_size.dimensions().margin,
