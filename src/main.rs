@@ -129,7 +129,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     pdf.insert_pem_text(encrypted);
 
-    pdf.insert_footer();
+    if !args.no_footer {
+        pdf.insert_footer();
+    }
 
     if output == PathBuf::from("-") {
         debug!("Writing to STDOUT");
