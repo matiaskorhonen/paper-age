@@ -67,13 +67,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     let reader: BufReader<Box<dyn Read>> = {
         if path == PathBuf::from("-") {
-            BufReader::new(Box::new(stdin().lock()))
+            BufReader::with_capacity(153600, Box::new(stdin().lock()))
         } else if path.is_file() {
             let size = path.metadata()?.len();
             if size >= 2048 {
                 warn!("File too large ({size:?} bytes). The maximum file size is about 1.9 KiB.");
             }
-            BufReader::new(Box::new(File::open(&path).unwrap()))
+            BufReader::with_capacity(153600, Box::new(File::open(&path).unwrap()))
         } else {
             error!("File not found: {}", path.display());
             std::process::exit(exitcode::NOINPUT);
