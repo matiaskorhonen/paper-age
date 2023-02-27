@@ -110,6 +110,16 @@ paper-age [OPTIONS] [INPUT]
 * `-h`, `--help` — Print help
 * `-V`, `--version` — Print version
 
+## Compression
+
+PaperAge is entirely agnostic about the input file type. If you need to squeeze in more data, you can apply compression to the input file before passing it on to PaperAge, for example:
+
+```sh
+gzip --best --stdout in.txt | paper-age --output=compressed.pdf --title="in.txt.gz"
+```
+
+Compression ratios vary wildly depending on the input data, so whether or not this is worth it is up to you.
+
 ## Development
 
 Run the latest from git locally, assuming you have already [installed Rust](https://www.rust-lang.org/learn/get-started):
