@@ -17,7 +17,7 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 * Outputs a PDF with a QR code of the encrypted ciphertext
 * Support for both A4 and letter paper sizes
 * The error correction level of the QR code is optimised (less data → more error correction)
-* The passphrase **isn't** rendered on the PDF so that it can be printed on an untrusted printer (for example at work or at the library)
+* The passphrase **isn't** rendered on the PDF so that it can be printed on an untrusted printer (for example at work or the library)
 * You don't need PaperAge to recover from the backup: use any QR code scanner and any interoperable implementation of Age (currently either the original [age](https://github.com/FiloSottile/age) or the Rust-based [rage](https://github.com/str4d/rage))
 
 ## Limitations
@@ -31,11 +31,11 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 * Adding the passphrase by hand allows the use of public printers, for example in libraries, offices, copy shops, and so forth
 * For extra protection, memorize the passphrase or store it separately from the printout
 * Needing to scan and decrypt protects against unsophisticated adversaries even if the passphrase is right there (the average burglar isn't going to care about your Mastodon account)
-* If you need protection from nation states or other advanced threats, look elsewhere
+* If you need protection from nation-states or other advanced threats, look elsewhere
 
 ## Example
 
-This is what the output PDF looks like (or alternatively see the [letter equivalent](https://github.com/matiaskorhonen/paper-age/files/10716387/snakeoil-letter.pdf)). The QR code is easily readable with an iPhone (or other modern smartphone).
+This is what the output PDF looks like (alternatively see the [letter equivalent](https://github.com/matiaskorhonen/paper-age/files/10716387/snakeoil-letter.pdf)). The QR code is easily readable with an iPhone (or any modern smartphone).
 
 <a title="Download example PDF (A4)" href="https://github.com/matiaskorhonen/paper-age/files/10675081/snakeoil.pdf"><img alt="A4 sheet with a title of ‘PaperAge’, a QR code, and a PEM encoded section" width="420" height="594" src="https://user-images.githubusercontent.com/43314/217248893-c7aed7d6-5a45-48af-b79a-8cdbd31d79cd.svg"></a>
 
@@ -120,6 +120,12 @@ gzip --best --stdout in.txt | paper-age --output=compressed.pdf --title="in.txt.
 ```
 
 Compression ratios vary wildly depending on the input data, so whether or not this is worth it is up to you.
+
+## Scanning the QR code
+
+On iOS, it's best to use the [Code Scanner](https://support.apple.com/en-gb/guide/iphone/iphe8bda8762/ios) from Control Center instead of the Camera app. The Code Scanner lets you copy the QR code contents to the clipboard instead of just searching for it.
+
+On Android, the built-in camera app should let you copy the QR code contents to the clipboard. The [Google Lens](https://play.google.com/store/apps/details?id=com.google.ar.lens&hl=en) app seems to work fine too.
 
 ## Development
 
