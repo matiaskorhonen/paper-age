@@ -12,7 +12,7 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 
 ## Features
 
-* Takes plaintext input either from a file or stdin
+* Accepts input either from a file or stdin
 * Encrypts that input with a passphrase
 * Outputs a PDF with a QR code of the encrypted ciphertext
 * Support for both A4 and letter paper sizes
