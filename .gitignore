@@ -8,3 +8,4 @@
 /test.*
 test-output.json
 *.profraw
+/.artifacts
