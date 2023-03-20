@@ -98,6 +98,10 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install GhostScript
+        run: |
+          sudo apt-get update
+          sudo apt-get install ghostscript
     - name: Change ImageMagick policy to allow PDF→PNG conversion
       run: |
         sudo sed -i_bak \
