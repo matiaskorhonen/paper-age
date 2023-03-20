@@ -121,7 +121,6 @@ jobs:
     - name: Save snapshots
       uses: actions/upload-artifact@v3
       with:
-        save-only: true
         path: .artifacts/visual-snapshots
 
   visual-diff:
