@@ -33,7 +33,7 @@ env_logger = "0.10.0"
 
 [dev-dependencies]
 assert_cmd = "2.0.8"
-assert_fs = "1.0.10"
+assert_fs = "1.0.12"
 predicates = "2.1.5"
 
 [build-dependencies]
