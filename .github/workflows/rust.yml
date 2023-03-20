@@ -82,3 +82,45 @@ jobs:
       if: ${{ always() }}
       run: "[ -f test-output.json ] && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
       continue-on-error: true
+
+  visual-snapshots:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Configure cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    - name: Generate PDFs
+      run: |
+        echo "Hello World" | cargo run -- --title="A4 secret" --page-size=a4 --out="a4.pdf
+        echo "Hello World" | cargo run -- --title="Letter secret" --page-size=letter --out="letter.pdf
+      env:
+        PAPERAGE_PASSPHRASE: supersecret
+    - name: Convert the PDFs to PNGs
+      run:
+        mkdir -p .artifacts/visual-snapshots
+        convert -density 300 -alpha remove a4.pdf PNG32:.artifacts/visual-snapshots/a4.png
+        convert -density 300 -alpha remove letter.pdf PNG32:.artifacts/visual-snapshots/letter.png
+    - name: Save snapshots
+      uses: actions/upload-artifact@v3
+      with:
+        save-only: true
+        path: .artifacts/visual-snapshots
+
+  visual-diff:
+    if: ${{ github.ref != 'refs/heads/main' }}
+    needs: visual-snapshots
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Diff snapshots
+        id: visual-snapshots-diff
+        uses: getsentry/action-visual-snapshot@v2
