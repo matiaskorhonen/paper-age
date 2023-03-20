@@ -105,7 +105,7 @@ jobs:
       env:
         PAPERAGE_PASSPHRASE: supersecret
     - name: Convert the PDFs to PNGs
-      run:
+      run: |
         mkdir -p .artifacts/visual-snapshots
         convert -density 300 -alpha remove a4.pdf PNG32:.artifacts/visual-snapshots/a4.png
         convert -density 300 -alpha remove letter.pdf PNG32:.artifacts/visual-snapshots/letter.png
