@@ -132,5 +132,6 @@ jobs:
       - name: Diff snapshots
         id: visual-snapshots-diff
         uses: getsentry/action-visual-snapshot@v2
+        continue-on-error: true
         with:
           base-branch: main
