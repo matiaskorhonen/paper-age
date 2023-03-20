@@ -99,7 +99,10 @@ jobs:
           target/
         key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Change ImageMagick policy to allow PDF→PNG conversion
-      run: "sudo sed -i 's/^.*policy.*coder.*none.*PDF.*//' /etc/ImageMagick-6/policy.xml"
+      run: |
+        sudo sed -i_bak \
+        's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' \
+        /etc/ImageMagick-6/policy.xml
     - name: Generate PDFs
       run: |
         echo "Hello World" | cargo run -- --title="A4 secret" --page-size=a4 --output=a4.pdf
