@@ -100,8 +100,8 @@ jobs:
         key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Generate PDFs
       run: |
-        echo "Hello World" | cargo run -- --title="A4 secret" --page-size=a4 --out="a4.pdf
-        echo "Hello World" | cargo run -- --title="Letter secret" --page-size=letter --out="letter.pdf
+        echo "Hello World" | cargo run -- --title="A4 secret" --page-size=a4 --output="a4.pdf
+        echo "Hello World" | cargo run -- --title="Letter secret" --page-size=letter --output="letter.pdf
       env:
         PAPERAGE_PASSPHRASE: supersecret
     - name: Convert the PDFs to PNGs

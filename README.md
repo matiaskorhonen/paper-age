@@ -134,7 +134,7 @@ Run the latest from git locally, assuming you have already [installed Rust](http
 1. Pull this repo
 2. Run the tests: `cargo test`
 3. Get help: `cargo run -- -h`
-4. Encrypt from stdin: `echo "Hello World" | cargo run -- --title="secrets from stdin" --out="stdin.pdf"`
+4. Encrypt from stdin: `echo "Hello World" | cargo run -- --title="secrets from stdin" --output="stdin.pdf"`
 5. Run with maximum verbosity:  `echo "Hello World" | cargo run -- -vvvv`
 
 ### Releases
