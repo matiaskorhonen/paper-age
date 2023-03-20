@@ -79,7 +79,7 @@ impl Document {
 
         // Align the title with the QR code if the title is narrower than the QR code
         let margin = {
-            if title.len() <= 37 {
+            if title.len() <= 100 {
                 self.page_size.qrcode_left_edge()
             } else {
                 self.page_size.dimensions().margin
