@@ -26,9 +26,9 @@ dependencies = [
 
 [[package]]
 name = "age"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1056efa39f3f960845e69985c292022187b47bc3f83ddfc96edfc586007735a1"
+checksum = "d9e4dfef09bebad6d85efa8b6e1b2f7a809c4419d7135ab573c4fd133c0e8ead"
 dependencies = [
  "age-core",
  "atty",
