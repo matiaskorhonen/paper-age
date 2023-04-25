@@ -82,3 +82,45 @@ jobs:
       if: ${{ always() }}
       run: "[ -f test-output.json ] && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
       continue-on-error: true
+
+  visual-snapshots:
+    runs-on: ubuntu-latest
+
+    needs: [test]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Configure cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    - name: Install GhostScript
+      run: |
+        sudo apt-get update
+        sudo apt-get install ghostscript
+    - name: Change ImageMagick policy to allow PDF→PNG conversion
+      run: |
+        sudo sed -i_bak \
+        's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' \
+        /etc/ImageMagick-6/policy.xml
+    - name: Generate PDFs
+      run: |
+        mkdir -p visual-snapshots
+        echo "Hello World" | cargo run -- --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4.pdf
+        echo "Hello World" | cargo run -- --title="Letter secret" --page-size=letter --output=visual-snapshots/letter.pdf
+      env:
+        PAPERAGE_PASSPHRASE: supersecret
+    - name: Convert the PDFs to PNGs
+      run: |
+        convert -density 300 -alpha remove visual-snapshots/a4.pdf PNG32:visual-snapshots/a4.png
+        convert -density 300 -alpha remove visual-snapshots/letter.pdf PNG32:visual-snapshots/letter.png
+    - name: Save snapshots
+      uses: actions/upload-artifact@v3
+      with:
+        path: visual-snapshots
