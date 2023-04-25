@@ -96,7 +96,6 @@ jobs:
     needs: [test]
 
     steps:
-    - uses: actions/checkout@v3
     - name: Install GhostScript
       run: |
         sudo apt-get update
