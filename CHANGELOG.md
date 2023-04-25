@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [1.1.2] - 2023-04-25
+
 ### Changed
 
 - Minor dependency updates
@@ -73,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent accidental overwrites of the output file
 
 <!-- next-url -->
-[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/matiaskorhonen/paper-age/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/matiaskorhonen/paper-age/compare/v1.0.0...v1.0.1
