@@ -51,6 +51,13 @@ jobs:
         CARGO_INCREMENTAL: 0
         RUSTFLAGS: -Cinstrument-coverage
         LLVM_PROFILE_FILE: cargo-test-%p-%m.profraw
+    - name: Compile binary
+      run: cargo build --release
+    - name: Store binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: paper-age-binary
+        path: target/release/paper-age
     - name: Process code coverage with grcov
       run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
     - name: Code Coverage Report
@@ -82,3 +89,41 @@ jobs:
       if: ${{ always() }}
       run: "[ -f test-output.json ] && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
       continue-on-error: true
+
+  visual-snapshots:
+    runs-on: ubuntu-latest
+
+    needs: [test]
+
+    steps:
+    - name: Install GhostScript
+      run: |
+        sudo apt-get update
+        sudo apt-get install ghostscript
+    - name: Change ImageMagick policy to allow PDF→PNG conversion
+      run: |
+        sudo sed -i_bak \
+        's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' \
+        /etc/ImageMagick-6/policy.xml
+    - name: Download paper-age binary
+      uses: actions/download-artifact@v3
+      with:
+        name: paper-age-binary
+    - name: Make the bianry executable
+      run: chmod u+x paper-age
+    - name: Generate PDFs
+      run: |
+        mkdir -p visual-snapshots
+        echo "Hello World" | ./paper-age --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4.pdf
+        echo "Hello World" | ./paper-age --title="Letter secret" --page-size=letter --output=visual-snapshots/letter.pdf
+      env:
+        PAPERAGE_PASSPHRASE: supersecret
+    - name: Convert the PDFs to PNGs
+      run: |
+        convert -density 300 -alpha remove visual-snapshots/a4.pdf PNG32:visual-snapshots/a4.png
+        convert -density 300 -alpha remove visual-snapshots/letter.pdf PNG32:visual-snapshots/letter.png
+    - name: Save snapshots
+      uses: actions/upload-artifact@v3
+      with:
+        name: visual-snapshots
+        path: visual-snapshots
