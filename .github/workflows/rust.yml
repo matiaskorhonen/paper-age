@@ -140,4 +140,4 @@ jobs:
         aws_bucket: ${{ secrets.AWS_BUCKET }}
         endpoint: ${{ secrets.AWS_ENDPOINT }}
         source_dir: "visual-snapshots"
-        destination_dir: "30-days/${{env.GITHUB_REPOSITORY}}/${{env.GITHUB_RUN_ID}}"
+        destination_dir: "30-days/${{ github.repository }}/${{ github.run_id }}"
