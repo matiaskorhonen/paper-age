@@ -131,3 +131,13 @@ jobs:
       with:
         name: visual-snapshots
         path: visual-snapshots
+    - name: Upload to B2
+      uses: shallwefootball/s3-upload-action@master
+      id: B2
+      with:
+        aws_key_id: ${{ secrets.AWS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+        aws_bucket: ${{ secrets.AWS_BUCKET }}
+        endpoint: ${{ secrets.AWS_ENDPOINT }}
+        source_dir: "visual-snapshots"
+        destination_dir: "30-days"
