@@ -141,3 +141,13 @@ jobs:
         endpoint: ${{ secrets.AWS_ENDPOINT }}
         source_dir: "visual-snapshots"
         destination_dir: "30-days/${{ github.repository }}/${{ github.run_id }}"
+    - uses: jwalton/gh-find-current-pr@v1
+      id: finder
+    - uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        number: ${{ steps.finder.outputs.pr }}
+        header: "Visual Snapshots"
+        message: |
+          ```
+          ${{steps.B2.outputs.object_locations}}
+          ```
