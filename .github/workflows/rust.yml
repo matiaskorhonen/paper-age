@@ -34,9 +34,9 @@ jobs:
         mv grcov "${HOME}/.local/bin"
         chmod +x "${HOME}/.local/bin/grcov"
     - name: Set up Rust
-      uses: dtolnay/rust-toolchain@nightly-2023-06-15
+      uses: dtolnay/rust-toolchain@master
       with:
-        components: llvm-tools-preview
+        toolchain: nightly-2023-06-15
     - name: Add llvm-tools
       run: rustup component add llvm-tools
     - name: Configure cache
