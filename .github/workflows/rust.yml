@@ -122,19 +122,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Install GhostScript
-      run: |
-        sudo apt-get update
-        sudo apt-get install ghostscript
     - name: "Setup Ruby"
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: "3.2"
-    - name: Change ImageMagick policy to allow PDF→PNG conversion
-      run: |
-        sudo sed -i_bak \
-        's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' \
-        /etc/ImageMagick-6/policy.xml
+    - uses: robinraju/release-downloader@v1.8
+      with:
+        repository: "klippa-app/pdfium-cli"
+        tag: "v0.1.1"
+        fileName: pdfium-linux-x64
+        out-file-path: bin
+    - name: Make PDFium executable
+      run: chmod u+x bin/pdfium-linux-x64
     - name: Download paper-age binary
       uses: actions/download-artifact@v3
       with:
@@ -148,8 +147,8 @@ jobs:
         echo "Hello World" | ./paper-age --title="Letter secret" --page-size=letter --output=visual-snapshots/letter.pdf
     - name: Convert the PDFs to PNGs
       run: |
-        convert -density 300 -alpha remove visual-snapshots/a4.pdf PNG32:visual-snapshots/a4.png
-        convert -density 300 -alpha remove visual-snapshots/letter.pdf PNG32:visual-snapshots/letter.png
+        ./bin/pdfium-linux-x64 render visual-snapshots/a4.pdf visual-snapshots/a4.png --combine-pages --dpi 300
+        ./bin/pdfium-linux-x64 render visual-snapshots/letter.pdf visual-snapshots/letter.png --combine-pages --dpi 300
     - name: Save snapshots
       uses: actions/upload-artifact@v3
       with:
