@@ -118,6 +118,7 @@ jobs:
     needs: [build-binary]
 
     steps:
+    - uses: actions/checkout@v3
     - name: Install GhostScript
       run: |
         sudo apt-get update
