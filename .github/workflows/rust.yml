@@ -173,3 +173,5 @@ jobs:
         number: ${{ steps.finder.outputs.pr }}
         header: "Visual Snapshots"
         path: "./visual-snapshots.tmp"
+    - name: Job summary
+      run: cat visual-snapshots.tmp > $GITHUB_STEP_SUMMARY
