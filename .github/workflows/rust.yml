@@ -55,13 +55,6 @@ jobs:
         CARGO_INCREMENTAL: 0
         RUSTFLAGS: -Cinstrument-coverage
         LLVM_PROFILE_FILE: cargo-test-%p-%m.profraw
-    - name: Compile binary
-      run: cargo build --release
-    - name: Store binary artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: paper-age-binary
-        path: target/release/paper-age
     - name: Process code coverage with grcov
       run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
     - name: Code Coverage Report
@@ -94,40 +87,89 @@ jobs:
       run: "[ -f test-output.json ] && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
       continue-on-error: true
 
+  build-binary:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+    - name: Configure cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    - name: Compile binary
+      run: cargo build --release
+    - name: Store binary artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: paper-age-binary
+        path: target/release/paper-age
+
   visual-snapshots:
     runs-on: ubuntu-latest
 
-    needs: [test]
+    needs: [build-binary]
+
+    env:
+      PAPERAGE_PASSPHRASE: supersecret
 
     steps:
-    - name: Install GhostScript
-      run: |
-        sudo apt-get update
-        sudo apt-get install ghostscript
-    - name: Change ImageMagick policy to allow PDF→PNG conversion
-      run: |
-        sudo sed -i_bak \
-        's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' \
-        /etc/ImageMagick-6/policy.xml
+    - uses: actions/checkout@v3
+    - name: "Setup Ruby"
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.2"
+    - uses: robinraju/release-downloader@v1.8
+      with:
+        repository: "klippa-app/pdfium-cli"
+        tag: "v0.1.1"
+        fileName: pdfium-linux-x64
+        out-file-path: bin
+    - name: Make PDFium executable
+      run: chmod u+x bin/pdfium-linux-x64
     - name: Download paper-age binary
       uses: actions/download-artifact@v3
       with:
         name: paper-age-binary
-    - name: Make the bianry executable
+    - name: Make the binary executable
       run: chmod u+x paper-age
     - name: Generate PDFs
       run: |
         mkdir -p visual-snapshots
         echo "Hello World" | ./paper-age --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4.pdf
         echo "Hello World" | ./paper-age --title="Letter secret" --page-size=letter --output=visual-snapshots/letter.pdf
-      env:
-        PAPERAGE_PASSPHRASE: supersecret
     - name: Convert the PDFs to PNGs
       run: |
-        convert -density 300 -alpha remove visual-snapshots/a4.pdf PNG32:visual-snapshots/a4.png
-        convert -density 300 -alpha remove visual-snapshots/letter.pdf PNG32:visual-snapshots/letter.png
+        ./bin/pdfium-linux-x64 render visual-snapshots/a4.pdf visual-snapshots/a4.png --combine-pages --dpi 300
+        ./bin/pdfium-linux-x64 render visual-snapshots/letter.pdf visual-snapshots/letter.png --combine-pages --dpi 300
     - name: Save snapshots
       uses: actions/upload-artifact@v3
       with:
         name: visual-snapshots
         path: visual-snapshots
+    - name: Upload to B2
+      uses: shallwefootball/s3-upload-action@master
+      id: B2
+      with:
+        aws_key_id: ${{ secrets.AWS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+        aws_bucket: ${{ secrets.AWS_BUCKET }}
+        endpoint: ${{ secrets.AWS_ENDPOINT }}
+        source_dir: "visual-snapshots"
+        destination_dir: "30-days/${{ github.repository }}/${{ github.run_id }}"
+    - name: Generate snapshots comment
+      run: ./bin/snapshots-comment '${{steps.B2.outputs.object_locations}}'
+    - uses: jwalton/gh-find-current-pr@v1
+      id: finder
+    - uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        number: ${{ steps.finder.outputs.pr }}
+        header: "Visual Snapshots"
+        path: "./visual-snapshots.tmp"

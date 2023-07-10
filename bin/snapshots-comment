@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require 'json'
+
+HELP_MESSAGE = <<~EOS
+Usage: ./bin/format-snapshots JSON_ARRAY_OF_SNAPSHOTS
+EOS
+
+if ARGV.length != 1
+  puts HELP_MESSAGE
+  exit 1
+end
+
+urls = JSON.parse(ARGV[0])
+
+snapshots = urls.map do |url|
+  {
+    type: url.end_with?('.pdf') ? :pdf : :png,
+    size: url.include?('letter') ? :letter : :a4,
+    url: url
+  }
+end
+
+a4_png = snapshots.find { _1[:type] == :png && _1[:size] == :a4 }
+letter_png = snapshots.find { _1[:type] == :png && _1[:size] == :letter }
+a4_pdf = snapshots.find { _1[:type] == :pdf && _1[:size] == :a4 }
+letter_pdf = snapshots.find { _1[:type] == :pdf && _1[:size] == :letter }
+
+table = <<~TABLE
+PaperAge output:
+
+| A4 | Letter |
+|---|---|
+| ![](#{a4_png[:url]}) | ![](#{letter_png[:url]}) |
+| [PDF](#{a4_pdf[:url]}) | [PDF](#{letter_pdf[:url]}) |
+
+Encryption passphrase: `#{ENV['PAPERAGE_PASSPHRASE']}`
+TABLE
+
+File.open('visual-snapshots.tmp', 'w') { _1.write(table) }
+
+puts "Wrote visual-snapshots.tmp"
