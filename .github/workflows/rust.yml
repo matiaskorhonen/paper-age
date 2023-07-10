@@ -122,6 +122,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install ghostscript
+    - name: "Setup Ruby"
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.2"
     - name: Change ImageMagick policy to allow PDF→PNG conversion
       run: |
         sudo sed -i_bak \
@@ -131,7 +135,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: paper-age-binary
-    - name: Make the bianry executable
+    - name: Make the binary executable
       run: chmod u+x paper-age
     - name: Generate PDFs
       run: |
