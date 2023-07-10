@@ -167,7 +167,7 @@ jobs:
     - name: Generate snapshots comment
       run: ./bin/snapshots-comment '${{steps.B2.outputs.object_locations}}'
     - uses: jwalton/gh-find-current-pr@v1
-      id: findernt
+      id: finder
     - uses: marocchino/sticky-pull-request-comment@v2
       with:
         number: ${{ steps.finder.outputs.pr }}
