@@ -165,7 +165,7 @@ jobs:
         source_dir: "visual-snapshots"
         destination_dir: "30-days/${{ github.repository }}/${{ github.run_id }}"
     - name: Generate snapshots comment
-      run: ./bin/snapshots-comment
+      run: ./bin/snapshots-comment '${{steps.B2.outputs.object_locations}}'
     - uses: jwalton/gh-find-current-pr@v1
       id: findernt
     - uses: marocchino/sticky-pull-request-comment@v2
