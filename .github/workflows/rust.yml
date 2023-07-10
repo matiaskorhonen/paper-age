@@ -57,7 +57,7 @@ jobs:
         LLVM_PROFILE_FILE: cargo-test-%p-%m.profraw
     - name: Process code coverage with grcov
       run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
-    - name: Code Coverage Report
+    - name: Code coverage report
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
         filename: target/cobertura.xml
@@ -75,7 +75,7 @@ jobs:
       with:
         recreate: true
         path: code-coverage-results.md
-    - name: Job Summary (coverage)
+    - name: Job summary (coverage)
       if: ${{ always() }}
       run: |
         echo "# Coverage report " >> $GITHUB_STEP_SUMMARY
@@ -160,8 +160,8 @@ jobs:
       with:
         aws_key_id: ${{ secrets.AWS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-        aws_bucket: ${{ secrets.AWS_BUCKET }}
-        endpoint: ${{ secrets.AWS_ENDPOINT }}
+        aws_bucket: ${{ vars.AWS_BUCKET }}
+        endpoint: ${{ vars.AWS_ENDPOINT }}
         source_dir: "visual-snapshots"
         destination_dir: "30-days/${{ github.repository }}/${{ github.run_id }}"
     - name: Generate snapshots comment
