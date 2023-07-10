@@ -27,12 +27,14 @@ a4_pdf = snapshots.find { _1[:type] == :pdf && _1[:size] == :a4 }
 letter_pdf = snapshots.find { _1[:type] == :pdf && _1[:size] == :letter }
 
 table = <<~TABLE
-PaperAge visual snapshots
+PaperAge output:
 
 | A4 | Letter |
 |---|---|
 | ![](#{a4_png[:url]}) | ![](#{letter_png[:url]}) |
 | [PDF](#{a4_pdf[:url]}) | [PDF](#{letter_pdf[:url]}) |
+
+Encryption passphrase: `#{ENV['PAPERAGE_PASSPHRASE']}`
 TABLE
 
 File.open('visual-snapshots.tmp', 'w') { _1.write(table) }

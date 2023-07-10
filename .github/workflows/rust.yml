@@ -117,6 +117,9 @@ jobs:
 
     needs: [build-binary]
 
+    env:
+      PAPERAGE_PASSPHRASE: supersecret
+
     steps:
     - uses: actions/checkout@v3
     - name: Install GhostScript
@@ -143,8 +146,6 @@ jobs:
         mkdir -p visual-snapshots
         echo "Hello World" | ./paper-age --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4.pdf
         echo "Hello World" | ./paper-age --title="Letter secret" --page-size=letter --output=visual-snapshots/letter.pdf
-      env:
-        PAPERAGE_PASSPHRASE: supersecret
     - name: Convert the PDFs to PNGs
       run: |
         convert -density 300 -alpha remove visual-snapshots/a4.pdf PNG32:visual-snapshots/a4.png
