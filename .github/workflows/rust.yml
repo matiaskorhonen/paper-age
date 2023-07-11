@@ -126,7 +126,20 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: "3.2"
-    - uses: robinraju/release-downloader@v1.8
+    - name: Install latest PaperAge release
+      uses: robinraju/release-downloader@v1.8
+      with:
+        repository: "matiaskorhonen/paper-age"
+        latest: true
+        extract: true
+        fileName: paper-age-x86_64-unknown-linux-gnu.tar.gz
+        out-file-path: tmp
+    - name: Make PaperAge executable
+      run: |
+        chmod u+x tmp/paper-age
+        mv tmp/paper-age bin/paper-age-release
+    - name: Install pdfium-cli
+      uses: robinraju/release-downloader@v1.8
       with:
         repository: "klippa-app/pdfium-cli"
         tag: "v0.1.1"
@@ -134,7 +147,7 @@ jobs:
         out-file-path: bin
     - name: Make PDFium executable
       run: chmod u+x bin/pdfium-linux-x64
-    - name: Download paper-age binary
+    - name: Download PaperAge binary for this branch
       uses: actions/download-artifact@v3
       with:
         name: paper-age-binary
@@ -143,12 +156,22 @@ jobs:
     - name: Generate PDFs
       run: |
         mkdir -p visual-snapshots
-        echo "Hello World" | ./paper-age --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4.pdf
-        echo "Hello World" | ./paper-age --title="Letter secret" --page-size=letter --output=visual-snapshots/letter.pdf
+        echo "Hello World" | ./paper-age --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4-branch.pdf
+        echo "Hello World" | ./paper-age --title="Letter secret" --page-size=letter --output=visual-snapshots/letter-branch.pdf
+        echo "Hello World" | ./bin/paper-age-release --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4-release.pdf
+        echo "Hello World" | ./bin/paper-age-release --title="Letter secret" --page-size=letter --output=visual-snapshots/letter-release.pdf
     - name: Convert the PDFs to PNGs
       run: |
-        ./bin/pdfium-linux-x64 render visual-snapshots/a4.pdf visual-snapshots/a4.png --combine-pages --dpi 300
-        ./bin/pdfium-linux-x64 render visual-snapshots/letter.pdf visual-snapshots/letter.png --combine-pages --dpi 300
+        for f in visual-snapshots/*.pdf; do
+          echo "Converting $f to PNG"
+          ./bin/pdfium-linux-x64 render "$f" "${f%.*}.png" --combine-pages --dpi 300 --file-type png
+        done
+    - name: Generate image diffs
+      run: |
+        for f in visual-snapshots/*-branch.png; do
+          echo "Comparing ${f/-branch.png/-release.png} to $f"
+          npx --package=odiff-bin --yes -- odiff --parsable-stdout --threshold=0.5 "${f/-branch.png/-release.png}" "$f" "${f/-branch.png/-diff.png}"  || true
+        done
     - name: Save snapshots
       uses: actions/upload-artifact@v3
       with:
