@@ -31,7 +31,9 @@ snapshots = urls.reduce({}) do |hash, url|
 end
 
 table = <<~TABLE
-PaperAge output:
+## PaperAge visual snapshots
+
+Compare the output of the latest release version of PaperAge with the relults from the current commit.
 
 |  | Latest release | Current commit | Diff |
 |---|---|---|---|
