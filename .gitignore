@@ -7,4 +7,5 @@
 /*.dat
 /test.*
 test-output.json
+/visual-snapshots
 *.profraw
