@@ -56,7 +56,7 @@ jobs:
         RUSTFLAGS: -Cinstrument-coverage
         LLVM_PROFILE_FILE: cargo-test-%p-%m.profraw
     - name: Process code coverage with grcov
-      run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --current --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
+      run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
     - name: Code coverage report
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
