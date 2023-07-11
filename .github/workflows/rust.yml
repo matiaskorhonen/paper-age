@@ -40,11 +40,11 @@ jobs:
         repository: "mozilla/grcov"
         tag: "v0.8.18"
         fileName: grcov-x86_64-unknown-linux-gnu.tar.bz2
-        extract: true
         out-file-path: tmp
     - name: Install grcov
       run: |
-        mv tmp/grcov "${HOME}/.local/bin"
+        tar -xvf /tmp/grcov/grcov-x86_64-unknown-linux-gnu.tar.bz2
+        mv grcov "${HOME}/.local/bin"
         chmod +x "${HOME}/.local/bin/grcov"
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@master
