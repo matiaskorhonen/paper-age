@@ -20,18 +20,29 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Download markdown-test-report
+      uses: robinraju/release-downloader@v1.8
+      with:
+        repository: "ctron/markdown-test-report"
+        tag: "v0.3.8"
+        fileName: markdown-test-report-linux-amd64
+        extract: true
+        out-file-path: tmp
     - name: Install markdown-test-report
       run: |
-        mkdir -p "${HOME}/.local/bin"
-        echo "${HOME}/.local/bin" >> $GITHUB_PATH
-        wget --quiet -O "${HOME}/.local/bin/markdown-test-report" https://github.com/ctron/markdown-test-report/releases/download/v0.3.6/markdown-test-report-linux-amd64
+        mv tmp/markdown-test-report-linux-amd64 "${HOME}/.local/bin/markdown-test-report"
         chmod +x "${HOME}/.local/bin/markdown-test-report"
+    - name: Download grcov
+      uses: robinraju/release-downloader@v1.8
+      with:
+        repository: "mozilla/grcov"
+        tag: "v0.8.18"
+        fileName: grcov-x86_64-unknown-linux-gnu.tar.bz2
+        extract: true
+        out-file-path: tmp
     - name: Install grcov
       run: |
-        mkdir -p /tmp/grcov
-        wget --quiet -O /tmp/grcov/grcov-x86_64-unknown-linux-gnu.tar.bz2 https://github.com/mozilla/grcov/releases/download/v0.8.13/grcov-x86_64-unknown-linux-gnu.tar.bz2
-        tar -xvf /tmp/grcov/grcov-x86_64-unknown-linux-gnu.tar.bz2
-        mv grcov "${HOME}/.local/bin"
+        mv tmp/grcov "${HOME}/.local/bin"
         chmod +x "${HOME}/.local/bin/grcov"
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@master
