@@ -19,8 +19,8 @@ snapshots = urls.reduce({}) do |hash, url|
   version = case url
             when /-release\./
               :release
-            when /-branch\./
-              :branch
+            when /-current\./
+              :current
             when /-diff\./
               :diff
             end
@@ -35,8 +35,8 @@ PaperAge output:
 
 |  | Latest release | Current commit | Diff |
 |---|---|---|---|
-| A4 | [![](#{snapshots.dig(:a4, :release_png)})](#{snapshots.dig(:a4, :release_pdf)}) | [![](#{snapshots.dig(:a4, :branch_png)})](#{snapshots.dig(:a4, :branch_pdf)}) | ![](#{snapshots.dig(:a4, :diff_png)}) |
-| Letter | [![](#{snapshots.dig(:letter, :release_png)})](#{snapshots.dig(:letter, :release_pdf)}) | [![](#{snapshots.dig(:letter, :branch_png)})](#{snapshots.dig(:letter, :branch_pdf)}) | ![#{snapshots.dig(:letter, :diff_png)}] |
+| A4 | [![](#{snapshots.dig(:a4, :release_png)})](#{snapshots.dig(:a4, :release_pdf)}) | [![](#{snapshots.dig(:a4, :current_png)})](#{snapshots.dig(:a4, :current_pdf)}) | ![](#{snapshots.dig(:a4, :diff_png)}) |
+| Letter | [![](#{snapshots.dig(:letter, :release_png)})](#{snapshots.dig(:letter, :release_pdf)}) | [![](#{snapshots.dig(:letter, :current_png)})](#{snapshots.dig(:letter, :current_pdf)}) | ![](#{snapshots.dig(:letter, :diff_png)}) |
 
 Encryption passphrase: `#{ENV['PAPERAGE_PASSPHRASE']}`
 
