@@ -21,14 +21,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Create local bin directory
-      run: mkdir -p "${HOME}/.local/bin/markdown-test-report"
+      run: mkdir -p "${HOME}/.local/bin"
     - name: Download markdown-test-report
       uses: robinraju/release-downloader@v1.8
       with:
         repository: "ctron/markdown-test-report"
         tag: "v0.3.8"
         fileName: markdown-test-report-linux-amd64
-        extract: true
         out-file-path: tmp
     - name: Install markdown-test-report
       run: |
