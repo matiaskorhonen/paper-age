@@ -33,7 +33,7 @@ end
 table = <<~TABLE
 ## PaperAge visual snapshots
 
-Compare the output of the latest release version of PaperAge with the relults from the current commit.
+Compare the output of the latest release version of PaperAge with the results from the current commit.
 
 |  | Latest release | Current commit | Diff |
 |---|---|---|---|
