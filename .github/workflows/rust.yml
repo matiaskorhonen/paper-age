@@ -172,6 +172,11 @@ jobs:
           echo "Comparing ${f/-branch.png/-release.png} to $f"
           npx --package=odiff-bin --yes -- odiff --parsable-stdout --threshold=0.5 "${f/-branch.png/-release.png}" "$f" "${f/-branch.png/-diff.png}"  || true
         done
+    - name: Compress Images
+      uses: calibreapp/image-actions@main
+      with:
+        githubToken: ${{ secrets.GITHUB_TOKEN }}
+        compressOnly: true
     - name: Save snapshots
       uses: actions/upload-artifact@v3
       with:
