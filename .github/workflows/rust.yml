@@ -56,7 +56,7 @@ jobs:
         RUSTFLAGS: -Cinstrument-coverage
         LLVM_PROFILE_FILE: cargo-test-%p-%m.profraw
     - name: Process code coverage with grcov
-      run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
+      run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --current --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
     - name: Code coverage report
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
@@ -134,10 +134,8 @@ jobs:
         extract: true
         fileName: paper-age-x86_64-unknown-linux-gnu.tar.gz
         out-file-path: tmp
-    - name: Make PaperAge executable
-      run: |
-        chmod u+x tmp/paper-age
-        mv tmp/paper-age bin/paper-age-release
+    - name: Move the release binary to bin
+      run: mv tmp/paper-age bin/paper-age-release
     - name: Install pdfium-cli
       uses: robinraju/release-downloader@v1.8
       with:
@@ -156,8 +154,8 @@ jobs:
     - name: Generate PDFs
       run: |
         mkdir -p visual-snapshots
-        echo "Hello World" | ./paper-age --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4-branch.pdf
-        echo "Hello World" | ./paper-age --title="Letter secret" --page-size=letter --output=visual-snapshots/letter-branch.pdf
+        echo "Hello World" | ./paper-age --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4-current.pdf
+        echo "Hello World" | ./paper-age --title="Letter secret" --page-size=letter --output=visual-snapshots/letter-current.pdf
         echo "Hello World" | ./bin/paper-age-release --title="A4 secret" --page-size=a4 --output=visual-snapshots/a4-release.pdf
         echo "Hello World" | ./bin/paper-age-release --title="Letter secret" --page-size=letter --output=visual-snapshots/letter-release.pdf
     - name: Convert the PDFs to PNGs
@@ -168,15 +166,10 @@ jobs:
         done
     - name: Generate image diffs
       run: |
-        for f in visual-snapshots/*-branch.png; do
-          echo "Comparing ${f/-branch.png/-release.png} to $f"
-          npx --package=odiff-bin --yes -- odiff --parsable-stdout --threshold=0.5 "${f/-branch.png/-release.png}" "$f" "${f/-branch.png/-diff.png}"  || true
+        for f in visual-snapshots/*-current.png; do
+          echo "Comparing ${f/-current.png/-release.png} to $f"
+          npx --package=odiff-bin --yes -- odiff --parsable-stdout --threshold=0.5 "${f/-current.png/-release.png}" "$f" "${f/-current.png/-diff.png}"  || true
         done
-    - name: Compress Images
-      uses: calibreapp/image-actions@main
-      with:
-        githubToken: ${{ secrets.GITHUB_TOKEN }}
-        compressOnly: true
     - name: Save snapshots
       uses: actions/upload-artifact@v3
       with:
