@@ -20,6 +20,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Create local bin directory
+      run: mkdir -p "${HOME}/.local/bin/markdown-test-report"
     - name: Download markdown-test-report
       uses: robinraju/release-downloader@v1.8
       with:
