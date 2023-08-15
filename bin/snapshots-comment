@@ -37,10 +37,12 @@ Compare the output of the latest release version of PaperAge with the results fr
 
 |  | Latest release | Current commit | Diff |
 |---|---|---|---|
-| A4 | [![](#{snapshots.dig(:a4, :release_png)})](#{snapshots.dig(:a4, :release_pdf)}) | [![](#{snapshots.dig(:a4, :current_png)})](#{snapshots.dig(:a4, :current_pdf)}) | ![](#{snapshots.dig(:a4, :diff_png)}) |
-| Letter | [![](#{snapshots.dig(:letter, :release_png)})](#{snapshots.dig(:letter, :release_pdf)}) | [![](#{snapshots.dig(:letter, :current_png)})](#{snapshots.dig(:letter, :current_pdf)}) | ![](#{snapshots.dig(:letter, :diff_png)}) |
+| A4 | [![A4 release](#{snapshots.dig(:a4, :release_png)})](#{snapshots.dig(:a4, :release_pdf)}) | [![A4 current](#{snapshots.dig(:a4, :current_png)})](#{snapshots.dig(:a4, :current_pdf)}) | ![A4 diff](#{snapshots.dig(:a4, :diff_png)}) |
+| Letter | [![Letter release](#{snapshots.dig(:letter, :release_png)})](#{snapshots.dig(:letter, :release_pdf)}) | [![Letter current](#{snapshots.dig(:letter, :current_png)})](#{snapshots.dig(:letter, :current_pdf)}) | ![Letter diff](#{snapshots.dig(:letter, :diff_png)}) |
 
 Encryption passphrase: `#{ENV['PAPERAGE_PASSPHRASE']}`
+
+*Note: Snapshots are deleted after 30 days.*
 
 TABLE
 
