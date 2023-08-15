@@ -11,7 +11,9 @@ updates:
       interval: "weekly"
     groups:
       cli-dependencies:
-        - "clap*"
+        patterns:
+          - "clap*"
       dev-dependencies:
-        - "assert_*"
-        - "predicates"
+        patterns:
+          - "assert_*"
+          - "predicates"
