@@ -69,24 +69,12 @@ jobs:
         LLVM_PROFILE_FILE: cargo-test-%p-%m.profraw
     - name: Process code coverage with grcov
       run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
-    - name: Code coverage report
-      uses: irongut/CodeCoverageSummary@v1.3.0
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
       with:
-        filename: target/cobertura.xml
-        badge: true
-        fail_below_min: false
-        format: markdown
-        hide_branch_rate: false
-        hide_complexity: true
-        indicators: true
-        output: both
-        thresholds: "50 75"
-    - name: Add Coverage PR Comment
-      uses: marocchino/sticky-pull-request-comment@v2
-      if: github.event_name == 'pull_request'
-      with:
-        recreate: true
-        path: code-coverage-results.md
+        files: target/cobertura.xml
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - name: Job summary (coverage)
       if: ${{ always() }}
       run: |
