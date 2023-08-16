@@ -75,13 +75,6 @@ jobs:
         files: target/cobertura.xml
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    - name: Job summary (coverage)
-      if: ${{ always() }}
-      run: |
-        echo "# Coverage report " >> $GITHUB_STEP_SUMMARY
-        [ -f code-coverage-results.md ] && cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-        echo "---" >> $GITHUB_STEP_SUMMARY
-      continue-on-error: true
     - name: Job summary (tests)
       if: ${{ always() }}
       run: "[ -f test-output.json ] && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
