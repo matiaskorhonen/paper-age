@@ -23,7 +23,7 @@ pre-release-replacements = [
 
 [dependencies]
 age = { version = "0.9.0", features = ["armor", "cli-common"] }
-clap = { version = "4.3", features = ["derive"] }
+clap = { version = "4.4", features = ["derive"] }
 clap-verbosity-flag = "2.0"
 exitcode = "1.1.2"
 printpdf = { version = "0.5.3", features = ["svg"] }
@@ -37,8 +37,8 @@ assert_fs = "1.0"
 predicates = "3.0"
 
 [build-dependencies]
-clap = { version = "4.3", features = ["derive"] }
-clap_complete = "4.1"
+clap = { version = "4.4", features = ["derive"] }
+clap_complete = "4.4"
 clap-verbosity-flag = "2.0"
 clap_mangen = { version = "0.2" }
 path-absolutize = "3.1"
