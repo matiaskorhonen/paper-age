@@ -9,3 +9,4 @@
 test-output.json
 /visual-snapshots
 *.profraw
+.idea/
