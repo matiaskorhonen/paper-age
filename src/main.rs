@@ -94,7 +94,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         pdf.draw_grid();
     }
 
-    pdf.insert_title_text(args.title);
+    pdf.insert_title_text(args.title, args.center);
 
     match pdf.insert_qr_code(encrypted.clone()) {
         Ok(()) => (),
@@ -123,9 +123,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
     );
 
-    pdf.insert_pem_text(encrypted);
+    pdf.insert_pem_text(encrypted, args.center);
 
-    pdf.insert_footer();
+    pdf.insert_footer(args.center);
 
     if output == PathBuf::from("-") {
         debug!("Writing to STDOUT");

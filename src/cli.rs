@@ -22,6 +22,10 @@ pub struct Args {
     #[arg(short = 's', long, default_value_t = PageSize::A4)]
     pub page_size: PageSize,
 
+    /// Center all text
+    #[arg(short, long, default_value_t = false)]
+    pub center: bool,
+
     /// Overwrite the output file if it already exists
     #[arg(short, long, default_value_t = false)]
     pub force: bool,

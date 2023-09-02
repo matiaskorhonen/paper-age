@@ -13,6 +13,9 @@ pub mod svg;
 /// PaperAge version
 pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 
+/// Font width / height = 3 / 5
+pub const FONT_RATIO: f64 = 3.0 / 5.0;
+
 /// Container for all the data required to insert elements into the PDF
 pub struct Document {
     /// A reference to the printpdf PDF document
@@ -69,8 +72,14 @@ impl Document {
         self.doc.get_page(self.page).get_layer(self.layer)
     }
 
+    /// Calculate the left margin when text is centered
+    fn calc_center_margin(&self, font_size: f64, text_length: usize) -> Mm {
+        let text_width = font_size * FONT_RATIO * text_length as f64;
+        (self.page_size.dimensions().width - Mm::from(Pt(text_width))) / 2.0
+    }
+
     /// Insert the given title at the top of the PDF
-    pub fn insert_title_text(&self, title: String) {
+    pub fn insert_title_text(&self, title: String, center: bool) {
         debug!("Inserting title: {}", title.as_str());
 
         let current_layer = self.get_current_layer();
@@ -78,8 +87,10 @@ impl Document {
         let font_size = 14.0;
 
         // Align the title with the QR code if the title is narrower than the QR code
-        let margin = {
-            if title.len() <= 37 {
+        let left_margin = {
+            if center {
+                self.calc_center_margin(font_size, title.len())
+            } else if title.len() <= 37 {
                 self.page_size.qrcode_left_edge()
             } else {
                 self.page_size.dimensions().margin
@@ -89,7 +100,7 @@ impl Document {
         current_layer.use_text(
             title,
             font_size,
-            margin,
+            left_margin,
             self.page_size.dimensions().height
                 - self.page_size.dimensions().margin
                 - Mm::from(Pt(font_size)),
@@ -98,7 +109,7 @@ impl Document {
     }
 
     /// Insert the given PEM ciphertext in the bottom half of the page
-    pub fn insert_pem_text(&self, pem: String) {
+    pub fn insert_pem_text(&self, pem: String, center: bool) {
         debug!("Inserting PEM encoded ciphertext");
 
         let current_layer = self.get_current_layer();
@@ -123,8 +134,14 @@ impl Document {
 
         current_layer.begin_text_section();
 
+        let left_margin = if center {
+            self.calc_center_margin(font_size, 64)
+        } else {
+            self.page_size.dimensions().margin
+        };
+
         current_layer.set_text_cursor(
-            self.page_size.dimensions().margin,
+            left_margin,
             (self.page_size.dimensions().height / 2.0)
                 - Mm::from(Pt(font_size))
                 - self.page_size.dimensions().margin,
@@ -272,15 +289,23 @@ impl Document {
     }
 
     /// Add the footer at the bottom of the page
-    pub fn insert_footer(&self) {
+    pub fn insert_footer(&self, center: bool) {
         debug!("Inserting footer");
 
         let current_layer = self.get_current_layer();
+        let text = "Scan QR code and decrypt using Age <https://age-encryption.org>";
+        let font_size = 13.0;
+
+        let left_margin = if center {
+            self.calc_center_margin(font_size, text.len())
+        } else {
+            self.page_size.dimensions().margin
+        };
 
         current_layer.use_text(
-            "Scan QR code and decrypt using Age <https://age-encryption.org>",
-            13.0,
-            self.page_size.dimensions().margin,
+            text,
+            font_size,
+            left_margin,
             self.page_size.dimensions().margin,
             &self.title_font,
         );
