@@ -26,6 +26,10 @@ pub struct Args {
     #[arg(short, long, default_value_t = false)]
     pub center: bool,
 
+    /// Display passphrase field instead of time
+    #[arg(short = 'P', long, default_value_t = false)]
+    pub passphrase_field: bool,
+
     /// Overwrite the output file if it already exists
     #[arg(short, long, default_value_t = false)]
     pub force: bool,

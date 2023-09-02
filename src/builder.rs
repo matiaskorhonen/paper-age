@@ -1,5 +1,6 @@
 //! PaperAge
 use std::io::{BufReader, Cursor};
+use chrono::Local;
 
 use printpdf::{
     Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
@@ -255,37 +256,50 @@ impl Document {
         current_layer.add_shape(divider);
     }
 
-    /// Insert the passphrase label and placeholder in the PDF
-    pub fn insert_passphrase(&self) {
+    /// Insert the time or passphrase field in the PDF
+    pub fn insert_time_or_passphrase(&self, passphrase_field: bool, center: bool) {
         debug!("Inserting passphrase placeholder");
 
         let current_layer = self.get_current_layer();
 
-        let baseline =
-            self.page_size.dimensions().height / 2.0 + self.page_size.dimensions().margin;
+        let font_size = 13.0;
+        let baseline = self.page_size.dimensions().height / 2.0 + self.page_size.dimensions().margin;
+        let text = if passphrase_field { "Passphrase: ".to_string() } else {
+            Local::now()
+                .format("Encrypted at %Y-%m-%d %H:%M:%S")
+                .to_string()
+        };
+
+        let left_margin = if center && !passphrase_field {
+            self.calc_center_margin(font_size, text.len())
+        } else {
+            self.page_size.qrcode_left_edge()
+        };
 
         current_layer.use_text(
-            "Passphrase: ",
-            13.0,
-            self.page_size.qrcode_left_edge(),
+            text,
+            font_size,
+            left_margin,
             baseline,
             &self.title_font,
         );
 
-        self.draw_line(
-            vec![
-                Point::new(
-                    self.page_size.qrcode_left_edge() + Mm(30.0),
-                    baseline - Mm(1.0),
-                ),
-                Point::new(
-                    self.page_size.qrcode_left_edge() + self.page_size.qrcode_size(),
-                    baseline - Mm(1.0),
-                ),
-            ],
-            1.0,
-            LineDashPattern::default(),
-        )
+        if passphrase_field {
+            self.draw_line(
+                vec![
+                    Point::new(
+                        self.page_size.qrcode_left_edge() + Mm(30.0),
+                        baseline - Mm(1.0),
+                    ),
+                    Point::new(
+                        self.page_size.qrcode_left_edge() + self.page_size.qrcode_size(),
+                        baseline - Mm(1.0),
+                    ),
+                ],
+                1.0,
+                LineDashPattern::default(),
+            )
+        }
     }
 
     /// Add the footer at the bottom of the page
