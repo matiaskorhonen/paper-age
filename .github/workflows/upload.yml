@@ -14,9 +14,14 @@ permissions:
 jobs:
   upload:
     runs-on: ubuntu-latest
+
     if: >
       github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
+
+    env:
+      PAPERAGE_PASSPHRASE: supersecret
+
     steps:
     - uses: actions/checkout@v3
     - name: 'Download artifact'
