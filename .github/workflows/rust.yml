@@ -187,6 +187,10 @@ jobs:
           echo "Comparing ${f/-current.png/-release.png} to $f"
           npx --package=odiff-bin --yes -- odiff --parsable-stdout --threshold=0.5 "${f/-current.png/-release.png}" "$f" "${f/-current.png/-diff.png}"  || true
         done
+    - name: Save PR number
+      run: |
+        mkdir -p ./pr
+        echo ${{ github.event.number }} > ./visual-snapshots/PR.txt
     - name: Save snapshots
       uses: actions/upload-artifact@v3
       with:
