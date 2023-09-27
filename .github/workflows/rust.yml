@@ -196,24 +196,3 @@ jobs:
       with:
         name: visual-snapshots
         path: visual-snapshots
-    - name: Upload to B2
-      uses: shallwefootball/s3-upload-action@master
-      id: B2
-      with:
-        aws_key_id: ${{ secrets.AWS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-        aws_bucket: ${{ vars.AWS_BUCKET }}
-        endpoint: ${{ vars.AWS_ENDPOINT }}
-        source_dir: "visual-snapshots"
-        destination_dir: "30-days/${{ github.repository }}/${{ github.run_id }}"
-    - name: Generate snapshots comment
-      run: ./bin/snapshots-comment '${{steps.B2.outputs.object_locations}}'
-    - uses: jwalton/gh-find-current-pr@v1
-      id: finder
-    - uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        number: ${{ steps.finder.outputs.pr }}
-        header: "Visual Snapshots"
-        path: "./visual-snapshots.tmp"
-    - name: Job summary (visuals)
-      run: cat visual-snapshots.tmp > $GITHUB_STEP_SUMMARY
