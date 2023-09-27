@@ -46,7 +46,7 @@ jobs:
       run: ls -R visual-snapshots/
     - name: Set variables
       run: |
-        PR_NUMBER=$(cat ./visual-snapshots/pr.txt)
+        PR_NUMBER=$(cat ./visual-snapshots/PR.txt)
         echo "PR_NUMBER=$VER" >> $GITHUB_ENV
     - name: Upload to B2
       uses: shallwefootball/s3-upload-action@master
