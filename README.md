@@ -18,7 +18,7 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 * Support for both A4 and letter paper sizes
 * The error correction level of the QR code is optimised (less data → more error correction)
 * The passphrase **isn't** rendered on the PDF so that it can be printed on an untrusted printer (for example at work or the library)
-* You don't need PaperAge to recover from the backup: use any QR code scanner and any interoperable implementation of Age (currently either the original [age](https://github.com/FiloSottile/age) or the Rust-based [rage](https://github.com/str4d/rage))
+* You don't need PaperAge to recover from the backup: use any QR code scanner and [any implementation of Age](https://github.com/FiloSottile/awesome-age#implementations).
 
 ## Limitations
 
