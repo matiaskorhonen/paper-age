@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Update printpdf to v0.6.0
+- Other minor dependency updates
+
 ## [1.1.3] - 2023-07-10
 
 ### Changed
