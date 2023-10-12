@@ -215,7 +215,7 @@ impl Document {
     }
 
     /// Draw a line on the page
-    pub fn draw_line(&self, points: Vec<Point>, thickness: f64, dash_pattern: LineDashPattern) {
+    pub fn draw_line(&self, points: Vec<Point>, thickness: f32, dash_pattern: LineDashPattern) {
         trace!("Drawing line");
 
         let current_layer = self.get_current_layer();
@@ -230,12 +230,9 @@ impl Document {
         let divider = Line {
             points: points.iter().map(|p| (*p, false)).collect(),
             is_closed: false,
-            has_fill: false,
-            has_stroke: true,
-            is_clipping_path: false,
         };
 
-        current_layer.add_shape(divider);
+        current_layer.add_line(divider);
     }
 
     /// Insert the passphrase label and placeholder in the PDF
