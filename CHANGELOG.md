@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- The passphrase/notes field below the QR code is now configurable
+- Use font subsetting to reduce the file size of the output PDFs
+
+### Changed
+
+- Update rustix to v0.38.20 (GHSA-c827-hfw6-qwvm)
+- Other minor dependency updates
+
 ## [1.1.4] - 2023-10-12
 
 ### Changed
