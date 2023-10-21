@@ -99,6 +99,10 @@ paper-age [OPTIONS] [INPUT]
 * `-t`, `--title <TITLE>` — Page title (max. 64 characters)
 
   Default value: `PaperAge`
+* `-n`, `--notes-label <NOTES_LABEL>` — Notes label below the QR code (max. 32 characters)
+
+  Default value: `Passphrase:`
+* `--skip-notes-line` — Skip the notes placeholder line (e.g. Passphrase: ________)
 * `-o`, `--output <OUTPUT>` — Output file name. Use - for STDOUT.
 
   Default value: `out.pdf`

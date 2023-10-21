@@ -18,7 +18,7 @@ pub struct Args {
     #[arg(short, long, default_value = "Passphrase:")]
     pub notes_label: String,
 
-    /// Skip the notes placeholder line (e.g. Passphrase: _________________)
+    /// Skip the notes placeholder line (e.g. Passphrase: ________)
     #[arg(long, default_value_t = false)]
     pub skip_notes_line: bool,
 
