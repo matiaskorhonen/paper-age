@@ -115,6 +115,24 @@ paper-age [OPTIONS] [INPUT]
 * `-h`, `--help` — Print help
 * `-V`, `--version` — Print version
 
+## Notes/passphrase field
+
+The notes field below the QR code can be customised with the `--notes-label <TEXT>` and `--skip-notes-line` arguments. There's no enforced limit for the label length but eventually the text will overflow the page bounds.
+
+### Examples
+
+* Print a placeholder for a hint instead of the passphrase:
+
+  ```sh
+  paper-age --notes-label="Hint:"
+  ```
+
+* Print a timestamp instead of the notes field:
+
+  ```sh
+  paper-age --notes-label="Created at: $(date -Iseconds)" --skip-notes-line
+  ```
+
 ## Compression
 
 PaperAge is entirely agnostic about the input file type. If you need to squeeze in more data, you can apply compression to the input file before passing it on to PaperAge, for example:
