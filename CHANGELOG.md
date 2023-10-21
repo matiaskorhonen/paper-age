@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [1.2.0] - 2023-10-21
+
 ### Added
 
 - The passphrase/notes field below the QR code is now configurable
@@ -99,7 +101,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent accidental overwrites of the output file
 
 <!-- next-url -->
-[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.4...HEAD
+[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.4...v1.2.0
 [1.1.4]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/matiaskorhonen/paper-age/compare/v1.1.1...v1.1.2
