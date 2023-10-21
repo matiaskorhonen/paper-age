@@ -51,7 +51,7 @@ fn test_stdout() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = Command::cargo_bin("paper-age")?;
 
-    let output_size = 200 * 1024; // 200 KiB
+    let output_size = 50 * 1024; // 50 KiB
     let len_predicate_fn = predicate::function(|x: &[u8]| x.len() > output_size);
 
     cmd.arg("--output")

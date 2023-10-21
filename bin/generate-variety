@@ -3,22 +3,24 @@
 # This script can be used to generate a variety of PDFs for testing while
 # developing PaperAge.
 
+set -euo pipefail
+
 function generate_variety {
   export PAPERAGE_PASSPHRASE="snakeoil"
 
-  echo "Small amount of data"
-  openssl rand -hex 6 | cargo run -- -vvv -f --page-size a4 -o a4-small.pdf
-  openssl rand -hex 6 | cargo run -- -vvv -f --page-size letter -o letter-small.pdf
+  # echo "Small amount of data"
+  openssl rand -hex 6 | cargo run "$@" -- -vvv -f --page-size a4 -o a4-small.pdf
+  openssl rand -hex 6 | cargo run "$@" -- -vvv -f --page-size letter -o letter-small.pdf
 
-  echo "Small amount of data"
-  openssl rand -hex 256 | cargo run -- -vvv -f --page-size a4 -o a4-medium.pdf
-  openssl rand -hex 256 | cargo run -- -vvv -f --page-size letter -o letter-medium.pdf
+  # echo "Small amount of data"
+  openssl rand -hex 256 | cargo run "$@" -- -vvv -f --page-size a4 -o a4-medium.pdf
+  openssl rand -hex 256 | cargo run "$@" -- -vvv -f --page-size letter -o letter-medium.pdf
 
-  echo "Large amount of data"
-  openssl rand -hex 900 | cargo run -- -vvv -f --page-size a4 -o a4-large.pdf
-  openssl rand -hex 900 | cargo run -- -vvv -f --page-size letter -o letter-large.pdf
+  # echo "Large amount of data"
+  openssl rand -hex 900 | cargo run "$@" -- -vvv -f --page-size a4 -o a4-large.pdf
+  openssl rand -hex 900 | cargo run "$@" -- -vvv -f --page-size letter -o letter-large.pdf
 
   unset PAPERAGE_PASSPHRASE
 }
 
-generate_variety
+generate_variety "$@"
