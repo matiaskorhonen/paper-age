@@ -14,6 +14,14 @@ pub struct Args {
     #[arg(short, long, default_value = "PaperAge")]
     pub title: String,
 
+    /// Notes label below the QR code (max. 32 characters)
+    #[arg(short, long, default_value = "Passphrase:")]
+    pub notes_label: String,
+
+    /// Skip the notes placeholder line (e.g. Passphrase: _________________)
+    #[arg(long, default_value_t = false)]
+    pub skip_notes_line: bool,
+
     /// Output file name. Use - for STDOUT.
     #[arg(short, long, default_value = "out.pdf")]
     pub output: PathBuf,
@@ -60,6 +68,9 @@ mod tests {
             "-g",
             "--title",
             "Hello",
+            "--notes-label",
+            "Notes:",
+            "--skip-notes-line",
             "--output",
             "test.pdf",
             "input.txt",
@@ -67,6 +78,8 @@ mod tests {
         assert!(args.force);
         assert!(args.grid);
         assert_eq!(args.title, "Hello");
+        assert_eq!(args.notes_label, "Notes:");
+        assert!(args.skip_notes_line);
         assert_eq!(args.output.to_str().unwrap(), "test.pdf");
         assert_eq!(args.input.unwrap().to_str().unwrap(), "input.txt");
     }
@@ -75,6 +88,8 @@ mod tests {
     fn test_defaults() {
         let args = Args::parse_from(["paper-age"]);
         assert_eq!(args.title, "PaperAge");
+        assert_eq!(args.notes_label, "Passphrase:");
+        assert!(!args.skip_notes_line);
         assert_eq!(args.output.to_str().unwrap(), "out.pdf");
         assert_eq!(args.input, None);
         assert!(!args.force);

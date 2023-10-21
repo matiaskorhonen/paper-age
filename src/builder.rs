@@ -13,6 +13,9 @@ pub mod svg;
 /// PaperAge version
 pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 
+/// Font width / height = 3 / 5
+const FONT_RATIO: f32 = 3.0 / 5.0;
+
 /// Container for all the data required to insert elements into the PDF
 pub struct Document {
     /// A reference to the printpdf PDF document
@@ -235,37 +238,46 @@ impl Document {
         current_layer.add_line(divider);
     }
 
-    /// Insert the passphrase label and placeholder in the PDF
-    pub fn insert_passphrase(&self) {
-        debug!("Inserting passphrase placeholder");
+    /// Insert the notes field label and placeholder in the PDF
+    pub fn insert_notes_field(&self, label: String, skip_line: bool) {
+        debug!("Inserting notes/passphrase placeholder");
+        const MAX_LABEL_LEN: usize = 32;
 
         let current_layer = self.get_current_layer();
 
         let baseline =
             self.page_size.dimensions().height / 2.0 + self.page_size.dimensions().margin;
 
+        let label_len = label.len();
+
+        let font_size = 13.0;
+
         current_layer.use_text(
-            "Passphrase: ",
-            13.0,
+            label,
+            font_size,
             self.page_size.qrcode_left_edge(),
             baseline,
             &self.title_font,
         );
 
-        self.draw_line(
-            vec![
-                Point::new(
-                    self.page_size.qrcode_left_edge() + Mm(30.0),
-                    baseline - Mm(1.0),
-                ),
-                Point::new(
-                    self.page_size.qrcode_left_edge() + self.page_size.qrcode_size(),
-                    baseline - Mm(1.0),
-                ),
-            ],
-            1.0,
-            LineDashPattern::default(),
-        )
+        // If the placeholder line would be ridiculously short, don't draw it
+        if label_len <= MAX_LABEL_LEN && !skip_line {
+            self.draw_line(
+                vec![
+                    Point::new(
+                        self.page_size.qrcode_left_edge()
+                            + Mm::from(Pt(FONT_RATIO * font_size * label_len as f32)),
+                        baseline - Mm(1.0),
+                    ),
+                    Point::new(
+                        self.page_size.qrcode_left_edge() + self.page_size.qrcode_size(),
+                        baseline - Mm(1.0),
+                    ),
+                ],
+                1.0,
+                LineDashPattern::default(),
+            )
+        }
     }
 
     /// Add the footer at the bottom of the page

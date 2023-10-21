@@ -109,7 +109,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    pdf.insert_passphrase();
+    pdf.insert_notes_field(args.notes_label, args.skip_notes_line);
 
     pdf.draw_line(
         vec![
