@@ -24,7 +24,7 @@ pre-release-replacements = [
 [dependencies]
 age = { version = "0.9.0", features = ["armor", "cli-common"] }
 clap = { version = "4.4", features = ["derive"] }
-clap-verbosity-flag = "2.0"
+clap-verbosity-flag = "2.1"
 exitcode = "1.1.2"
 printpdf = { version = "0.6.0", features = ["svg", "font_subsetting"] }
 qrcode = "0.12.0"
@@ -39,7 +39,7 @@ predicates = "3.0"
 [build-dependencies]
 clap = { version = "4.4", features = ["derive"] }
 clap_complete = "4.4"
-clap-verbosity-flag = "2.0"
+clap-verbosity-flag = "2.1"
 clap_mangen = { version = "0.2" }
 path-absolutize = "3.1"
 printpdf = { version = "0.6.0", features = ["svg"] }
