@@ -102,7 +102,7 @@ jobs:
         RUSTFLAGS: -Cinstrument-coverage
         LLVM_PROFILE_FILE: cargo-test-%p-%m.profraw
     - name: Run tests (normal output)
-      if: ! startsWith(matrix.os, 'ubuntu')
+      if: ${{ !startsWith(matrix.os, 'ubuntu') }}
       run: cargo test
     - name: Process code coverage with grcov
       if: startsWith(matrix.os, 'ubuntu')
