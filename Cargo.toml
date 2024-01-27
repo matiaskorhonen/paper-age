@@ -1,7 +1,7 @@
 [package]
 name = "paper-age"
 description = "Easy and secure paper backups of secrets"
-version = "1.2.0"
+version = "1.2.1"
 edition = "2021"
 repository = "https://github.com/matiaskorhonen/paper-age"
 authors = ["Matias Korhonen <me@matiaskorhonen.fi>"]
