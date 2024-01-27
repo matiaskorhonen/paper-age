@@ -116,7 +116,7 @@ jobs:
       run: |
         [ -f test-output.json ] && \
           command -v markdown-test-report &> /dev/null && \
-          markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY
+          markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY || true
       continue-on-error: true
 
   build-binary:
