@@ -112,7 +112,11 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - name: Job summary (tests)
       if: ${{ always() }}
-      run: "[ -f test-output.json ] && command -v markdown-test-report &> /dev/null && markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY"
+      shell: bash
+      run: |
+        [ -f test-output.json ] && \
+          command -v markdown-test-report &> /dev/null && \
+          markdown-test-report --no-front-matter --output - >> $GITHUB_STEP_SUMMARY
       continue-on-error: true
 
   build-binary:
