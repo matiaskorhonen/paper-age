@@ -15,7 +15,7 @@ jobs:
       tag: ${{ steps.create-gh-release.outputs.computed-prefix }}${{ steps.create-gh-release.outputs.version }}
       version: ${{ steps.create-gh-release.outputs.version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Changelog variable
         if: ${{ !(contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'prerelease') || contains(github.ref, 'rc')) }}
         run: |
@@ -46,9 +46,9 @@ jobs:
             os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Configure cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
@@ -89,7 +89,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: mark release as non-draft
         run: |
           gh release edit ${{ needs.create-release.outputs.tag }} --draft=false

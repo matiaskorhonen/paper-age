@@ -25,7 +25,7 @@ jobs:
       with:
         components: clippy
     - name: Configure cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/bin/
@@ -85,7 +85,7 @@ jobs:
     - name: Add llvm-tools
       run: rustup component add llvm-tools
     - name: Configure cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/bin/
@@ -131,7 +131,7 @@ jobs:
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
     - name: Configure cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/bin/
