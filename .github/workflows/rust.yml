@@ -42,7 +42,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ "ubuntu-latest", "windows-latest" ]
+        os: [ "ubuntu-latest", "macos-latest", "windows-latest" ]
 
     runs-on: ${{ matrix.os }}
 
@@ -94,12 +94,16 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - name: Run tests
+    - name: Run tests (JSON output)
+      if: startsWith(matrix.os, 'ubuntu')
       run: cargo test --verbose -- -Z unstable-options --report-time --format json | tee test-output.json
       env:
         CARGO_INCREMENTAL: 0
         RUSTFLAGS: -Cinstrument-coverage
         LLVM_PROFILE_FILE: cargo-test-%p-%m.profraw
+    - name: Run tests (normal output)
+      if: ${{ !startsWith(matrix.os, 'ubuntu') }}
+      run: cargo test
     - name: Process code coverage with grcov
       if: startsWith(matrix.os, 'ubuntu')
       run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
