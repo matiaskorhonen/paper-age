@@ -17,3 +17,7 @@ updates:
         patterns:
           - "assert_*"
           - "predicates"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
