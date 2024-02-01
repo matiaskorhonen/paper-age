@@ -109,7 +109,7 @@ jobs:
       run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
     - name: Upload coverage reports to Codecov
       if: startsWith(matrix.os, 'ubuntu')
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: target/cobertura.xml
       env:
