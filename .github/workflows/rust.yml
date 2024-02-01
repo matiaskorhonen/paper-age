@@ -33,7 +33,7 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        key: test-${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - uses: giraffate/clippy-action@v1
       with:
         reporter: github-pr-review
@@ -93,7 +93,7 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        key: test-${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Run tests (JSON output)
       if: startsWith(matrix.os, 'ubuntu')
       run: cargo test --verbose -- -Z unstable-options --report-time --format json | tee test-output.json
@@ -139,7 +139,7 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        key: test-${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - name: Compile binary
       run: cargo build --release
     - name: Store binary artifact
