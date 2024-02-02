@@ -22,7 +22,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Rust
-      run: rustup toolchain install stable --component clippy --profile minimal --no-self-update
+      run: |
+        rustup toolchain install stable --component clippy --profile minimal --no-self-update
+        rustup default stable
     - name: Configure cache
       uses: Swatinem/rust-cache@v2
     - uses: giraffate/clippy-action@v1
@@ -60,7 +62,7 @@ jobs:
       uses: robinraju/release-downloader@v1.9
       with:
         repository: "mozilla/grcov"
-        tag: "v0.8.18"
+        latest: true
         fileName: grcov-x86_64-unknown-linux-gnu.tar.bz2
         out-file-path: tmp
     - name: Install grcov
@@ -70,11 +72,14 @@ jobs:
         mv grcov "${HOME}/.local/bin"
         chmod +x "${HOME}/.local/bin/grcov"
     - name: Set up Rust
-      run: rustup toolchain install nightly --component llvm-tools --profile minimal --no-self-update
+      run: |
+        rustup toolchain install nightly --component llvm-tools --profile minimal --no-self-update
+        rustup default nightly
     - name: Configure cache
       uses: Swatinem/rust-cache@v2
     - name: Run tests (JSON output)
       if: startsWith(matrix.os, 'ubuntu')
+      shell: bash
       run: cargo test --verbose -- -Z unstable-options --report-time --format json | tee test-output.json
       env:
         CARGO_INCREMENTAL: 0
@@ -108,7 +113,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Rust
-      run: rustup toolchain install stable --profile minimal --no-self-update
+      run: |
+        rustup toolchain install stable --profile minimal --no-self-update
+        rustup default stable
     - name: Configure cache
       uses: Swatinem/rust-cache@v2
     - name: Compile binary
