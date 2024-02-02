@@ -21,9 +21,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        components: clippy
+    - name: Set up Rust
+      run: rustup toolchain install stable --component clippy --profile minimal --no-self-update
     - name: Configure cache
       uses: Swatinem/rust-cache@v2
     - uses: giraffate/clippy-action@v1
@@ -71,11 +70,7 @@ jobs:
         mv grcov "${HOME}/.local/bin"
         chmod +x "${HOME}/.local/bin/grcov"
     - name: Set up Rust
-      uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: nightly-2023-06-15
-    - name: Add llvm-tools
-      run: rustup component add llvm-tools
+      run: rustup toolchain install nightly --component llvm-tools --profile minimal --no-self-update
     - name: Configure cache
       uses: Swatinem/rust-cache@v2
     - name: Run tests (JSON output)
@@ -113,7 +108,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Rust
-      uses: dtolnay/rust-toolchain@stable
+      run: rustup toolchain install stable --profile minimal --no-self-update
     - name: Configure cache
       uses: Swatinem/rust-cache@v2
     - name: Compile binary
