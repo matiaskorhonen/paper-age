@@ -70,7 +70,7 @@ jobs:
         mv grcov "${HOME}/.local/bin"
         chmod +x "${HOME}/.local/bin/grcov"
     - name: Set up Rust
-      run: rustup toolchain install nightly --component llvm-tools-preview --profile minimal --no-self-update
+      run: rustup toolchain install nightly --component llvm-tools --profile minimal --no-self-update
     - name: Configure cache
       uses: Swatinem/rust-cache@v2
     - name: Run tests (JSON output)
