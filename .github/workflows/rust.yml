@@ -71,6 +71,8 @@ jobs:
         chmod +x "${HOME}/.local/bin/grcov"
     - name: Set up Rust
       run: rustup toolchain install nightly --component llvm-tools --profile minimal --no-self-update
+    - name: Add llvm-tools-preview
+      run: rustup component add llvm-tools-preview
     - name: Configure cache
       uses: Swatinem/rust-cache@v2
     - name: Run tests (JSON output)
