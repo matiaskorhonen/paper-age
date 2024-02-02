@@ -77,6 +77,7 @@ jobs:
       uses: Swatinem/rust-cache@v2
     - name: Run tests (JSON output)
       if: startsWith(matrix.os, 'ubuntu')
+      shell: bash
       run: cargo test --verbose -- -Z unstable-options --report-time --format json | tee test-output.json
       env:
         CARGO_INCREMENTAL: 0
