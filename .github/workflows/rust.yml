@@ -21,19 +21,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        components: clippy
+    - name: Set up Rust
+      run: rustup toolchain install stable --component clippy --profile minimal --no-self-update
     - name: Configure cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: test-${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      uses: Swatinem/rust-cache@v2
     - uses: giraffate/clippy-action@v1
       with:
         reporter: github-pr-review
@@ -79,21 +70,9 @@ jobs:
         mv grcov "${HOME}/.local/bin"
         chmod +x "${HOME}/.local/bin/grcov"
     - name: Set up Rust
-      uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: nightly-2023-06-15
-    - name: Add llvm-tools
-      run: rustup component add llvm-tools
+      run: rustup toolchain install nightly --component llvm-tools --profile minimal --no-self-update
     - name: Configure cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: test-${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      uses: Swatinem/rust-cache@v2
     - name: Run tests (JSON output)
       if: startsWith(matrix.os, 'ubuntu')
       run: cargo test --verbose -- -Z unstable-options --report-time --format json | tee test-output.json
@@ -129,17 +108,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Rust
-      uses: dtolnay/rust-toolchain@stable
+      run: rustup toolchain install stable --profile minimal --no-self-update
     - name: Configure cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: test-${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      uses: Swatinem/rust-cache@v2
     - name: Compile binary
       run: cargo build --release
     - name: Store binary artifact
