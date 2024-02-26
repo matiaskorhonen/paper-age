@@ -22,7 +22,7 @@ pre-release-replacements = [
 ]
 
 [dependencies]
-age = { version = "0.9.0", features = ["armor", "cli-common"] }
+age = { version = "0.10.0", features = ["armor", "cli-common", "plugin", "ssh"] }
 clap = { version = "4.4", features = ["derive"] }
 clap-verbosity-flag = "2.1"
 exitcode = "1.1.2"
