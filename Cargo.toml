@@ -30,7 +30,7 @@ printpdf = { version = "0.6.0", features = ["svg", "font_subsetting"] }
 qrcode = "0.13.0"
 rpassword = "7"
 log = "0.4"
-env_logger = "0.10"
+env_logger = "0.11"
 
 [dev-dependencies]
 assert_cmd = "2.0"
