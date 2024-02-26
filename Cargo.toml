@@ -22,12 +22,13 @@ pre-release-replacements = [
 ]
 
 [dependencies]
-age = { version = "0.10.0", features = ["armor", "cli-common", "plugin", "ssh"] }
+age = { version = "0.10.0", features = ["armor"] }
 clap = { version = "4.4", features = ["derive"] }
 clap-verbosity-flag = "2.1"
 exitcode = "1.1.2"
 printpdf = { version = "0.6.0", features = ["svg", "font_subsetting"] }
 qrcode = "0.13.0"
+rpassword = "7"
 log = "0.4"
 env_logger = "0.10"
 

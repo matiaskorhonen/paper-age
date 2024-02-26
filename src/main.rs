@@ -11,13 +11,11 @@ use std::{
     path::PathBuf,
 };
 
-use age::{
-    cli_common::read_secret,
-    secrecy::{Secret, SecretString},
-};
+use age::secrecy::{ExposeSecret, Secret, SecretString};
 use clap::Parser;
 use printpdf::LineDashPattern;
 use qrcode::types::QrError;
+use rpassword::prompt_password;
 
 pub mod builder;
 pub mod cli;
@@ -140,6 +138,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+/// Read a secret from the user
+pub fn read_secret(prompt: &str) -> Result<Secret<String>, io::Error> {
+    let passphrase = prompt_password(format!("{}: ", prompt)).map(SecretString::new)?;
+
+    if passphrase.expose_secret().is_empty() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "Passphrase can't be empty",
+        ));
+    }
+
+    Ok(passphrase)
+}
+
 /// Get the passphrase from an interactive prompt or from the PAPERAGE_PASSPHRASE
 /// environment variable
 fn get_passphrase() -> Result<Secret<String>, io::Error> {
@@ -149,7 +161,7 @@ fn get_passphrase() -> Result<Secret<String>, io::Error> {
         return Ok(SecretString::from(value));
     }
 
-    match read_secret("Type passphrase", "Passphrase", None) {
+    match read_secret("Passphrase") {
         Ok(secret) => Ok(secret),
         Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{e}"))),
     }
