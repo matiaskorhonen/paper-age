@@ -928,6 +928,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "image"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fd54d660e773627692c524beaad361aca785a4f9f5730ce91f42aabe5bce3d11"
+dependencies = [
+ "bytemuck",
+ "byteorder",
+ "num-traits",
+]
+
+[[package]]
 name = "imagesize"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1443,11 +1454,11 @@ dependencies = [
 
 [[package]]
 name = "qrcode"
-version = "0.13.0"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "166f136dfdb199f98186f3649cf7a0536534a61417a1a30221b492b4fb60ce3f"
+checksum = "23e719ca51966ff9f5a8436edb00d6115b3c606a0bb27c8f8ca74a38ff2b036d"
 dependencies = [
- "image",
+ "image 0.25.1",
 ]
 
 [[package]]
@@ -1848,7 +1859,7 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4283ae77d25dbee75aa1bce6b5bc8e7d802960135d6de306eaec0a5241d80c8"
 dependencies = [
- "image",
+ "image 0.24.7",
  "miniz_oxide",
  "pdf-writer",
  "usvg",
