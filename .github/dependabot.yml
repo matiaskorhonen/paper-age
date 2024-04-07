@@ -13,6 +13,7 @@ updates:
       cli-dependencies:
         patterns:
           - "clap*"
+          - "rpassword"
       dev-dependencies:
         patterns:
           - "assert_*"
