@@ -45,7 +45,7 @@ If you want to try decoding it yourself, the passphrase is `snakeoil`.
 
 Release builds are available for macOS (Apple Silicon and Intel), Linux (ARM and x86-64), and Windows (x86-64).
 
-The test suite is automatically run on all three platforms but the Windows builds are provided on a best effort basis and only Windows 11 is “officially” supported.
+While the Windows build *should* work on both Windows 10 and 11, only Windows 11 is “officially” supported.
 
 ### Homebrew
 
