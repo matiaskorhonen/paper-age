@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated age to v0.10.0
 - Use rpassword directly for passphrase prompt
 - Removes indirect dependency on atty (GHSA-g98v-hv3f-hcfr)
+- Other minor dependency updates
 
 ## [1.2.1] - 2024-01-27
 
