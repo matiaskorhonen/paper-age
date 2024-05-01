@@ -46,7 +46,7 @@ jobs:
       run: mkdir -p "${HOME}/.local/bin"
     - name: Download markdown-test-report
       if: startsWith(matrix.os, 'ubuntu')
-      uses: robinraju/release-downloader@v1.9
+      uses: robinraju/release-downloader@v1.10
       with:
         repository: "ctron/markdown-test-report"
         tag: "v0.3.8"
@@ -59,7 +59,7 @@ jobs:
         chmod +x "${HOME}/.local/bin/markdown-test-report"
     - name: Download grcov
       if: startsWith(matrix.os, 'ubuntu')
-      uses: robinraju/release-downloader@v1.9
+      uses: robinraju/release-downloader@v1.10
       with:
         repository: "mozilla/grcov"
         latest: true
@@ -141,7 +141,7 @@ jobs:
       with:
         ruby-version: "3.2"
     - name: Install latest PaperAge release
-      uses: robinraju/release-downloader@v1.9
+      uses: robinraju/release-downloader@v1.10
       with:
         repository: "matiaskorhonen/paper-age"
         latest: true
@@ -151,7 +151,7 @@ jobs:
     - name: Move the release binary to bin
       run: mv tmp/paper-age bin/paper-age-release
     - name: Install pdfium-cli
-      uses: robinraju/release-downloader@v1.9
+      uses: robinraju/release-downloader@v1.10
       with:
         repository: "klippa-app/pdfium-cli"
         tag: "v0.1.1"
