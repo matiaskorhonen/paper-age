@@ -1,7 +1,7 @@
 [package]
 name = "paper-age"
 description = "Easy and secure paper backups of secrets"
-version = "1.2.1"
+version = "1.3.0"
 edition = "2021"
 rust-version = "1.74"
 repository = "https://github.com/matiaskorhonen/paper-age"
