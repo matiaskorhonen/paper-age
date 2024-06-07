@@ -92,9 +92,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update Homebrew Formula
-        uses: peter-evans/repository-dispatch@v3
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.PAT }}
-          repository: matiaskorhonen/homebrew-paper-age
-          event-type: "Update Homebrew Formula"
-          client-payload: '{ "version": "${{ needs.create-release.outputs.version }}" }'
+          github-token: ${{ secrets.PAT }}
+          script: |
+            github.rest.actions.createDispatchEvent({
+              owner: "matiaskorhonen",
+              repo: "homebrew-paper-age",
+              event_type: "Update Homebrew Formula",
+              client_payload: {
+                version: ${{ toJSON(needs.create-release.outputs.version) }}
+              }
+            })
