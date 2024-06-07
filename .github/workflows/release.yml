@@ -77,6 +77,8 @@ jobs:
           include: README.md,LICENSE.txt,src/assets/fonts/IBMPlexMono-LICENSE.txt,${{ env.include_docs }}
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
+          # Sign build products using codesign on macOS (using an ad-hoc developer identity)
+          codesign: '-'
       - uses: actions/attest-build-provenance@v1
         with:
           subject-path: "${{ steps.upload-rust-binary-action.outputs.archive }}.*"
