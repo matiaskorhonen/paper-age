@@ -1,7 +1,9 @@
 name: Release
 
 permissions:
+  id-token: write
   contents: write
+  attestations: write
 
 on:
   push:
@@ -61,7 +63,8 @@ jobs:
         if: ${{ contains(matrix.target, 'linux') }}
         run: |
           echo "include_docs=target/${{ matrix.target }}/release/man,target/${{ matrix.target }}/release/completion" >> $GITHUB_ENV
-      - uses: taiki-e/upload-rust-binary-action@v1
+      - id: upload-rust-binary-action
+        uses: taiki-e/upload-rust-binary-action@v1.21.0
         with:
           # (required) Comma-separated list of binary names (non-extension portion of filename) to build and upload.
           # Note that glob pattern is not supported yet.
@@ -74,6 +77,9 @@ jobs:
           include: README.md,LICENSE.txt,src/assets/fonts/IBMPlexMono-LICENSE.txt,${{ env.include_docs }}
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: "${{ steps.upload-rust-binary-action.outputs.archive }}.*"
 
   publish-release:
     needs: [create-release, upload-assets]
