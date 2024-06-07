@@ -63,11 +63,11 @@ Download the latest release from the [Releases](https://github.com/matiaskorhone
 ```sh
 # Download the latest release (pick your OS)
 # macOS (Intel or Apple Silicon):
-curl -Lo paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/v1.3.0/paper-age-universal-apple-darwin.tar.gz
+curl -Lo paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/v1.3.1/paper-age-universal-apple-darwin.tar.gz
 # Linux (x86-64):
-curl -Lo paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/v1.3.0/paper-age-x86_64-unknown-linux-gnu.tar.gz
+curl -Lo paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/v1.3.1/paper-age-x86_64-unknown-linux-gnu.tar.gz
 # Linux (ARM):
-curl -Lo paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/v1.3.0/paper-age-aarch64-unknown-linux-gnu.tar.gz
+curl -Lo paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/v1.3.1/paper-age-aarch64-unknown-linux-gnu.tar.gz
 
 # Verify the artifact attestation using the GitHub CLI tool (optional)
 gh attestation verify paper-age.tar.gz --repo matiaskorhonen/paper-age
