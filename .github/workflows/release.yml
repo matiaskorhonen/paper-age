@@ -104,7 +104,7 @@ jobs:
         with:
           github-token: ${{ secrets.PAT }}
           script: |
-            github.rest.actions.createDispatchEvent({
+            github.rest.repos.createDispatchEvent({
               owner: "matiaskorhonen",
               repo: "homebrew-paper-age",
               event_type: "Update Homebrew Formula",
