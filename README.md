@@ -69,6 +69,9 @@ curl -Lo paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/d
 # Linux (ARM):
 curl -Lo paper-age.tar.gz https://github.com/matiaskorhonen/paper-age/releases/download/v1.3.0/paper-age-aarch64-unknown-linux-gnu.tar.gz
 
+# Verify the artifact attestation using the GitHub CLI tool (optional)
+gh attestation verify paper-age.tar.gz --repo matiaskorhonen/paper-age
+
 # Extract the files
 tar -xf paper-age.tar.gz
 
@@ -77,6 +80,7 @@ sudo install paper-age /usr/local/bin/
 # Or: sudo mv paper-age /usr/local/bin/
 
 # macOS only: clear the quarantine flag
+# This may not be required, depending on how the release was downloaded and extracted
 sudo xattr -r -d com.apple.quarantine /usr/local/bin/paper-age
 ```
 
@@ -87,6 +91,10 @@ If you already have Rust installed, PaperAge can be installed with Cargo:
 ```sh
 cargo install paper-age
 ```
+
+### Artifact attestations
+
+Starting with v1.3.1, PaperAge releases have [artifact attestations](https://github.com/matiaskorhonen/paper-age/attestations). Attestations are generated using [GitHub's tooling](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
 
 ## Usage
 
