@@ -12,7 +12,7 @@ function generate_variety {
   openssl rand -hex 6 | cargo run "$@" -- -vvv -f --page-size a4 -o a4-small.pdf
   openssl rand -hex 6 | cargo run "$@" -- -vvv -f --page-size letter -o letter-small.pdf
 
-  # echo "Small amount of data"
+  # echo "Medium amount of data"
   openssl rand -hex 256 | cargo run "$@" -- -vvv -f --page-size a4 -o a4-medium.pdf
   openssl rand -hex 256 | cargo run "$@" -- -vvv -f --page-size letter -o letter-medium.pdf
 
