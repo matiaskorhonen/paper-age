@@ -28,7 +28,7 @@ clap = { version = "4.5", features = ["derive"] }
 clap-verbosity-flag = "2.2"
 exitcode = "1.1.2"
 printpdf = { version = "0.7.0", features = ["svg", "font_subsetting"] }
-qrcode = "0.14.0"
+qrcode = "0.14.1"
 rpassword = "7"
 log = "0.4"
 env_logger = "0.11"
