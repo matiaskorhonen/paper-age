@@ -63,7 +63,7 @@ jobs:
           CODESIGN_IDENTITY: ${{ secrets.CODESIGN_IDENTITY }}
         run: |
           # sign the binary
-          codesign --sign "$CODESIGN_IDENTITY" tmp/paper-age
+          codesign --force --sign "$CODESIGN_IDENTITY" tmp/paper-age
       - name: Upload the signed binary
         uses: actions/upload-artifact@v4
         with:
