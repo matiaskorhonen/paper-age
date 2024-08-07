@@ -61,10 +61,10 @@ jobs:
       - name: Sign the binary
         env:
           CODESIGN_IDENTITY: "7FP48PW9TN"
-          IDENTITY: "fi.matias.korhonen.paper-age"
+          CODESIGN_IDENTIFIER: "fi.matias.korhonen.paper-age"
         run: |
           # sign the binary
-          codesign --force --sign "$CODESIGN_IDENTITY" --identifier "$IDENTIFIER" tmp/paper-age
+          codesign --force --sign "$CODESIGN_IDENTITY" --identifier "$CODESIGN_IDENTIFIER" tmp/paper-age
       - name: Upload the signed binary
         uses: actions/upload-artifact@v4
         with:
