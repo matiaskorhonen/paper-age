@@ -76,7 +76,7 @@ jobs:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER: ${{ secrets.ISSUER }}
         run: |
-          xcrun notarytool submit paper-age-signed.zip \
+          xcrun notarytool submit tmp/paper-age-signed.zip \
             --key "$RUNNER_TEMP/AuthKey.p8" \
             --key-id "$KEY_ID" \
             --issuer "$ISSUER" \
