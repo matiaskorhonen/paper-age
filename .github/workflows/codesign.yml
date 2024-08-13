@@ -56,10 +56,10 @@ jobs:
           echo -n "$AUTH_KEY_BASE64" | base64 --decode -o $AUTH_KEY_PATH
 
           # setup outputs
-          echo "auth_key_path=$AUTH_KEY_PATH" >> $GITHUB_ENV
-          echo "keychain_path=$KEYCHAIN_PATH" >> $GITHUB_ENV
-          echo "pp_path=$PP_PATH" >> $GITHUB_ENV
-          echo "certificate_path=$CERTIFICATE_PATH" >> $GITHUB_ENV
+          echo "auth_key_path=$AUTH_KEY_PATH" >> $GITHUB_OUTPUT
+          echo "keychain_path=$KEYCHAIN_PATH" >> $GITHUB_OUTPUT
+          echo "pp_path=$PP_PATH" >> $GITHUB_OUTPUT
+          echo "certificate_path=$CERTIFICATE_PATH" >> $GITHUB_OUTPUT
       - name: Fetch PaperAge release
         uses: robinraju/release-downloader@v1.11
         with:
