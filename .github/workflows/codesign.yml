@@ -20,6 +20,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Install the Apple certificate and provisioning profile
+        id: keychain
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
@@ -29,7 +30,7 @@ jobs:
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          PP_PATH=$RUNNER_TEMP/build_pp.provisionprofile
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           AUTH_KEY_PATH=$RUNNER_TEMP/AuthKey.p8
 
@@ -53,6 +54,12 @@ jobs:
 
           # create auth key file for notarization
           echo -n "$AUTH_KEY_BASE64" | base64 --decode -o $AUTH_KEY_PATH
+
+          # setup outputs
+          echo "auth_key_path=$AUTH_KEY_PATH" >> $GITHUB_ENV
+          echo "keychain_path=$KEYCHAIN_PATH" >> $GITHUB_ENV
+          echo "pp_path=$PP_PATH" >> $GITHUB_ENV
+          echo "certificate_path=$CERTIFICATE_PATH" >> $GITHUB_ENV
       - name: Fetch PaperAge release
         uses: robinraju/release-downloader@v1.11
         with:
@@ -77,9 +84,8 @@ jobs:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER: ${{ secrets.ISSUER }}
         run: |
-          shasum "$RUNNER_TEMP/AuthKey.p8"
           xcrun notarytool submit tmp/paper-age-signed.zip \
-            --key "$RUNNER_TEMP/AuthKey.p8" \
+            --key "${{ steps.keychain.outputs.auth_key_path }}" \
             --key-id "$KEY_ID" \
             --issuer "$ISSUER" \
             --wait
@@ -92,6 +98,7 @@ jobs:
       - name: Clean up keychain and provisioning profile
         if: ${{ always() }}
         run: |
-          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
-          rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
-          rm $RUNNER_TEMP/AuthKey.p8
+          security delete-keychain "${{ steps.keychain.outputs.keychain_path }}"
+          rm "${{ steps.keychain.outputs.pp_path }}"
+          rm "${{ steps.keychain.outputs.certificate_path }}"
+          rm "${{ steps.keychain.outputs.auth_key_path }}"
