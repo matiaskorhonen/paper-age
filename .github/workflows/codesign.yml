@@ -66,10 +66,10 @@ jobs:
       - name: Sign the binary
         env:
           CODESIGN_IDENTITY: "7FP48PW9TN"
-          CODESIGN_IDENTIFIER: "fi.matias.korhonen.paper-age"
+          CODESIGN_PREFIX: "fi.matias.korhonen."
         run: |
           # sign the binary
-          codesign --force --sign "$CODESIGN_IDENTITY" --identifier "$CODESIGN_IDENTIFIER" tmp/paper-age
+          codesign --force --sign "$CODESIGN_IDENTITY" --prefix "$CODESIGN_PREFIX" --options runtime tmp/paper-age
       - name: Zip the signed binary
         run: zip -r tmp/paper-age-signed.zip tmp/paper-age
       - name: Notarize the binary
