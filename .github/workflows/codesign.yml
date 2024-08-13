@@ -30,6 +30,7 @@ jobs:
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          AUTH_KEY_PATH=$RUNNER_TEMP/AuthKey.p8
 
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
@@ -48,6 +49,9 @@ jobs:
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+
+          # create auth key file for notarization
+          echo -n "$AUTH_KEY_BASE64" | base64 --decode -o $AUTH_KEY_PATH
       - name: Fetch PaperAge release
         uses: robinraju/release-downloader@v1.11
         with:
@@ -65,6 +69,18 @@ jobs:
         run: |
           # sign the binary
           codesign --force --sign "$CODESIGN_IDENTITY" --identifier "$CODESIGN_IDENTIFIER" tmp/paper-age
+      - name: Zip the signed binary
+        run: zip -r tmp/paper-age-signed.zip tmp/paper-age
+      - name: Notarize the binary
+        env:
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER: ${{ secrets.ISSUER }}
+        run: |
+          xcrun notarytool submit paper-age-signed.zip \
+            --key "$RUNNER_TEMP/AuthKey.p8" \
+            --key-id "$KEY_ID" \
+            --issuer "$ISSUER" \
+            --wait
       - name: Upload the signed binary
         uses: actions/upload-artifact@v4
         with:
@@ -76,3 +92,4 @@ jobs:
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+          rm $RUNNER_TEMP/AuthKey.p8
