@@ -78,10 +78,6 @@ tar -xf paper-age.tar.gz
 # Install the binary in /usr/local/bin
 sudo install paper-age /usr/local/bin/
 # Or: sudo mv paper-age /usr/local/bin/
-
-# macOS only: clear the quarantine flag
-# This may not be required, depending on how the release was downloaded and extracted
-sudo xattr -r -d com.apple.quarantine /usr/local/bin/paper-age
 ```
 
 ### Cargo
