@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Adds codesigning and notarization on macOS
+- Minor dependency updates
+
 ## [1.3.2] - 2024-07-01
 
 ### Changed
