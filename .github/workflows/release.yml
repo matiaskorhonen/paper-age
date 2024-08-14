@@ -123,6 +123,20 @@ jobs:
           codesign: '7FP48PW9TN'
           codesign-prefix: 'fi.matiaskorhonen.'
           codesign-options: 'runtime'
+      - name: Zip the binary for notarization (macOS)
+        if: ${{ matrix.target == 'universal-apple-darwin' }}
+        run: zip -r $RUNNER_TEMP/paper-age-signed.zip paper-age/target/universal-apple-darwin/release/paper-age
+      - name: Upload the binary for notarization (macOS)
+        if: ${{ matrix.target == 'universal-apple-darwin' }}
+        env:
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER: ${{ secrets.ISSUER }}
+        run: |
+          xcrun notarytool submit $RUNNER_TEMP/paper-age-signed.zip \
+            --key "${{ steps.keychain.outputs.auth_key_path }}" \
+            --key-id "$KEY_ID" \
+            --issuer "$ISSUER" \
+            --wait
       - uses: actions/attest-build-provenance@v1
         with:
           subject-path: "${{ steps.upload-rust-binary-action.outputs.archive }}.*"
