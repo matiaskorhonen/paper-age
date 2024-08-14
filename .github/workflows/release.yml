@@ -125,7 +125,7 @@ jobs:
           codesign-options: 'runtime'
       - name: Zip the binary for notarization (macOS)
         if: ${{ matrix.target == 'universal-apple-darwin' }}
-        run: zip -r $RUNNER_TEMP/paper-age-signed.zip paper-age/target/universal-apple-darwin/release/paper-age
+        run: zip -r $RUNNER_TEMP/paper-age-signed.zip target/${{ matrix.target }}/release/paper-age
       - name: Upload the binary for notarization (macOS)
         if: ${{ matrix.target == 'universal-apple-darwin' }}
         env:
