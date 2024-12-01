@@ -23,7 +23,7 @@ pre-release-replacements = [
 ]
 
 [dependencies]
-age = { version = "0.10.0", features = ["armor"] }
+age = { version = "0.11.0", features = ["armor"] }
 clap = { version = "4.5", features = ["derive"] }
 clap-verbosity-flag = "2.2"
 exitcode = "1.1.2"
