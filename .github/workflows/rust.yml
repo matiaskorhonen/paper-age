@@ -96,8 +96,6 @@ jobs:
       uses: codecov/codecov-action@v5
       with:
         files: target/cobertura.xml
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - name: Job summary (tests)
       if: ${{ always() }}
       shell: bash
