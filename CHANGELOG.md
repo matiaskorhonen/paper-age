@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Update the age crate to v0.11.0
+- Generated PDFs now have a white background layer
 
 ## [1.3.3] - 2024-08-14
 
