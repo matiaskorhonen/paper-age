@@ -3,7 +3,7 @@ use std::io::{BufReader, Cursor};
 
 use printpdf::{
     Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
-    PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rgb, Svg, SvgTransform,
+    PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rect, Rgb, Svg, SvgTransform,
 };
 
 use crate::page::*;
@@ -45,8 +45,18 @@ impl Document {
 
         let dimensions = page_size.dimensions();
 
-        let (mut doc, page, layer) =
-            PdfDocument::new(title, dimensions.width, dimensions.height, "Layer 1");
+        let (mut doc, page, background_ref) =
+            PdfDocument::new(title, dimensions.width, dimensions.height, "Background");
+
+        let layer = doc.get_page(page).add_layer("Foreground").layer;
+
+        let fill_color = Color::Rgb(Rgb::new(1.0, 1.0, 1.0, None));
+
+        let background_layer = doc.get_page(page).get_layer(background_ref);
+        background_layer.set_fill_color(fill_color);
+
+        let bg = Rect::new(Mm(0.0), Mm(0.0), dimensions.width, dimensions.height);
+        background_layer.add_rect(bg);
 
         let producer = format!("Paper Rage v{}", VERSION.unwrap_or("0.0.0"));
         doc = doc.with_producer(producer);
