@@ -3,12 +3,12 @@ use std::io::Write;
 
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
-use age::secrecy::Secret;
+use age::secrecy::SecretString;
 
 /// Encrypt the data from the reader and PEM encode the ciphertext
 pub fn encrypt_plaintext(
     reader: &mut dyn std::io::BufRead,
-    passphrase: Secret<String>,
+    passphrase: SecretString,
 ) -> Result<(usize, String), Box<dyn std::error::Error>> {
     debug!("Encrypting plaintext");
 
@@ -39,7 +39,7 @@ mod tests {
     #[test]
     fn test_armored_output() {
         let mut input = b"some secrets" as &[u8];
-        let passphrase = Secret::new(String::from("snakeoil"));
+        let passphrase = SecretString::from("snakeoil".to_owned());
         let result = encrypt_plaintext(&mut input, passphrase);
 
         assert!(result.is_ok());

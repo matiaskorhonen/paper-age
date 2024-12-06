@@ -11,7 +11,7 @@ use std::{
     path::PathBuf,
 };
 
-use age::secrecy::{ExposeSecret, Secret, SecretString};
+use age::secrecy::{ExposeSecret, SecretString};
 use clap::Parser;
 use printpdf::LineDashPattern;
 use qrcode::types::QrError;
@@ -139,8 +139,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Read a secret from the user
-pub fn read_secret(prompt: &str) -> Result<Secret<String>, io::Error> {
-    let passphrase = prompt_password(format!("{}: ", prompt)).map(SecretString::new)?;
+pub fn read_secret(prompt: &str) -> Result<SecretString, io::Error> {
+    let passphrase = prompt_password(format!("{}: ", prompt)).map(SecretString::from)?;
 
     if passphrase.expose_secret().is_empty() {
         return Err(io::Error::new(
@@ -154,7 +154,7 @@ pub fn read_secret(prompt: &str) -> Result<Secret<String>, io::Error> {
 
 /// Get the passphrase from an interactive prompt or from the PAPERAGE_PASSPHRASE
 /// environment variable
-fn get_passphrase() -> Result<Secret<String>, io::Error> {
+fn get_passphrase() -> Result<SecretString, io::Error> {
     let env_passphrase = env::var("PAPERAGE_PASSPHRASE");
 
     if let Ok(value) = env_passphrase {
