@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# This script can be used to generate a preview image for the README
+
+set -euo pipefail
+
+function generate_preview {
+  export PAPERAGE_PASSPHRASE="snakeoil"
+
+  echo "Generating PDFs"
+  echo "Hello World" | cargo run "$@" -- -vvv -f --page-size a4 -o a4.pdf
+  echo "Hello World" | cargo run "$@" -- -vvv -f --page-size letter -o letter.pdf
+
+  echo "Generating preview image"
+  magick montage \
+    -background "rgba(255,255,255,0)" \
+    -density 300 \
+    -geometry 1024x+16+16 \
+    -border 1 \
+    -bordercolor "#CCCCCC" \
+    -tile 2x a4.pdf letter.pdf miff:- | magick - -trim preview.png
+
+  unset PAPERAGE_PASSPHRASE
+}
+
+generate_preview "$@"
