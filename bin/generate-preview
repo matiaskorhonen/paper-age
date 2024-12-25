@@ -16,6 +16,7 @@ function generate_preview {
     -background "rgba(255,255,255,0)" \
     -density 300 \
     -geometry 1024x+16+16 \
+    -gravity North \
     -border 1 \
     -bordercolor "#CCCCCC" \
     -tile 2x a4.pdf letter.pdf miff:- | magick - -trim preview.png
