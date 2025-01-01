@@ -137,7 +137,7 @@ jobs:
             --key-id "$KEY_ID" \
             --issuer "$ISSUER" \
             --wait
-      - uses: actions/attest-build-provenance@v1
+      - uses: actions/attest-build-provenance@v2
         with:
           subject-path: "${{ steps.upload-rust-binary-action.outputs.archive }}.*"
 
