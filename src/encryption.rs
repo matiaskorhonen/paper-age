@@ -1,4 +1,5 @@
 //! Age based encryption
+use log::debug;
 use std::io::Write;
 
 use age::armor::ArmoredWriter;
