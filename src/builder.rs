@@ -1,10 +1,10 @@
 //! PaperAge
-use std::io::{BufReader, Cursor};
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use printpdf::{
-    Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
-    PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rect, Rgb, Svg, SvgTransform,
+    Color, ExternalXObject, FontId, Layer, LayerInternalId, Line, LineDashPattern, LinePoint, Mm,
+    Op, ParsedFont, PdfDocument, PdfPage, PdfWarnMsg, Point, Pt, Rgb, Svg, TextItem, XObjectId,
+    XObjectTransform,
 };
 
 use crate::page::*;
@@ -18,105 +18,191 @@ pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 const FONT_RATIO: f32 = 3.0 / 5.0;
 
 /// Container for all the data required to insert elements into the PDF
-pub struct Document {
-    /// A reference to the printpdf PDF document
-    pub doc: PdfDocumentReference,
+pub struct DocumentBuilder {
+    pub title: String,
 
-    /// Index of the first page in the PDF document
-    pub page: PdfPageIndex,
-
-    /// Index of the initial layer in the PDF document
-    pub layer: PdfLayerIndex,
-
-    /// Reference to the medium weight font
-    pub title_font: IndirectFontRef,
-
-    /// Reference to the regular weight font
-    pub code_font: IndirectFontRef,
-
-    /// Page size
     pub page_size: PageSize,
+
+    pub grid: bool,
+
+    pub notes_label: String,
+
+    pub skip_notes_line: bool,
 }
 
-impl Document {
-    /// Initialize the PDF with default dimensions and the required fonts. Also
-    /// sets the title and the producer in the PDF metadata.
-    pub fn new(title: String, page_size: PageSize) -> Result<Document> {
-        debug!("Initializing PDF");
-
-        let dimensions = page_size.dimensions();
-
-        let (mut doc, page, background_ref) =
-            PdfDocument::new(title, dimensions.width, dimensions.height, "Background");
-
-        let layer = doc.get_page(page).add_layer("Foreground").layer;
-
-        let fill_color = Color::Rgb(Rgb::new(1.0, 1.0, 1.0, None));
-
-        let background_layer = doc.get_page(page).get_layer(background_ref);
-        background_layer.set_fill_color(fill_color);
-
-        let bg = Rect::new(Mm(0.0), Mm(0.0), dimensions.width, dimensions.height);
-        background_layer.add_rect(bg);
-
-        let producer = format!("Paper Rage v{}", VERSION.unwrap_or("0.0.0"));
-        doc = doc.with_producer(producer);
-
-        let code_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
-        let code_font = doc.add_external_font(BufReader::new(Cursor::new(code_data)))?;
-
-        let title_data = include_bytes!("assets/fonts/IBMPlexMono-Medium.ttf");
-        let title_font = doc.add_external_font(BufReader::new(Cursor::new(title_data)))?;
-
-        Ok(Document {
-            doc,
-            page,
-            layer,
-            title_font,
-            code_font,
+impl DocumentBuilder {
+    pub fn new(title: String, page_size: PageSize) -> Self {
+        Self {
+            title,
             page_size,
-        })
+            grid: false,
+            notes_label: "".to_string(),
+            skip_notes_line: false,
+        }
     }
 
-    /// Get the default layer from the PDF
-    fn get_current_layer(&self) -> PdfLayerReference {
-        self.doc.get_page(self.page).get_layer(self.layer)
+    pub fn build(&self, encrypted_data: &str) -> Result<PdfDocument> {
+        let producer = format!("Paper Rage v{}", VERSION.unwrap_or("0.0.0"));
+        let mut warnings = vec![];
+
+        let mut doc = PdfDocument::new(&self.title);
+        doc.metadata.info.producer = producer;
+
+        // Load fonts
+        let title_font_data = include_bytes!("assets/fonts/IBMPlexMono-Medium.ttf");
+        let title_font = ParsedFont::from_bytes(title_font_data, 0, &mut warnings)
+            .ok_or(anyhow!("Can't load title font!"))?;
+        let title_font_id = doc.add_font(&title_font);
+        let code_font_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
+        let code_font = ParsedFont::from_bytes(code_font_data, 1, &mut warnings)
+            .ok_or(anyhow!("Can't load title font!"))?;
+        let code_font_id = doc.add_font(&code_font);
+
+        // Create QR-code
+        let qrcode = self.generate_qr_code(encrypted_data, &mut warnings)?;
+        let qrcode_id = doc.add_xobject(&qrcode);
+
+        // Create Layers
+        let background_layer = Layer::new("Background");
+        let background_layer_id = doc.add_layer(&background_layer);
+
+        let layer = Layer::new("Foreground");
+        let layer_id = doc.add_layer(&layer);
+
+        // Build
+        let content: Vec<Op> = [
+            self.build_background_layer(&background_layer_id),
+            self.build_foreground_layer(
+                encrypted_data,
+                &layer_id,
+                &title_font_id,
+                &code_font_id,
+                &qrcode_id,
+                &qrcode,
+            ),
+        ]
+        .into_iter()
+        .flatten()
+        .collect();
+        let page = PdfPage::new(
+            self.page_size.dimensions().width,
+            self.page_size.dimensions().height,
+            content,
+        );
+        doc.with_pages(vec![page]);
+        Ok(doc)
+    }
+
+    pub fn generate_qr_code(
+        &self,
+        encrypted_data: &str,
+        warnings: &mut Vec<PdfWarnMsg>,
+    ) -> Result<ExternalXObject> {
+        let image = svg::qrcode(encrypted_data)?;
+        Svg::parse(image.as_str(), warnings)
+            .map_err(|_| anyhow!("The QR code generation failed for an unknown reason"))
+    }
+
+    fn build_background_layer(&self, layer: &LayerInternalId) -> Vec<Op> {
+        let fill_color = Color::Rgb(Rgb::new(1.0, 1.0, 1.0, None));
+        let contents = [vec![Op::SetFillColor { col: fill_color }]];
+        self.build_layer(layer, contents)
+    }
+
+    fn build_foreground_layer(
+        &self,
+        encrypted_data: &str,
+        layer: &LayerInternalId,
+        title_font_id: &FontId,
+        code_font_id: &FontId,
+        qrcode_id: &XObjectId,
+        qrcode: &ExternalXObject,
+    ) -> Vec<Op> {
+        let contents = [
+            self.grid.then(|| self.draw_grid()).unwrap_or(vec![]),
+            self.insert_title_text(title_font_id),
+            self.insert_qr_code(qrcode_id, qrcode),
+            self.insert_notes_field(
+                self.notes_label.clone(),
+                self.skip_notes_line,
+                title_font_id,
+            ),
+            self.draw_line(
+                vec![
+                    self.page_size.dimensions().center_left(),
+                    self.page_size.dimensions().center_right(),
+                ],
+                1.0,
+                LineDashPattern {
+                    dash_1: Some(5),
+                    ..LineDashPattern::default()
+                },
+            ),
+            self.insert_pem_text(encrypted_data, code_font_id),
+            self.insert_footer(title_font_id),
+        ];
+        self.build_layer(layer, contents)
+    }
+
+    fn build_layer<C: IntoIterator<Item = Vec<Op>>>(
+        &self,
+        layer: &LayerInternalId,
+        contents: C,
+    ) -> Vec<Op> {
+        let mut layer_content = vec![];
+        layer_content.push(Op::BeginLayer {
+            layer_id: layer.clone(),
+        });
+        for content in contents {
+            layer_content.extend(content)
+        }
+        layer_content.push(Op::EndLayer {
+            layer_id: layer.clone(),
+        });
+        layer_content
     }
 
     /// Insert the given title at the top of the PDF
-    pub fn insert_title_text(&self, title: String) {
-        debug!("Inserting title: {}", title.as_str());
-
-        let current_layer = self.get_current_layer();
-
+    fn insert_title_text(&self, font: &FontId) -> Vec<Op> {
         let font_size = 14.0;
 
         // Align the title with the QR code if the title is narrower than the QR code
         let margin = {
-            if title.len() <= 37 {
+            if self.title.len() <= 37 {
                 self.page_size.qrcode_left_edge()
             } else {
                 self.page_size.dimensions().margin
             }
         };
 
-        current_layer.use_text(
-            title,
-            font_size,
-            margin,
-            self.page_size.dimensions().height
-                - self.page_size.dimensions().margin
-                - Mm::from(Pt(font_size)),
-            &self.title_font,
-        );
+        vec![
+            Op::StartTextSection,
+            Op::SetFillColor {
+                col: Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)),
+            },
+            Op::SetFontSize {
+                size: Pt(font_size),
+                font: font.clone(),
+            },
+            Op::SetTextCursor {
+                pos: Point {
+                    x: margin.into(),
+                    y: (self.page_size.dimensions().height
+                        - self.page_size.dimensions().margin
+                        - Mm::from(Pt(font_size)))
+                    .into(),
+                },
+            },
+            Op::WriteText {
+                items: vec![TextItem::Text(self.title.clone())],
+                font: font.clone(),
+            },
+            Op::EndTextSection,
+        ]
     }
 
     /// Insert the given PEM ciphertext in the bottom half of the page
-    pub fn insert_pem_text(&self, pem: String) {
-        debug!("Inserting PEM encoded ciphertext");
-
-        let current_layer = self.get_current_layer();
-
+    fn insert_pem_text(&self, pem: &str, font: &FontId) -> Vec<Op> {
         let mut font_size = 13.0;
         let mut line_height = 15.0;
 
@@ -135,51 +221,62 @@ impl Document {
             line_height = 12.0;
         }
 
-        current_layer.begin_text_section();
-
-        current_layer.set_text_cursor(
-            self.page_size.dimensions().margin,
-            (self.page_size.dimensions().height / 2.0)
-                - Mm::from(Pt(font_size))
-                - self.page_size.dimensions().margin,
-        );
-        current_layer.set_line_height(line_height);
-        current_layer.set_font(&self.code_font, font_size);
-
+        let mut content = vec![
+            Op::StartTextSection,
+            Op::SetFillColor {
+                col: Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)),
+            },
+            Op::SetLineHeight {
+                lh: Pt(line_height),
+            },
+            Op::SetFontSize {
+                size: Pt(font_size),
+                font: font.clone(),
+            },
+            Op::SetTextCursor {
+                pos: Point {
+                    x: self.page_size.dimensions().margin.into(),
+                    y: ((self.page_size.dimensions().height / 2.0)
+                        - Mm::from(Pt(font_size))
+                        - self.page_size.dimensions().margin)
+                        .into(),
+                },
+            },
+        ];
         for line in pem.lines() {
-            current_layer.write_text(line, &self.code_font);
-            current_layer.add_line_break();
+            content.extend(vec![
+                Op::WriteText {
+                    items: vec![TextItem::Text(line.to_string())],
+                    font: font.clone(),
+                },
+                Op::AddLineBreak,
+            ])
         }
-
-        current_layer.end_text_section();
+        content.push(Op::EndTextSection);
+        content
     }
 
     /// Insert the QR code of the PEM encoded ciphertext in the top half of the page
-    pub fn insert_qr_code(&self, text: String) -> Result<(), Box<dyn std::error::Error>> {
-        debug!("Inserting QR code");
-
-        let image = svg::qrcode(text)?;
-        let qrcode = Svg::parse(image.as_str())?;
-
-        let current_layer = self.get_current_layer();
-
+    fn insert_qr_code(&self, qrcode_id: &XObjectId, qrcode: &ExternalXObject) -> Vec<Op> {
+        let qrcode_width = qrcode.width.expect("QR code need to have not zero width");
+        let qrcode_height = qrcode.height.expect("QR code need to have not zero height");
         let desired_qr_size = self.page_size.qrcode_size();
-        let initial_qr_size = Mm::from(qrcode.height.into_pt(300.0));
+        let initial_qr_size = Mm::from(qrcode_height.into_pt(300.0));
         let qr_scale = desired_qr_size / initial_qr_size;
 
         let scale = qr_scale;
         let dpi = 300.0;
-        let code_width = qrcode.width.into_pt(dpi) * scale;
-        let code_height = qrcode.height.into_pt(dpi) * scale;
+        let code_width = qrcode_width.into_pt(dpi) * scale;
+        let code_height = qrcode_height.into_pt(dpi) * scale;
 
         let translate_x = (self.page_size.dimensions().width.into_pt() - code_width) / 2.0;
         let translate_y = self.page_size.dimensions().height.into_pt()
             - code_height
             - (self.page_size.dimensions().margin.into_pt() * 2.0);
 
-        qrcode.add_to_layer(
-            &current_layer,
-            SvgTransform {
+        vec![Op::UseXobject {
+            id: qrcode_id.clone(),
+            transform: XObjectTransform {
                 translate_x: Some(translate_x),
                 translate_y: Some(translate_y),
                 rotate: None,
@@ -187,15 +284,12 @@ impl Document {
                 scale_y: Some(scale),
                 dpi: Some(dpi),
             },
-        );
-
-        Ok(())
+        }]
     }
 
     /// Draw a grid debugging layout issues
-    pub fn draw_grid(&self) {
-        debug!("Drawing grid");
-
+    fn draw_grid(&self) -> Vec<Op> {
+        let mut operations = vec![];
         let grid_size = Mm(5.0);
         let thickness = 0.0;
 
@@ -204,7 +298,7 @@ impl Document {
         while x < self.page_size.dimensions().width {
             x += grid_size;
 
-            self.draw_line(
+            let line = self.draw_line(
                 vec![
                     Point::new(x, self.page_size.dimensions().height),
                     Point::new(x, Mm(0.0)),
@@ -212,11 +306,12 @@ impl Document {
                 thickness,
                 LineDashPattern::default(),
             );
+            operations.extend(line);
 
             while y > Mm(0.0) {
                 y -= grid_size;
 
-                self.draw_line(
+                let line = self.draw_line(
                     vec![
                         Point::new(self.page_size.dimensions().width, y),
                         Point::new(Mm(0.0), y),
@@ -224,37 +319,42 @@ impl Document {
                     thickness,
                     LineDashPattern::default(),
                 );
+                operations.extend(line);
             }
         }
+        operations
     }
 
     /// Draw a line on the page
-    pub fn draw_line(&self, points: Vec<Point>, thickness: f32, dash_pattern: LineDashPattern) {
-        trace!("Drawing line");
-
-        let current_layer = self.get_current_layer();
-
-        current_layer.set_line_dash_pattern(dash_pattern);
-
-        let outline_color = Color::Rgb(Rgb::new(0.75, 0.75, 0.75, None));
-        current_layer.set_outline_color(outline_color);
-
-        current_layer.set_outline_thickness(thickness);
-
-        let divider = Line {
-            points: points.iter().map(|p| (*p, false)).collect(),
+    fn draw_line(
+        &self,
+        points: Vec<Point>,
+        thickness: f32,
+        dash_pattern: LineDashPattern,
+    ) -> Vec<Op> {
+        let line = Line {
+            points: points
+                .into_iter()
+                .map(|p| LinePoint { p, bezier: false })
+                .collect(),
             is_closed: false,
         };
 
-        current_layer.add_line(divider);
+        vec![
+            Op::SaveGraphicsState,
+            Op::SetOutlineColor {
+                col: Color::Rgb(Rgb::new(0.75, 0.75, 0.75, None)),
+            },
+            Op::SetLineDashPattern { dash: dash_pattern },
+            Op::SetOutlineThickness { pt: Pt(thickness) },
+            Op::DrawLine { line },
+            Op::RestoreGraphicsState,
+        ]
     }
 
     /// Insert the notes field label and placeholder in the PDF
-    pub fn insert_notes_field(&self, label: String, skip_line: bool) {
-        debug!("Inserting notes/passphrase placeholder");
+    pub fn insert_notes_field(&self, label: String, skip_line: bool, font: &FontId) -> Vec<Op> {
         const MAX_LABEL_LEN: usize = 32;
-
-        let current_layer = self.get_current_layer();
 
         let baseline =
             self.page_size.dimensions().height / 2.0 + self.page_size.dimensions().margin;
@@ -263,17 +363,30 @@ impl Document {
 
         let font_size = 13.0;
 
-        current_layer.use_text(
-            label,
-            font_size,
-            self.page_size.qrcode_left_edge(),
-            baseline,
-            &self.title_font,
-        );
+        let mut content = vec![
+            Op::StartTextSection,
+            Op::SetFillColor {
+                col: Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)),
+            },
+            Op::SetFontSize {
+                size: Pt(font_size),
+                font: font.clone(),
+            },
+            Op::SetTextCursor {
+                pos: Point {
+                    x: self.page_size.qrcode_left_edge().into(),
+                    y: baseline.into(),
+                },
+            },
+            Op::WriteText {
+                items: vec![TextItem::Text(label)],
+                font: font.clone(),
+            },
+            Op::EndTextSection,
+        ];
 
-        // If the placeholder line would be ridiculously short, don't draw it
         if label_len <= MAX_LABEL_LEN && !skip_line {
-            self.draw_line(
+            content.extend(self.draw_line(
                 vec![
                     Point::new(
                         self.page_size.qrcode_left_edge()
@@ -287,23 +400,36 @@ impl Document {
                 ],
                 1.0,
                 LineDashPattern::default(),
-            )
+            ))
         }
+        content
     }
 
     /// Add the footer at the bottom of the page
-    pub fn insert_footer(&self) {
-        debug!("Inserting footer");
-
-        let current_layer = self.get_current_layer();
-
-        current_layer.use_text(
-            "Scan QR code and decrypt using Age <https://age-encryption.org>",
-            13.0,
-            self.page_size.dimensions().margin,
-            self.page_size.dimensions().margin,
-            &self.title_font,
-        );
+    pub fn insert_footer(&self, font: &FontId) -> Vec<Op> {
+        vec![
+            Op::StartTextSection,
+            Op::SetFillColor {
+                col: Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)),
+            },
+            Op::SetFontSize {
+                size: Pt(13.0),
+                font: font.clone(),
+            },
+            Op::SetTextCursor {
+                pos: Point {
+                    x: self.page_size.dimensions().margin.into(),
+                    y: self.page_size.dimensions().margin.into(),
+                },
+            },
+            Op::WriteText {
+                items: vec![TextItem::Text(
+                    "Scan QR code and decrypt using Age <https://age-encryption.org>".to_string(),
+                )],
+                font: font.clone(),
+            },
+            Op::EndTextSection,
+        ]
     }
 }
 
@@ -317,36 +443,30 @@ fn test_paper_dimensions_default() {
 #[test]
 fn test_new_document() {
     let title = String::from("Hello World!");
-    let result = Document::new(title, PageSize::A4);
-    assert!(result.is_ok());
-
-    let doc = result.unwrap();
+    let doc = DocumentBuilder::new(title, PageSize::A4);
     assert_eq!(doc.page_size.dimensions(), crate::page::A4_PAGE);
 }
 
 #[test]
 fn test_new_letter_document() {
     let title = String::from("Hello Letter!");
-    let result = Document::new(title, PageSize::Letter);
-    assert!(result.is_ok());
-
-    let doc = result.unwrap();
+    let doc = DocumentBuilder::new(title, PageSize::Letter);
     assert_eq!(doc.page_size.dimensions(), crate::page::LETTER_PAGE);
 }
 
 #[test]
 fn test_qrcode() {
-    let result = Document::new(String::from("QR code"), PageSize::A4);
-    let document = result.unwrap();
-    let result = document.insert_qr_code(String::from("payload"));
+    let mut warnings = vec![];
+    let doc = DocumentBuilder::new(String::from("QR code"), PageSize::A4);
+    let result = doc.generate_qr_code("payload", &mut warnings);
     assert!(result.is_ok());
 }
 
 #[test]
 fn test_qrcode_too_large() {
-    let document = Document::new(String::from("QR code"), PageSize::A4).unwrap();
-    let result = document.insert_qr_code(String::from(include_str!("../tests/data/too_large.txt")));
-
+    let mut warnings = vec![];
+    let doc = DocumentBuilder::new(String::from("QR code"), PageSize::A4);
+    let result = doc.generate_qr_code(include_str!("../tests/data/too_large.txt"), &mut warnings);
     assert!(result.is_err());
     assert!(result.unwrap_err().is::<qrcode::types::QrError>());
 }
