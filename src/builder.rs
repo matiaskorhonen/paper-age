@@ -1,6 +1,7 @@
 //! PaperAge
 use std::io::{BufReader, Cursor};
 
+use anyhow::Result;
 use printpdf::{
     Color, IndirectFontRef, Line, LineDashPattern, Mm, PdfDocument, PdfDocumentReference,
     PdfLayerIndex, PdfLayerReference, PdfPageIndex, Point, Pt, Rect, Rgb, Svg, SvgTransform,
@@ -40,7 +41,7 @@ pub struct Document {
 impl Document {
     /// Initialize the PDF with default dimensions and the required fonts. Also
     /// sets the title and the producer in the PDF metadata.
-    pub fn new(title: String, page_size: PageSize) -> Result<Document, Box<dyn std::error::Error>> {
+    pub fn new(title: String, page_size: PageSize) -> Result<Document> {
         debug!("Initializing PDF");
 
         let dimensions = page_size.dimensions();

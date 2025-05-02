@@ -32,6 +32,7 @@ qrcode = "0.14.1"
 rpassword = "7"
 log = "0.4"
 env_logger = "0.11"
+anyhow = "1.0"
 
 [dev-dependencies]
 assert_cmd = "2.0"
@@ -45,3 +46,4 @@ clap-verbosity-flag = "3.0"
 clap_mangen = { version = "0.2" }
 path-absolutize = "3.1"
 printpdf = { version = "0.7.0", features = ["svg"] }
+anyhow = "1.0"

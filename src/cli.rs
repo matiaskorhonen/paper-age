@@ -102,7 +102,7 @@ mod tests {
     }
 
     #[test]
-    fn test_fonts_license_conflict() -> Result<(), Box<dyn std::error::Error>> {
+    fn test_fonts_license_conflict() -> Result<()> {
         let result = Args::try_parse_from(["paper-age", "--fonts-license", "--grid"]);
 
         assert!(result.is_err());

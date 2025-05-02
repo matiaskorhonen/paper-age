@@ -12,6 +12,7 @@ use std::{
 };
 
 use age::secrecy::{ExposeSecret, SecretString};
+use anyhow::Result;
 use clap::Parser;
 use printpdf::LineDashPattern;
 use qrcode::types::QrError;
@@ -28,7 +29,7 @@ extern crate log;
 /// Maximum length of the document title
 const TITLE_MAX_LEN: usize = 64;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<()> {
     let args = cli::Args::parse();
 
     env_logger::Builder::new()
@@ -173,7 +174,7 @@ mod tests {
     use age::secrecy::ExposeSecret;
 
     #[test]
-    fn test_get_passphrase_from_env() -> Result<(), Box<dyn std::error::Error>> {
+    fn test_get_passphrase_from_env() -> Result<()> {
         env::set_var("PAPERAGE_PASSPHRASE", "secret");
 
         let result = get_passphrase();
