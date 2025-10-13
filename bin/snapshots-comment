@@ -14,6 +14,7 @@ end
 urls = JSON.parse(ARGV[0])
 
 snapshots = urls.reduce({}) do |hash, url|
+  public_url = url.gsub("https://#{ENV["AWS_ENDPOINT"]}", "https://#{ENV["AWS_ENDPOINT_PUBLIC"]}")
   file_type = url.end_with?(".pdf") ? :pdf : :png
   page_size = url.include?("letter") ? :letter : :a4
   version = case url
@@ -26,7 +27,7 @@ snapshots = urls.reduce({}) do |hash, url|
             end
 
   hash[page_size] ||= {}
-  hash[page_size][:"#{version}_#{file_type}"] = url
+  hash[page_size][:"#{version}_#{file_type}"] = public_url
   hash
 end
 
