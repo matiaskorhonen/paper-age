@@ -65,6 +65,7 @@ jobs:
     - name: Generate snapshots comment
       run: ./bin/snapshots-comment '${{steps.B2.outputs.object_locations}}'
       env:
+        AWS_BUCKET: ${{ vars.AWS_BUCKET }}
         AWS_ENDPOINT: ${{ vars.AWS_ENDPOINT }}
         AWS_ENDPOINT_PUBLIC: ${{ vars.AWS_ENDPOINT_PUBLIC }}
     - uses: marocchino/sticky-pull-request-comment@v2
