@@ -12,8 +12,9 @@ use std::{
 };
 
 use age::secrecy::{ExposeSecret, SecretString};
+use anyhow::Result;
 use clap::Parser;
-use printpdf::LineDashPattern;
+use printpdf::PdfSaveOptions;
 use qrcode::types::QrError;
 use rpassword::prompt_password;
 
@@ -28,7 +29,7 @@ extern crate log;
 /// Maximum length of the document title
 const TITLE_MAX_LEN: usize = 64;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<()> {
     let args = cli::Args::parse();
 
     env_logger::Builder::new()
@@ -86,53 +87,40 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = builder::Document::new(args.title.clone(), args.page_size)?;
+    let builder = builder::DocumentBuilder {
+        title: args.title,
+        page_size: args.page_size,
+        grid: args.grid,
+        notes_label: args.notes_label,
+        skip_notes_line: args.skip_notes_line,
+    };
+    let pdf_result = builder.build(&encrypted);
 
-    if args.grid {
-        pdf.draw_grid();
-    }
-
-    pdf.insert_title_text(args.title);
-
-    match pdf.insert_qr_code(encrypted.clone()) {
-        Ok(()) => (),
+    let pdf = match pdf_result {
+        Ok(pdf) => pdf,
         Err(error) => {
             if error.is::<QrError>() {
                 error!("Too much data after encryption, please try a smaller file");
                 std::process::exit(exitcode::DATAERR);
             } else {
-                error!("The QR code generation failed for an unknown reason");
+                error!("{}", error);
                 std::process::exit(exitcode::SOFTWARE);
             }
         }
-    }
+    };
 
-    pdf.insert_notes_field(args.notes_label, args.skip_notes_line);
-
-    pdf.draw_line(
-        vec![
-            pdf.page_size.dimensions().center_left(),
-            pdf.page_size.dimensions().center_right(),
-        ],
-        1.0,
-        LineDashPattern {
-            dash_1: Some(5),
-            ..LineDashPattern::default()
-        },
-    );
-
-    pdf.insert_pem_text(encrypted);
-
-    pdf.insert_footer();
-
+    // pdf.insert_footer();
+    //
+    let save_opt = PdfSaveOptions::default();
+    let mut warnings = vec![]; // FIXME: Check
     if output == PathBuf::from("-") {
         debug!("Writing to STDOUT");
-        let bytes = pdf.doc.save_to_bytes()?;
+        let bytes = pdf.save(&save_opt, &mut warnings);
         io::stdout().write_all(&bytes)?;
     } else {
         debug!("Writing to file: {}", output.to_string_lossy());
         let file = File::create(output)?;
-        pdf.doc.save(&mut BufWriter::new(file))?;
+        pdf.save_writer(&mut BufWriter::new(file), &save_opt, &mut warnings);
     }
 
     Ok(())
@@ -173,7 +161,7 @@ mod tests {
     use age::secrecy::ExposeSecret;
 
     #[test]
-    fn test_get_passphrase_from_env() -> Result<(), Box<dyn std::error::Error>> {
+    fn test_get_passphrase_from_env() -> Result<()> {
         env::set_var("PAPERAGE_PASSPHRASE", "secret");
 
         let result = get_passphrase();

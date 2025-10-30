@@ -1,9 +1,11 @@
 //! Generate SVG formnat QR codes
+use log::{debug, info};
+
 use qrcode::{render::svg, types::QrError, EcLevel, QrCode};
 
 /// Generate a QR code svg for the given string. The error correction level of
 /// the QR code is optimised (less data → more error correction)
-pub fn qrcode(text: String) -> Result<String, QrError> {
+pub fn qrcode(text: &str) -> Result<String, QrError> {
     // QR Code Error Correction Capability (approx.)
     //     H: 30%
     //     Q: 25%
@@ -15,7 +17,7 @@ pub fn qrcode(text: String) -> Result<String, QrError> {
     let mut result: Result<QrCode, QrError> = Result::Err(QrError::DataTooLong);
     for ec_level in levels.iter() {
         debug!("Trying EC level {:?}", *ec_level);
-        result = QrCode::with_error_correction_level(text.clone(), *ec_level);
+        result = QrCode::with_error_correction_level(text, *ec_level);
 
         if result.is_ok() {
             break;
@@ -43,7 +45,7 @@ mod tests {
 
     #[test]
     fn test_svg_qrcode() {
-        let svg = qrcode(String::from("Some value")).unwrap();
+        let svg = qrcode("Some value").unwrap();
         assert_eq!(
             svg,
             String::from(include_str!("../../tests/data/some_value.svg")).trim()
@@ -52,7 +54,7 @@ mod tests {
 
     #[test]
     fn test_input_too_large() {
-        let result = qrcode(String::from(include_str!("../../tests/data/too_large.txt")));
+        let result = qrcode(include_str!("../../tests/data/too_large.txt"));
         assert!(result.is_err());
     }
 }

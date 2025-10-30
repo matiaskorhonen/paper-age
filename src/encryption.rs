@@ -1,15 +1,17 @@
 //! Age based encryption
+use log::debug;
 use std::io::Write;
 
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::SecretString;
+use anyhow::Result;
 
 /// Encrypt the data from the reader and PEM encode the ciphertext
 pub fn encrypt_plaintext(
     reader: &mut dyn std::io::BufRead,
     passphrase: SecretString,
-) -> Result<(usize, String), Box<dyn std::error::Error>> {
+) -> Result<(usize, String)> {
     debug!("Encrypting plaintext");
 
     let mut plaintext: Vec<u8> = vec![];
