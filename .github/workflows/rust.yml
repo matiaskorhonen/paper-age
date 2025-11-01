@@ -158,7 +158,7 @@ jobs:
     - name: Make PDFium executable
       run: chmod u+x bin/pdfium-linux-x64
     - name: Download PaperAge binary for this branch
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: paper-age-binary
     - name: Make the binary executable
