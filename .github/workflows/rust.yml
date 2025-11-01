@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Rust
       run: |
         rustup toolchain install stable --component clippy --profile minimal --no-self-update
@@ -40,7 +40,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Create local bin directory
       if: startsWith(matrix.os, 'ubuntu')
       run: mkdir -p "${HOME}/.local/bin"
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Rust
       run: |
         rustup toolchain install stable --profile minimal --no-self-update
@@ -133,7 +133,7 @@ jobs:
       PAPERAGE_PASSPHRASE: supersecret
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
