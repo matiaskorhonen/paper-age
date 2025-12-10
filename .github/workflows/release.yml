@@ -106,7 +106,7 @@ jobs:
         run: |
           echo "include_docs=target/${{ matrix.target }}/release/man,target/${{ matrix.target }}/release/completion" >> $GITHUB_ENV
       - id: upload-rust-binary-action
-        uses: taiki-e/upload-rust-binary-action@v1.25.0
+        uses: taiki-e/upload-rust-binary-action@v1.27.0
         with:
           # (required) Comma-separated list of binary names (non-extension portion of filename) to build and upload.
           # Note that glob pattern is not supported yet.
