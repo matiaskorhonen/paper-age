@@ -1,4 +1,4 @@
-use assert_cmd::Command;
+use assert_cmd::cargo::cargo_bin_cmd;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
 
@@ -8,7 +8,7 @@ fn test_happy_path() -> Result<(), Box<dyn std::error::Error>> {
     let input = temp.child("sample.txt");
     input.write_str("Hello")?;
     let output = temp.child("output.pdf");
-    let mut cmd = Command::cargo_bin("paper-age")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
 
     cmd.arg("--output")
         .arg(output.path())
@@ -28,7 +28,7 @@ fn test_letter_support() -> Result<(), Box<dyn std::error::Error>> {
     let input = temp.child("sample.txt");
     input.write_str("Hello")?;
     let output = temp.child("letter.pdf");
-    let mut cmd = Command::cargo_bin("paper-age")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
 
     cmd.arg("--output")
         .arg(output.path())
@@ -49,7 +49,7 @@ fn test_stdout() -> Result<(), Box<dyn std::error::Error>> {
     let input = temp.child("sample.txt");
     input.write_str("STDOUT")?;
 
-    let mut cmd = Command::cargo_bin("paper-age")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
 
     let output_size = 50 * 1024; // 50 KiB
     let len_predicate_fn = predicate::function(|x: &[u8]| x.len() > output_size);
@@ -67,7 +67,7 @@ fn test_stdout() -> Result<(), Box<dyn std::error::Error>> {
 fn test_file_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
     let temp = assert_fs::TempDir::new().unwrap();
     let output = temp.child("output.pdf");
-    let mut cmd = Command::cargo_bin("paper-age")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
 
     cmd.arg("--output")
         .arg(output.path())
@@ -87,7 +87,7 @@ fn test_too_much_data() -> Result<(), Box<dyn std::error::Error>> {
     let input = temp.child("sample.txt");
     input.write_str("x".repeat(2048).as_str())?;
     let output = temp.child("output.pdf");
-    let mut cmd = Command::cargo_bin("paper-age")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
 
     cmd.arg("--output")
         .arg(output.path())
@@ -104,7 +104,7 @@ fn test_too_much_data() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_fonts_license() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("paper-age")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
 
     cmd.arg("--fonts-license");
     cmd.assert()
@@ -117,7 +117,7 @@ fn test_fonts_license() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 fn test_title_too_long() -> Result<(), Box<dyn std::error::Error>> {
     let input = assert_fs::NamedTempFile::new("sample.txt")?;
-    let mut cmd = Command::cargo_bin("paper-age")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
 
     cmd.arg("--title").arg("x".repeat(80)).arg(input.path());
     cmd.assert()
