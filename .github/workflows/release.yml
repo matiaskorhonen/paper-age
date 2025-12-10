@@ -17,7 +17,7 @@ jobs:
       tag: ${{ steps.create-gh-release.outputs.computed-prefix }}${{ steps.create-gh-release.outputs.version }}
       version: ${{ steps.create-gh-release.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Changelog variable
         if: ${{ !(contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'prerelease') || contains(github.ref, 'rc')) }}
         run: |
@@ -48,7 +48,7 @@ jobs:
             os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Configure cache
         uses: Swatinem/rust-cache@v2
       - name: Include documentation files variable (macOS)
@@ -137,7 +137,7 @@ jobs:
             --key-id "$KEY_ID" \
             --issuer "$ISSUER" \
             --wait
-      - uses: actions/attest-build-provenance@v2
+      - uses: actions/attest-build-provenance@v3
         with:
           subject-path: "${{ steps.upload-rust-binary-action.outputs.archive }}.*"
 
@@ -147,7 +147,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: mark release as non-draft
         run: |
           gh release edit ${{ needs.create-release.outputs.tag }} --draft=false
@@ -158,7 +158,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update Homebrew Formula
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PAT }}
           script: |
