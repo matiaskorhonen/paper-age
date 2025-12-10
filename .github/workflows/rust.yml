@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Rust
       run: |
         rustup toolchain install stable --component clippy --profile minimal --no-self-update
@@ -40,7 +40,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Create local bin directory
       if: startsWith(matrix.os, 'ubuntu')
       run: mkdir -p "${HOME}/.local/bin"
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Rust
       run: |
         rustup toolchain install stable --profile minimal --no-self-update
@@ -119,7 +119,7 @@ jobs:
     - name: Compile binary
       run: cargo build --release
     - name: Store binary artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: paper-age-binary
         path: target/release/paper-age
@@ -133,7 +133,7 @@ jobs:
       PAPERAGE_PASSPHRASE: supersecret
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -158,7 +158,7 @@ jobs:
     - name: Make PDFium executable
       run: chmod u+x bin/pdfium-linux-x64
     - name: Download PaperAge binary for this branch
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: paper-age-binary
     - name: Make the binary executable
@@ -187,7 +187,7 @@ jobs:
         mkdir -p ./pr
         echo ${{ github.event.number }} > ./visual-snapshots/PR.txt
     - name: Save snapshots
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: visual-snapshots
         path: visual-snapshots
