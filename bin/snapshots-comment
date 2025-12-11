@@ -2,6 +2,22 @@
 
 require 'json'
 
+def array_to_markdown_table(array_of_arrays)
+  return "" if array_of_arrays.nil? || array_of_arrays.empty?
+
+  headers = array_of_arrays.first
+  rows = array_of_arrays[1..] || []
+
+  # Create the header row
+  header_line = "| " + headers.map(&:to_s).join(" | ") + " |"
+  # Create the separator row
+  separator = "| " + headers.map { "---" }.join(" | ") + " |"
+  # Create each data row
+  row_lines = rows.map { |row| "| " + row.map(&:to_s).join(" | ") + " |" }
+
+  ([header_line, separator] + row_lines).join("\n")
+end
+
 HELP_MESSAGE = <<~EOS
 Usage: ./bin/format-snapshots JSON_ARRAY_OF_SNAPSHOTS
 EOS
@@ -31,15 +47,26 @@ snapshots = urls.reduce({}) do |hash, url|
   hash
 end
 
-table = <<~TABLE
+table = [
+  # Headers
+  ["", "Latest release", "Current commit", "Diff"],
+  # Rows
+  ["A4",
+   "[![A4 release](#{snapshots.dig(:a4, :release_png)})](#{snapshots.dig(:a4, :release_pdf)})",
+   "[![A4 current](#{snapshots.dig(:a4, :current_png)})](#{snapshots.dig(:a4, :current_pdf)})",
+   "![A4 diff](#{snapshots.dig(:a4, :diff_png)})"],
+  ["Letter",
+   "[![Letter release](#{snapshots.dig(:letter, :release_png)})](#{snapshots.dig(:letter, :release_pdf)})",
+   "[![Letter current](#{snapshots.dig(:letter, :current_png)})](#{snapshots.dig(:letter, :current_pdf)})",
+   "![Letter diff](#{snapshots.dig(:letter, :diff_png)})"]
+]
+
+comment = <<~TABLE
 ## PaperAge visual snapshots
 
 Compare the output of the latest release version of PaperAge with the results from the current commit.
 
-|  | Latest release | Current commit | Diff |
-|---|---|---|---|
-| A4 | [![A4 release](#{snapshots.dig(:a4, :release_png)})](#{snapshots.dig(:a4, :release_pdf)}) | [![A4 current](#{snapshots.dig(:a4, :current_png)})](#{snapshots.dig(:a4, :current_pdf)}) | ![A4 diff](#{snapshots.dig(:a4, :diff_png)}) |
-| Letter | [![Letter release](#{snapshots.dig(:letter, :release_png)})](#{snapshots.dig(:letter, :release_pdf)}) | [![Letter current](#{snapshots.dig(:letter, :current_png)})](#{snapshots.dig(:letter, :current_pdf)}) | ![Letter diff](#{snapshots.dig(:letter, :diff_png)}) |
+#{array_to_markdown_table(table)}
 
 Encryption passphrase: `#{ENV['PAPERAGE_PASSPHRASE']}`
 
@@ -47,6 +74,6 @@ Encryption passphrase: `#{ENV['PAPERAGE_PASSPHRASE']}`
 
 TABLE
 
-File.open('visual-snapshots.tmp', 'w') { _1.write(table) }
+File.open('visual-snapshots.tmp', 'w') { _1.write(comment) }
 
 puts "Wrote visual-snapshots.tmp"
