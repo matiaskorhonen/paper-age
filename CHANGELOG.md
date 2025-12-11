@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+- Update the age crate to v0.11.2
+- Minor dependency updates
+
 ## [1.3.4] - 2024-12-25
 
 ### Changed
