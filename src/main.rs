@@ -64,7 +64,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         None => PathBuf::from("-"),
     };
     let mut reader: BufReader<Box<dyn Read>> = {
-        if path == PathBuf::from("-") {
+        if path.to_string_lossy() == "-" {
             BufReader::new(Box::new(stdin().lock()))
         } else if path.is_file() {
             let size = path.metadata()?.len();
@@ -125,7 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     pdf.insert_footer();
 
-    if output == PathBuf::from("-") {
+    if output.to_string_lossy() == "-" {
         debug!("Writing to STDOUT");
         let bytes = pdf.doc.save_to_bytes()?;
         io::stdout().write_all(&bytes)?;
@@ -163,7 +163,7 @@ fn get_passphrase() -> Result<SecretString, io::Error> {
 
     match read_secret("Passphrase") {
         Ok(secret) => Ok(secret),
-        Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{e}"))),
+        Err(e) => Err(io::Error::other(format!("{e}"))),
     }
 }
 
