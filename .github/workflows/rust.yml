@@ -120,7 +120,7 @@ jobs:
     - name: Compile binary
       run: cargo build --release
     - name: Store binary artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: paper-age-binary
         path: target/release/paper-age
@@ -159,7 +159,7 @@ jobs:
     - name: Make PDFium executable
       run: chmod u+x bin/pdfium-linux-x64
     - name: Download PaperAge binary for this branch
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: paper-age-binary
     - name: Make the binary executable
@@ -188,7 +188,7 @@ jobs:
         mkdir -p ./pr
         echo ${{ github.event.number }} > ./visual-snapshots/PR.txt
     - name: Save snapshots
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: visual-snapshots
         path: visual-snapshots
