@@ -3,9 +3,9 @@
 use std::io::Write;
 
 use printpdf::{
-    Color, Line, LineDashPattern, LinePoint, Mm, Op, PaintMode, ParsedFont, PdfDocument,
-    PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, Rect, Rgb, Svg, TextItem,
-    WindingOrder, XObjectTransform,
+    Color, DateTime, Line, LineDashPattern, LinePoint, Mm, Op, PaintMode, ParsedFont, PdfDocument,
+    PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, Rect, Rgb, Svg, TextItem, WindingOrder,
+    XObjectTransform,
 };
 
 use crate::page::*;
@@ -17,6 +17,9 @@ pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 
 /// Font width / height = 3 / 5
 const FONT_RATIO: f32 = 3.0 / 5.0;
+
+const CODE_FONT_BYTES: &[u8] = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
+const TITLE_FONT_BYTES: &[u8] = include_bytes!("assets/fonts/IBMPlexMono-Medium.ttf");
 
 /// Container for all the data required to insert elements into the PDF
 pub struct Document {
@@ -46,19 +49,20 @@ impl Document {
 
         let mut doc = PdfDocument::new(&title);
 
-        let producer = format!("Paper Rage v{}", VERSION.unwrap_or("0.0.0"));
+        let producer = format!("PaperAge v{}", VERSION.unwrap_or("0.0.0"));
+        let now = DateTime::now();
         doc.metadata.info.producer = producer;
+        doc.metadata.info.creation_date = now;
+        doc.metadata.info.modification_date = now;
 
         let mut warnings = Vec::new();
 
-        let code_data = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
-        let code_parsed = ParsedFont::from_bytes(code_data, 0, &mut warnings)
+        let code_parsed = ParsedFont::from_bytes(CODE_FONT_BYTES, 0, &mut warnings)
             .ok_or("Failed to parse code font")?;
         let code_font_id = doc.add_font(&code_parsed);
         let code_font = PdfFontHandle::External(code_font_id);
 
-        let title_data = include_bytes!("assets/fonts/IBMPlexMono-Medium.ttf");
-        let title_parsed = ParsedFont::from_bytes(title_data, 0, &mut warnings)
+        let title_parsed = ParsedFont::from_bytes(TITLE_FONT_BYTES, 0, &mut warnings)
             .ok_or("Failed to parse title font")?;
         let title_font_id = doc.add_font(&title_parsed);
         let title_font = PdfFontHandle::External(title_font_id);
@@ -77,6 +81,11 @@ impl Document {
                 mode: Some(PaintMode::Fill),
                 winding_order: Some(WindingOrder::NonZero),
             },
+        });
+
+        // Reset fill color to black for text and QR code
+        ops.push(Op::SetFillColor {
+            col: Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)),
         });
 
         Ok(Document {
@@ -110,6 +119,9 @@ impl Document {
         self.ops.push(Op::StartTextSection);
         self.ops.push(Op::SetTextCursor {
             pos: Point::new(margin, y),
+        });
+        self.ops.push(Op::SetFillColor {
+            col: Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)),
         });
         self.ops.push(Op::SetFont {
             font: self.title_font.clone(),
@@ -259,19 +271,21 @@ impl Document {
     pub fn draw_line(&mut self, points: Vec<Point>, thickness: f32, dash_pattern: LineDashPattern) {
         trace!("Drawing line");
 
-        self.ops
-            .push(Op::SetLineDashPattern { dash: dash_pattern });
+        self.ops.push(Op::SetLineDashPattern { dash: dash_pattern });
 
         let outline_color = Color::Rgb(Rgb::new(0.75, 0.75, 0.75, None));
-        self.ops.push(Op::SetOutlineColor {
-            col: outline_color,
-        });
+        self.ops.push(Op::SetOutlineColor { col: outline_color });
 
-        self.ops
-            .push(Op::SetOutlineThickness { pt: Pt(thickness) });
+        self.ops.push(Op::SetOutlineThickness { pt: Pt(thickness) });
 
         let divider = Line {
-            points: points.iter().map(|p| LinePoint { p: *p, bezier: false }).collect(),
+            points: points
+                .iter()
+                .map(|p| LinePoint {
+                    p: *p,
+                    bezier: false,
+                })
+                .collect(),
             is_closed: false,
         };
 
@@ -339,7 +353,9 @@ impl Document {
             size: Pt(13.0),
         });
         self.ops.push(Op::ShowText {
-            items: vec![TextItem::Text("Scan QR code and decrypt using Age <https://age-encryption.org>".to_string())],
+            items: vec![TextItem::Text(
+                "Scan QR code and decrypt using Age <https://age-encryption.org>".to_string(),
+            )],
         });
         self.ops.push(Op::EndTextSection);
     }
