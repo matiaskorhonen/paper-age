@@ -67,26 +67,26 @@ impl Document {
         let title_font_id = doc.add_font(&title_parsed);
         let title_font = PdfFontHandle::External(title_font_id);
 
-        // White background
-        let mut ops = Vec::new();
-        ops.push(Op::SetFillColor {
-            col: Color::Rgb(Rgb::new(1.0, 1.0, 1.0, None)),
-        });
-        ops.push(Op::DrawRectangle {
-            rectangle: Rect {
-                x: Pt(0.0),
-                y: Pt(0.0),
-                width: dimensions.width.into_pt(),
-                height: dimensions.height.into_pt(),
-                mode: Some(PaintMode::Fill),
-                winding_order: Some(WindingOrder::NonZero),
+        let ops = vec![
+            // White background
+            Op::SetFillColor {
+                col: Color::Rgb(Rgb::new(1.0, 1.0, 1.0, None)),
             },
-        });
-
-        // Reset fill color to black for text and QR code
-        ops.push(Op::SetFillColor {
-            col: Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)),
-        });
+            Op::DrawRectangle {
+                rectangle: Rect {
+                    x: Pt(0.0),
+                    y: Pt(0.0),
+                    width: dimensions.width.into_pt(),
+                    height: dimensions.height.into_pt(),
+                    mode: Some(PaintMode::Fill),
+                    winding_order: Some(WindingOrder::NonZero),
+                },
+            },
+            // Reset fill color to black for text and QR code
+            Op::SetFillColor {
+                col: Color::Rgb(Rgb::new(0.0, 0.0, 0.0, None)),
+            },
+        ];
 
         Ok(Document {
             doc,
