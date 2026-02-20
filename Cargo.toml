@@ -27,7 +27,7 @@ age = { version = "0.11.2", features = ["armor"] }
 clap = { version = "4.5", features = ["derive"] }
 clap-verbosity-flag = "3.0"
 exitcode = "1.1.2"
-printpdf = { version = "0.7.0", features = ["svg", "font_subsetting"] }
+printpdf = { version = "0.9.1", features = ["svg"] }
 qrcode = "0.14.1"
 rpassword = "7"
 log = "0.4"
@@ -44,4 +44,4 @@ clap_complete = "4.5"
 clap-verbosity-flag = "3.0"
 clap_mangen = { version = "0.2" }
 path-absolutize = "3.1"
-printpdf = { version = "0.7.0", features = ["svg"] }
+printpdf = { version = "0.9.1", default-features = false }

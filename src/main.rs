@@ -86,7 +86,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = builder::Document::new(args.title.clone(), args.page_size)?;
+    let mut pdf = builder::Document::new(args.title.clone(), args.page_size)?;
 
     if args.grid {
         pdf.draw_grid();
@@ -127,12 +127,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if output.to_string_lossy() == "-" {
         debug!("Writing to STDOUT");
-        let bytes = pdf.doc.save_to_bytes()?;
+        let bytes = pdf.save_to_bytes()?;
         io::stdout().write_all(&bytes)?;
     } else {
         debug!("Writing to file: {}", output.to_string_lossy());
         let file = File::create(output)?;
-        pdf.doc.save(&mut BufWriter::new(file))?;
+        pdf.save_to_writer(&mut BufWriter::new(file))?;
     }
 
     Ok(())
