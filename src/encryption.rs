@@ -4,6 +4,7 @@ use std::io::Write;
 use age::armor::ArmoredWriter;
 use age::armor::Format::AsciiArmor;
 use age::secrecy::SecretString;
+use log::debug;
 
 /// Encrypt the data from the reader and PEM encode the ciphertext
 pub fn encrypt_plaintext(

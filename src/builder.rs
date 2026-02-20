@@ -2,6 +2,7 @@
 
 use std::io::Write;
 
+use log::{debug, trace};
 use printpdf::{
     Color, DateTime, Line, LineDashPattern, LinePoint, Mm, Op, PaintMode, ParsedFont, PdfDocument,
     PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, Rect, Rgb, Svg, TextItem, WindingOrder,
