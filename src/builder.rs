@@ -431,7 +431,7 @@ impl Document {
 
         self.insert_footer();
 
-        Ok(self.save_to_bytes()?)
+        self.save_to_bytes()
     }
 }
 
