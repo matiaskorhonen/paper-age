@@ -13,7 +13,6 @@ use std::{
 
 use age::secrecy::{ExposeSecret, SecretString};
 use clap::Parser;
-use printpdf::LineDashPattern;
 use qrcode::types::QrError;
 use rpassword::prompt_password;
 
@@ -86,16 +85,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let mut pdf = builder::Document::new(args.title.clone(), args.page_size)?;
+    let pdf = builder::Document::new(args.title, args.page_size)?;
 
-    if args.grid {
-        pdf.draw_grid();
-    }
-
-    pdf.insert_title_text(args.title);
-
-    match pdf.insert_qr_code(encrypted.clone()) {
-        Ok(()) => (),
+    let bytes = match pdf.create_pdf(args.grid, args.notes_label, args.skip_notes_line, encrypted) {
+        Ok(b) => b,
         Err(error) => {
             if error.is::<QrError>() {
                 error!("Too much data after encryption, please try a smaller file");
@@ -105,34 +98,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 std::process::exit(exitcode::SOFTWARE);
             }
         }
-    }
-
-    pdf.insert_notes_field(args.notes_label, args.skip_notes_line);
-
-    pdf.draw_line(
-        vec![
-            pdf.page_size.dimensions().center_left(),
-            pdf.page_size.dimensions().center_right(),
-        ],
-        1.0,
-        LineDashPattern {
-            dash_1: Some(5),
-            ..LineDashPattern::default()
-        },
-    );
-
-    pdf.insert_pem_text(encrypted);
-
-    pdf.insert_footer();
+    };
 
     if output.to_string_lossy() == "-" {
         debug!("Writing to STDOUT");
-        let bytes = pdf.save_to_bytes()?;
         io::stdout().write_all(&bytes)?;
     } else {
         debug!("Writing to file: {}", output.to_string_lossy());
         let file = File::create(output)?;
-        pdf.save_to_writer(&mut BufWriter::new(file))?;
+        BufWriter::new(file).write_all(&bytes)?;
     }
 
     Ok(())

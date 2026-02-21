@@ -2,6 +2,7 @@
 
 use std::io::Write;
 
+use log::{debug, trace};
 use printpdf::{
     Color, DateTime, Line, LineDashPattern, LinePoint, Mm, Op, PaintMode, ParsedFont, PdfDocument,
     PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, Rect, Rgb, Svg, TextItem, WindingOrder,
@@ -37,6 +38,9 @@ pub struct Document {
 
     /// Page size
     pub page_size: PageSize,
+
+    /// Document title
+    pub title: String,
 }
 
 impl Document {
@@ -94,6 +98,7 @@ impl Document {
             title_font,
             code_font,
             page_size,
+            title: title.clone(),
         })
     }
 
@@ -384,6 +389,49 @@ impl Document {
         self.doc
             .save_writer(writer, &PdfSaveOptions::default(), &mut warnings);
         Ok(())
+    }
+
+    /// Build a PaperAge PDF and return its bytes.
+    ///
+    /// # Arguments
+    /// * `grid` - Whether to draw a debug grid
+    /// * `notes_label` - Label for the notes/passphrase field
+    /// * `skip_notes_line` - Whether to omit the notes placeholder line
+    /// * `encrypted` - The encrypted ciphertext to encode as a QR code and PEM block
+    pub fn create_pdf(
+        mut self,
+        grid: bool,
+        notes_label: String,
+        skip_notes_line: bool,
+        encrypted: String,
+    ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+        if grid {
+            self.draw_grid();
+        }
+
+        self.insert_title_text(self.title.clone());
+
+        self.insert_qr_code(encrypted.clone())?;
+
+        self.insert_notes_field(notes_label, skip_notes_line);
+
+        self.draw_line(
+            vec![
+                self.page_size.dimensions().center_left(),
+                self.page_size.dimensions().center_right(),
+            ],
+            1.0,
+            LineDashPattern {
+                dash_1: Some(5),
+                ..LineDashPattern::default()
+            },
+        );
+
+        self.insert_pem_text(encrypted);
+
+        self.insert_footer();
+
+        self.save_to_bytes()
     }
 }
 
