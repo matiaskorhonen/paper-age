@@ -68,7 +68,7 @@ jobs:
         AWS_BUCKET: ${{ vars.AWS_BUCKET }}
         AWS_ENDPOINT: ${{ vars.AWS_ENDPOINT }}
         AWS_ENDPOINT_PUBLIC: ${{ vars.AWS_ENDPOINT_PUBLIC }}
-    - uses: marocchino/sticky-pull-request-comment@v2
+    - uses: marocchino/sticky-pull-request-comment@v3
       if: ${{ env.PR_NUMBER != '' }}
       with:
         number: ${{ env.PR_NUMBER }}
