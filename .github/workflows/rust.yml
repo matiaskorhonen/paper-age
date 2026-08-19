@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Rust
         run: |
           rustup toolchain install stable --component clippy --profile minimal --no-self-update
@@ -41,13 +41,13 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Create local bin directory
         if: startsWith(matrix.os, 'ubuntu')
         run: mkdir -p "${HOME}/.local/bin"
       - name: Download grcov
         if: startsWith(matrix.os, 'ubuntu')
-        uses: robinraju/release-downloader@v1.12
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "mozilla/grcov"
           latest: true
@@ -76,7 +76,7 @@ jobs:
         run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
       - name: Upload coverage reports to Codecov
         if: startsWith(matrix.os, 'ubuntu')
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           files: target/cobertura.xml
 
@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Rust
         run: |
           rustup toolchain install stable --profile minimal --no-self-update
@@ -94,7 +94,7 @@ jobs:
       - name: Compile binary
         run: cargo build --release
       - name: Store binary artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: paper-age-binary
           path: target/release/paper-age
@@ -108,13 +108,13 @@ jobs:
       PAPERAGE_PASSPHRASE: supersecret
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
       - name: Install latest PaperAge release
-        uses: robinraju/release-downloader@v1.12
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "matiaskorhonen/paper-age"
           latest: true
@@ -124,7 +124,7 @@ jobs:
       - name: Move the release binary to bin
         run: mv tmp/paper-age bin/paper-age-release
       - name: Install pdfium-cli
-        uses: robinraju/release-downloader@v1.12
+        uses: robinraju/release-downloader@v1.13
         with:
           repository: "klippa-app/pdfium-cli"
           tag: "v0.1.1"
@@ -133,7 +133,7 @@ jobs:
       - name: Make PDFium executable
         run: chmod u+x bin/pdfium-linux-x64
       - name: Download PaperAge binary for this branch
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: paper-age-binary
       - name: Make the binary executable
@@ -162,7 +162,7 @@ jobs:
           mkdir -p ./pr
           echo ${{ github.event.number }} > ./visual-snapshots/PR.txt
       - name: Save snapshots
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: visual-snapshots
           path: visual-snapshots

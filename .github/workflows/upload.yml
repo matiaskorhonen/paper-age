@@ -22,9 +22,9 @@ jobs:
       PAPERAGE_PASSPHRASE: supersecret
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: 'Download artifact'
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
           var artifacts = await github.rest.actions.listWorkflowRunArtifacts({
@@ -68,7 +68,7 @@ jobs:
         AWS_BUCKET: ${{ vars.AWS_BUCKET }}
         AWS_ENDPOINT: ${{ vars.AWS_ENDPOINT }}
         AWS_ENDPOINT_PUBLIC: ${{ vars.AWS_ENDPOINT_PUBLIC }}
-    - uses: marocchino/sticky-pull-request-comment@v2
+    - uses: marocchino/sticky-pull-request-comment@v3
       if: ${{ env.PR_NUMBER != '' }}
       with:
         number: ${{ env.PR_NUMBER }}
