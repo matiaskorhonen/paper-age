@@ -392,10 +392,7 @@ impl Document {
                 self.page_size.dimensions().center_right(),
             ],
             1.0,
-            LineDashPattern {
-                dash_1: Some(5),
-                ..LineDashPattern::default()
-            },
+            LineDashPattern::new(0.0, &[5.0]),
         );
 
         self.insert_pem_text(encrypted);
