@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+- Update printpdf to v0.12.6
+
 ## [1.5.0] - 2026-02-24
 
 - Replace the SVG-based QR code rendering with a more optimised solution
