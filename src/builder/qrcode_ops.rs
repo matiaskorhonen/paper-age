@@ -453,7 +453,7 @@ mod tests {
                 .rings
                 .iter()
                 .flat_map(|ring| ring.points.iter())
-                .map(|lp| Pt::from(lp.p.x).0)
+                .map(|lp| lp.p.x.0)
                 .fold(f32::INFINITY, f32::min);
             let diff = (x_min - expected_origin_x).abs();
             assert!(diff < 0.5, "Expected x ≈ {expected_origin_x}, got {x_min}");
