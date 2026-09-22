@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'json'
+# Writes the visual snapshots PR comment to visual-snapshots.tmp. Images are
+# referenced by their local paths; `gh pr comment --attach` uploads them and
+# rewrites the references to the uploaded URLs.
 
 def array_to_markdown_table(array_of_arrays)
   return "" if array_of_arrays.nil? || array_of_arrays.empty?
@@ -19,7 +21,7 @@ def array_to_markdown_table(array_of_arrays)
 end
 
 HELP_MESSAGE = <<~EOS
-Usage: ./bin/format-snapshots JSON_ARRAY_OF_SNAPSHOTS
+Usage: ./bin/snapshots-comment SNAPSHOTS_DIR
 EOS
 
 if ARGV.length != 1
@@ -27,24 +29,17 @@ if ARGV.length != 1
   exit 1
 end
 
-urls = JSON.parse(ARGV[0])
+dir = ARGV[0]
 
-snapshots = urls.reduce({}) do |hash, url|
-  public_url = url.gsub("https://#{ENV["AWS_BUCKET"]}.#{ENV["AWS_ENDPOINT"]}", "https://#{ENV["AWS_ENDPOINT_PUBLIC"]}")
-  file_type = url.end_with?(".pdf") ? :pdf : :png
-  page_size = url.include?("letter") ? :letter : :a4
-  version = case url
-            when /-release\./
-              :release
-            when /-current\./
-              :current
-            when /-diff\./
-              :diff
-            end
-
-  hash[page_size] ||= {}
-  hash[page_size][:"#{version}_#{file_type}"] = public_url
-  hash
+def image_cell(dir, page_size, version, label)
+  path = File.join(dir, "#{page_size}-#{version}.png")
+  if File.exist?(path)
+    "![#{label}](#{path})"
+  elsif version == "diff"
+    "No differences"
+  else
+    "Missing"
+  end
 end
 
 table = [
@@ -52,13 +47,13 @@ table = [
   ["", "Latest release", "Current commit", "Diff"],
   # Rows
   ["A4",
-   "[![A4 release](#{snapshots.dig(:a4, :release_png)})](#{snapshots.dig(:a4, :release_pdf)})",
-   "[![A4 current](#{snapshots.dig(:a4, :current_png)})](#{snapshots.dig(:a4, :current_pdf)})",
-   "![A4 diff](#{snapshots.dig(:a4, :diff_png)})"],
+   image_cell(dir, "a4", "release", "A4 release"),
+   image_cell(dir, "a4", "current", "A4 current"),
+   image_cell(dir, "a4", "diff", "A4 diff")],
   ["Letter",
-   "[![Letter release](#{snapshots.dig(:letter, :release_png)})](#{snapshots.dig(:letter, :release_pdf)})",
-   "[![Letter current](#{snapshots.dig(:letter, :current_png)})](#{snapshots.dig(:letter, :current_pdf)})",
-   "![Letter diff](#{snapshots.dig(:letter, :diff_png)})"]
+   image_cell(dir, "letter", "release", "Letter release"),
+   image_cell(dir, "letter", "current", "Letter current"),
+   image_cell(dir, "letter", "diff", "Letter diff")]
 ]
 
 comment = <<~TABLE
@@ -69,8 +64,6 @@ Compare the output of the latest release version of PaperAge with the results fr
 #{array_to_markdown_table(table)}
 
 Encryption passphrase: `#{ENV['PAPERAGE_PASSPHRASE']}`
-
-*Note: Snapshots are deleted after 30 days.*
 
 TABLE
 
