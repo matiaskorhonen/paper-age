@@ -57,6 +57,7 @@ table = [
 ]
 
 comment = <<~TABLE
+<!-- paper-age-visual-snapshots -->
 ## PaperAge visual snapshots
 
 Compare the output of the latest release version of PaperAge with the results from the current commit.

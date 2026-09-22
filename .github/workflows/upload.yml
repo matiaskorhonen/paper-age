@@ -60,14 +60,25 @@ jobs:
     - name: Comment on the PR with the snapshots
       if: ${{ env.PR_NUMBER != '' }}
       env:
-        GH_TOKEN: ${{ github.token }}
+        # Attachments can't be uploaded with GITHUB_TOKEN, only with a user token
+        GH_TOKEN: ${{ secrets.SNAPSHOTS_TOKEN }}
         GH_REPO: ${{ github.repository }}
       run: |
         attachments=()
         for f in visual-snapshots/*.png; do
           attachments+=(--attach "$f")
         done
-        gh pr comment "$PR_NUMBER" \
-          --edit-last --create-if-none \
+        comment_url=$(gh pr comment "$PR_NUMBER" \
           --body-file visual-snapshots.tmp \
-          "${attachments[@]}"
+          "${attachments[@]}")
+        echo "Posted $comment_url"
+        new_id="${comment_url##*-}"
+
+        # Remove the previous snapshot comments posted by the same account
+        login=$(gh api user --jq .login)
+        gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
+          --jq ".[] | select(.user.login == \"$login\" and .id != $new_id and (.body | contains(\"<!-- paper-age-visual-snapshots -->\"))) | .id" |
+          while read -r id; do
+            echo "Deleting previous snapshots comment $id"
+            gh api -X DELETE "repos/$GH_REPO/issues/comments/$id"
+          done
