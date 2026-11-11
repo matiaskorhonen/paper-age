@@ -3,6 +3,9 @@ use std::fmt;
 
 use printpdf::{Mm, Point};
 
+/// Default footer text at the bottom of the page
+pub const DEFAULT_FOOTER: &str = "Scan QR code and decrypt using Age <https://age-encryption.org>";
+
 /// PDF dimensions
 #[derive(Clone, Copy, Debug)]
 pub struct PageDimensions {

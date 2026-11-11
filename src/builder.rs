@@ -40,6 +40,9 @@ pub struct Document {
 
     /// Document title
     pub title: String,
+
+    /// Footer text at the bottom of the page
+    pub footer: String,
 }
 
 impl Document {
@@ -99,7 +102,14 @@ impl Document {
             code_font,
             page_size,
             title: title.clone(),
+            footer: DEFAULT_FOOTER.to_string(),
         })
+    }
+
+    /// Replace the footer text at the bottom of the page
+    pub fn with_footer(mut self, footer: String) -> Self {
+        self.footer = footer;
+        self
     }
 
     /// Insert the given title at the top of the PDF
@@ -329,9 +339,7 @@ impl Document {
             size: Pt(13.0),
         });
         self.ops.push(Op::ShowText {
-            items: vec![TextItem::Text(
-                "Scan QR code and decrypt using Age <https://age-encryption.org>".to_string(),
-            )],
+            items: vec![TextItem::Text(self.footer.clone())],
         });
         self.ops.push(Op::EndTextSection);
     }
@@ -418,6 +426,7 @@ fn test_new_document() {
 
     let doc = result.unwrap();
     assert_eq!(doc.page_size.dimensions(), crate::page::A4_PAGE);
+    assert_eq!(doc.footer, DEFAULT_FOOTER);
 }
 
 #[test]
