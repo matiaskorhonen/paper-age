@@ -115,6 +115,7 @@ paper-age [OPTIONS] [INPUT]
 | `-t, --title <TITLE>` | Page title (max. 64 characters) | `PaperAge` |
 | `-n, --notes-label <NOTES_LABEL>` | Notes label below the QR code (max. 32 characters) | `Passphrase:` |
 | `--skip-notes-line` | Skip the notes placeholder line (e.g. Passphrase: ________) | |
+| `--footer <FOOTER>` | Footer text at the bottom of the page | `Scan QR code and decrypt using Age <https://age-encryption.org>` |
 | `-o, --output <OUTPUT>` | Output file name. Use `-` for STDOUT | `out.pdf` |
 | `-s, --page-size <PAGE_SIZE>` | Paper size. Possible values: `a4`, `letter` | `a4` |
 | `-f, --force` | Overwrite the output file if it already exists | |

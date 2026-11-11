@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 
-use crate::page::PageSize;
+use crate::page::{PageSize, DEFAULT_FOOTER};
 
 /// Command line arguments
 #[derive(Parser, Debug)]
@@ -21,6 +21,10 @@ pub struct Args {
     /// Skip the notes placeholder line (e.g. Passphrase: ________)
     #[arg(long, default_value_t = false)]
     pub skip_notes_line: bool,
+
+    /// Footer text at the bottom of the page
+    #[arg(long, default_value = DEFAULT_FOOTER)]
+    pub footer: String,
 
     /// Output file name. Use - for STDOUT.
     #[arg(short, long, default_value = "out.pdf")]
@@ -71,6 +75,8 @@ mod tests {
             "--notes-label",
             "Notes:",
             "--skip-notes-line",
+            "--footer",
+            "Custom footer",
             "--output",
             "test.pdf",
             "input.txt",
@@ -80,6 +86,7 @@ mod tests {
         assert_eq!(args.title, "Hello");
         assert_eq!(args.notes_label, "Notes:");
         assert!(args.skip_notes_line);
+        assert_eq!(args.footer, "Custom footer");
         assert_eq!(args.output.to_str().unwrap(), "test.pdf");
         assert_eq!(args.input.unwrap().to_str().unwrap(), "input.txt");
     }
@@ -90,6 +97,7 @@ mod tests {
         assert_eq!(args.title, "PaperAge");
         assert_eq!(args.notes_label, "Passphrase:");
         assert!(!args.skip_notes_line);
+        assert_eq!(args.footer, DEFAULT_FOOTER);
         assert_eq!(args.output.to_str().unwrap(), "out.pdf");
         assert_eq!(args.input, None);
         assert!(!args.force);
