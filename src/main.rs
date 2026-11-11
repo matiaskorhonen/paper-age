@@ -81,7 +81,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = builder::Document::new(args.title, args.page_size)?;
+    let pdf = builder::Document::new(args.title, args.page_size)?.with_footer(args.footer);
 
     let bytes = match pdf.create_pdf(args.grid, args.notes_label, args.skip_notes_line, encrypted) {
         Ok(b) => b,
