@@ -24,6 +24,12 @@ Easy and secure paper backups of (smallish) secrets using the Age format ([age-e
 
 An experimental WASM-based web app is [available](https://paper-age.matiaskorhonen.fi). Encryption and PDF generation happen locally in the browser. No data is sent to a server.
 
+### Needles (iPhone and iPad)
+
+[Needles](https://needles.matiaskorhonen.fi) is a companion app for iPhone and iPad. Scan the QR code on a PaperAge backup, type in the passphrase, and get your secret back without needing a computer. It also works with any other age-encrypted file or text, and supports age (X25519) and SSH keys as well as passphrases. Everything happens on the device and no data is collected.
+
+More details in the [announcement post](https://www.randomerrata.com/articles/2026/needles/).
+
 ## Limitations
 
 * The maximum input size is about 1.9 KiB as QR codes cannot encode arbitrarily large payloads
