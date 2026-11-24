@@ -22,7 +22,7 @@ pub struct Args {
     #[arg(long, default_value_t = false)]
     pub skip_notes_line: bool,
 
-    /// Footer text at the bottom of the page
+    /// Footer text at the bottom of the page (max. 64 characters)
     #[arg(long, default_value = DEFAULT_FOOTER)]
     pub footer: String,
 

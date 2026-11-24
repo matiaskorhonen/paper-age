@@ -149,3 +149,16 @@ fn test_title_too_long() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+#[test]
+fn test_footer_too_long() -> Result<(), Box<dyn std::error::Error>> {
+    let input = assert_fs::NamedTempFile::new("sample.txt")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
+
+    cmd.arg("--footer").arg("x".repeat(80)).arg(input.path());
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains("The footer cannot be longer than"));
+
+    Ok(())
+}
