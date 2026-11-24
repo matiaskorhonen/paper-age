@@ -25,6 +25,27 @@ fn test_happy_path() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_custom_footer() -> Result<(), Box<dyn std::error::Error>> {
+    let temp = assert_fs::TempDir::new().unwrap();
+    let input = temp.child("sample.txt");
+    input.write_str("Hello")?;
+    let output = temp.child("footer.pdf");
+    let mut cmd = cargo_bin_cmd!("paper-age");
+
+    cmd.arg("--output")
+        .arg(output.path())
+        .arg("--footer")
+        .arg("Custom footer")
+        .arg(input.path())
+        .env("PAPERAGE_PASSPHRASE", "secret");
+    cmd.assert().success();
+
+    output.assert(predicate::path::is_file());
+
+    Ok(())
+}
+
+#[test]
 fn test_letter_support() -> Result<(), Box<dyn std::error::Error>> {
     let temp = assert_fs::TempDir::new().unwrap();
     let input = temp.child("sample.txt");
@@ -130,6 +151,19 @@ fn test_title_too_long() -> Result<(), Box<dyn std::error::Error>> {
     cmd.assert()
         .failure()
         .stderr(predicate::str::contains("The title cannot be longer than"));
+
+    Ok(())
+}
+
+#[test]
+fn test_footer_too_long() -> Result<(), Box<dyn std::error::Error>> {
+    let input = assert_fs::NamedTempFile::new("sample.txt")?;
+    let mut cmd = cargo_bin_cmd!("paper-age");
+
+    cmd.arg("--footer").arg("x".repeat(80)).arg(input.path());
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains("The footer cannot be longer than"));
 
     Ok(())
 }

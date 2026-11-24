@@ -23,6 +23,9 @@ extern crate log;
 /// Maximum length of the document title
 const TITLE_MAX_LEN: usize = 64;
 
+/// Maximum length of the footer text
+const FOOTER_MAX_LEN: usize = 64;
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = cli::Args::parse();
 
@@ -40,6 +43,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         error!(
             "The title cannot be longer than {} characters",
             TITLE_MAX_LEN
+        );
+        std::process::exit(exitcode::DATAERR);
+    }
+
+    if args.footer.len() > FOOTER_MAX_LEN {
+        error!(
+            "The footer cannot be longer than {} characters",
+            FOOTER_MAX_LEN
         );
         std::process::exit(exitcode::DATAERR);
     }
@@ -81,7 +92,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Plaintext length: {plaintext_len:?} bytes");
     info!("Encrypted length: {:?} bytes", encrypted.len());
 
-    let pdf = builder::Document::new(args.title, args.page_size)?;
+    let pdf = builder::Document::new(args.title, args.page_size)?.with_footer(args.footer);
 
     let bytes = match pdf.create_pdf(args.grid, args.notes_label, args.skip_notes_line, encrypted) {
         Ok(b) => b,
