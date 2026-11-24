@@ -52,7 +52,7 @@ clap = { version = "4.6", features = ["derive"] }
 clap_complete = "4.6"
 clap-verbosity-flag = "3.0"
 clap_mangen = { version = "0.3" }
-path-absolutize = "3.1"
+path-absolutize = "4.0"
 printpdf = { version = "0.12.6", default-features = false }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
