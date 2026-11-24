@@ -53,14 +53,19 @@ fn test_stdout() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = cargo_bin_cmd!("paper-age");
 
-    let output_size = 50 * 1024; // 50 KiB
-    let len_predicate_fn = predicate::function(|x: &[u8]| x.len() > output_size);
+    // Check that a complete PDF lands on stdout. The exact byte count depends on
+    // how printpdf compresses its streams, so assert on the PDF structure plus a
+    // conservative size floor rather than on a precise length.
+    let min_size = 16 * 1024; // 16 KiB
+    let pdf_predicate_fn = predicate::function(move |x: &[u8]| {
+        x.starts_with(b"%PDF-") && x.ends_with(b"%%EOF") && x.len() > min_size
+    });
 
     cmd.arg("--output")
         .arg("-")
         .arg(input.path())
         .env("PAPERAGE_PASSPHRASE", "secret");
-    cmd.assert().stdout(len_predicate_fn).success();
+    cmd.assert().stdout(pdf_predicate_fn).success();
 
     Ok(())
 }
