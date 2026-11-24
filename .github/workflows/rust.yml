@@ -73,7 +73,7 @@ jobs:
           LLVM_PROFILE_FILE: ${{ startsWith(matrix.os, 'ubuntu') && 'cargo-test-%p-%m.profraw' || '' }}
       - name: Process code coverage with grcov
         if: startsWith(matrix.os, 'ubuntu')
-        run: grcov . --binary-path ./target/debug/deps/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
+        run: grcov . --binary-path ./target/debug/ -s . -t cobertura --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/cobertura.xml
       - name: Upload coverage reports to Codecov
         if: startsWith(matrix.os, 'ubuntu')
         uses: codecov/codecov-action@v7
