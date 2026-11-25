@@ -18,6 +18,12 @@ pub const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
 /// Font width / height = 3 / 5
 const FONT_RATIO: f32 = 3.0 / 5.0;
 
+/// Maximum length of the document title
+pub const TITLE_MAX_LEN: usize = 64;
+
+/// Maximum length of the footer text
+pub const FOOTER_MAX_LEN: usize = 64;
+
 const CODE_FONT_BYTES: &[u8] = include_bytes!("assets/fonts/IBMPlexMono-Regular.ttf");
 const TITLE_FONT_BYTES: &[u8] = include_bytes!("assets/fonts/IBMPlexMono-Medium.ttf");
 
