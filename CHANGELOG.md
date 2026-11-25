@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [1.6.0] - 2026-11-25
+
 - Update printpdf to v0.12.6
 - Add a `--footer` option to customise the footer text
 - **Breaking (library):** `convenience::create_pdf` now takes a `PdfOptions` struct instead of positional `Option` arguments. Build it with `PdfOptions::default()` and chain setters such as `.page_size(...)` and `.footer(...)`
@@ -163,7 +165,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent accidental overwrites of the output file
 
 <!-- next-url -->
-[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/matiaskorhonen/paper-age/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/matiaskorhonen/paper-age/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/matiaskorhonen/paper-age/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/matiaskorhonen/paper-age/compare/v1.3.4...v1.4.0
 [1.3.4]: https://github.com/matiaskorhonen/paper-age/compare/v1.3.3...v1.3.4
