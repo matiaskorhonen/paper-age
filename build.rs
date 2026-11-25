@@ -2,8 +2,6 @@
 use clap::CommandFactory;
 #[cfg(feature = "cli")]
 use clap_complete::{generate_to, shells::Shell};
-#[cfg(feature = "cli")]
-use path_absolutize::*;
 
 #[cfg(feature = "cli")]
 #[path = "src/cli.rs"]
@@ -25,25 +23,18 @@ fn main() -> std::io::Result<()> {
         let mut buffer: Vec<u8> = Default::default();
         man.render(&mut buffer)?;
 
-        // Create a man directory at the same level as the binary, even though build
-        // scripts shouldn't
-        let man_dir = &out_dir.join("../../../man");
-        let absolute_man_dir = man_dir.absolutize()?;
-        std::fs::create_dir_all(&absolute_man_dir)?;
-        let man_path = absolute_man_dir.join("paper-age.1");
-        std::fs::write(man_path, buffer)?;
+        // Write the man page and completions next to the binary (in the profile
+        // directory, e.g. target/release), even though build scripts shouldn't.
+        let profile_dir = profile_dir(&out_dir)?;
 
-        // Create a completion directory the same level as the binary
-        let completion_dir = out_dir.join("../../../completion");
-        let absolute_completion_dir = completion_dir.absolutize()?;
-        std::fs::create_dir_all(absolute_completion_dir.clone())?;
+        let man_dir = profile_dir.join("man");
+        std::fs::create_dir_all(&man_dir)?;
+        std::fs::write(man_dir.join("paper-age.1"), buffer)?;
+
+        let completion_dir = profile_dir.join("completion");
+        std::fs::create_dir_all(&completion_dir)?;
         for shell in [Shell::Bash, Shell::Fish, Shell::Zsh] {
-            generate_to(
-                shell,
-                &mut cmd,
-                "paper-age",
-                absolute_completion_dir.as_ref(),
-            )?;
+            generate_to(shell, &mut cmd, "paper-age", &completion_dir)?;
         }
 
         // Re-run if the cli or page files change
@@ -52,4 +43,24 @@ fn main() -> std::io::Result<()> {
     }
 
     Ok(())
+}
+
+/// Finds the profile directory (e.g. `target/release`) from `OUT_DIR`.
+///
+/// `OUT_DIR` is `<profile>/build/paper-age-<hash>/out` on older Cargo versions and
+/// `<profile>/build/paper-age/<hash>/out` since Cargo 1.100, so rather than going up
+/// a fixed number of levels, look for the `build` directory and take its parent.
+#[cfg(feature = "cli")]
+fn profile_dir(out_dir: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
+    out_dir
+        .ancestors()
+        .find(|dir| dir.file_name().is_some_and(|name| name == "build"))
+        .and_then(std::path::Path::parent)
+        .map(std::path::Path::to_path_buf)
+        .ok_or_else(|| {
+            std::io::Error::other(format!(
+                "could not find the profile directory from OUT_DIR: {}",
+                out_dir.display()
+            ))
+        })
 }

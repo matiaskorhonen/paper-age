@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking (library):** `convenience::create_pdf` now takes a `PdfOptions` struct instead of positional `Option` arguments. Build it with `PdfOptions::default()` and chain setters such as `.page_size(...)` and `.footer(...)`
 - **Breaking (library):** `PaperAgeError` is now `#[non_exhaustive]` and has a new `InvalidInput` variant
 - `convenience::create_pdf` now enforces the same 64 character title and footer limits as the CLI
+- Fix the man page and shell completions being generated in the wrong directory with Cargo 1.100 and later
 
 ## [1.5.0] - 2026-02-24
 
