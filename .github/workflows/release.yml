@@ -157,12 +157,22 @@ jobs:
     if: ${{ !(contains(needs.create-release.outputs.tag, 'alpha') || contains(needs.create-release.outputs.tag, 'beta') || contains(needs.create-release.outputs.tag, 'prerelease') || contains(needs.create-release.outputs.tag, 'rc')) }}
     runs-on: ubuntu-latest
     steps:
+      - name: Generate a GitHub App token for the tap
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: matiaskorhonen
+          repositories: homebrew-paper-age
+          # Sending a repository_dispatch event needs contents: write
+          permission-contents: write
       - name: Update Homebrew Formula
         uses: actions/github-script@v9
         with:
-          github-token: ${{ secrets.PAT }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
-            github.rest.repos.createDispatchEvent({
+            await github.rest.repos.createDispatchEvent({
               owner: "matiaskorhonen",
               repo: "homebrew-paper-age",
               event_type: "Update Homebrew Formula",
