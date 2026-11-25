@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+- Update chacha20 to v0.10.2 (v0.10.1 was yanked)
+
 ## [1.6.0] - 2026-11-25
 
 - Update printpdf to v0.12.6
