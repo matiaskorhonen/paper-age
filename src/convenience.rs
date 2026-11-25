@@ -291,6 +291,39 @@ mod tests {
         assert!(matches!(result, Err(PaperAgeError::InvalidInput(_))));
     }
 
+    /// A reader whose reads always fail
+    struct FailingReader;
+
+    impl std::io::Read for FailingReader {
+        fn read(&mut self, _buf: &mut [u8]) -> std::io::Result<usize> {
+            Err(std::io::Error::other("read failed"))
+        }
+    }
+
+    #[test]
+    fn test_create_pdf_read_error() {
+        let mut reader = std::io::BufReader::new(FailingReader);
+        let result = create_pdf(
+            "Read error",
+            &mut reader,
+            "passphrase",
+            &PdfOptions::default(),
+        );
+        assert!(matches!(result, Err(PaperAgeError::Encryption(_))));
+    }
+
+    #[test]
+    fn test_create_pdf_data_too_large() {
+        let data = vec![b'x'; 4096];
+        let result = create_pdf(
+            "Too large",
+            &mut &data[..],
+            "passphrase",
+            &PdfOptions::default(),
+        );
+        assert!(matches!(result, Err(PaperAgeError::PdfCreation(_))));
+    }
+
     #[test]
     fn test_error_display() {
         assert_eq!(
