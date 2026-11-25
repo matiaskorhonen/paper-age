@@ -20,12 +20,6 @@ use rpassword::prompt_password;
 #[macro_use]
 extern crate log;
 
-/// Maximum length of the document title
-const TITLE_MAX_LEN: usize = 64;
-
-/// Maximum length of the footer text
-const FOOTER_MAX_LEN: usize = 64;
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = cli::Args::parse();
 
@@ -39,18 +33,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    if args.title.len() > TITLE_MAX_LEN {
+    if args.title.len() > builder::TITLE_MAX_LEN {
         error!(
             "The title cannot be longer than {} characters",
-            TITLE_MAX_LEN
+            builder::TITLE_MAX_LEN
         );
         std::process::exit(exitcode::DATAERR);
     }
 
-    if args.footer.len() > FOOTER_MAX_LEN {
+    if args.footer.len() > builder::FOOTER_MAX_LEN {
         error!(
             "The footer cannot be longer than {} characters",
-            FOOTER_MAX_LEN
+            builder::FOOTER_MAX_LEN
         );
         std::process::exit(exitcode::DATAERR);
     }

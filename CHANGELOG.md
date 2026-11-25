@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update printpdf to v0.12.6
 - Add a `--footer` option to customise the footer text
+- **Breaking (library):** `convenience::create_pdf` now takes a `PdfOptions` struct instead of positional `Option` arguments. Build it with `PdfOptions::default()` and chain setters such as `.page_size(...)` and `.footer(...)`
+- **Breaking (library):** `PaperAgeError` is now `#[non_exhaustive]` and has a new `InvalidInput` variant
+- `convenience::create_pdf` now enforces the same 64 character title and footer limits as the CLI
 
 ## [1.5.0] - 2026-02-24
 
